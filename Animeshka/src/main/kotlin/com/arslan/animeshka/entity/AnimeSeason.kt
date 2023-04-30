@@ -1,21 +1,15 @@
 package com.arslan.animeshka.entity
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
-@Table("USERS")
-class User(
-    var firstName: String,
+@Table("ANIME_SEASONS")
+class AnimeSeason(
 
-    var lastName: String,
+    var season: Season,
 
-    var username: String,
-
-    var email: String,
-
-    var password: String,
-
-    var role: UserRole,
+    var year: Int,
 
     @Id
     var id: Long? = null
