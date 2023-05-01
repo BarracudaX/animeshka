@@ -52,7 +52,7 @@ class SecurityConfig {
     }
 
     @Bean
-    fun jwtDecoder(@Value("\${secret.key}") key: ByteArray,dataSource: ConnectionFactory,jwsAlgorithm: JWSAlgorithm) : ReactiveJwtDecoder{
+    fun jwtDecoder(@Value("\${secret.key}") key: ByteArray,jwsAlgorithm: JWSAlgorithm) : ReactiveJwtDecoder{
         val secretKey = SecretKeySpec(key,jwsAlgorithm.name)
         return NimbusReactiveJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build()
     }

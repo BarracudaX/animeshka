@@ -1,12 +1,13 @@
 package com.arslan.animeshka
 
+import org.springframework.context.MessageSource
 import org.springframework.test.context.ActiveProfiles
+import java.util.*
 
 @ActiveProfiles("test")
 abstract class AbstractTest{
 
     companion object{
-
         /**
          * Taken from hibernate email validator test.
          */
@@ -32,11 +33,16 @@ abstract class AbstractTest{
          "a\"b(c)d,e:f;g<h>i[j\\k]l@example.com", // (none of the special characters in this local-part are allowed outside quotation marks)
          "just\"not\"right@example.com", // (quoted strings must be dot separated or the only element making up the local-part)
          "this is\"not\\allowed@example.com", // (spaces, quotes, and backslashes may only exist when within quoted strings and preceded by a backslash)
-         "this\\ still\\\"not\\\\allowed@example.com", // (even if escaped (preceded by a backslash), spaces, quotes, and backslashes must still be contained by quotes)
          "john..doe@example.com", // (double dot before @) with caveat: Gmail lets this through, Email address#Local-part the dots altogether
          "john.doe@example..com"
         )
 
+        @JvmStatic
+        fun invalidPasswords() = arrayOf("","7Chars!","NoDigits!","NoSpec1Char","12345678!")
+
+        @JvmStatic
+        fun blankStrings() = arrayOf("","   ")
     }
 
+    protected fun MessageSource.getMessage(code: String) : String = getMessage(code, emptyArray(), Locale.getDefault())
 }

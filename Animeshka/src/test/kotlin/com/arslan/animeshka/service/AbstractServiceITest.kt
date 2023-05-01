@@ -50,6 +50,4 @@ abstract class AbstractServiceITest : AbstractTest(){
 
     }
 
-    protected fun MessageSource.getMessage(code: String) : String = getMessage(code, emptyArray(),Locale.getDefault())
-
 }

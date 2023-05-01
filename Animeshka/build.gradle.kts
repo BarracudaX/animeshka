@@ -45,6 +45,7 @@ dependencies {
     testImplementation("org.testcontainers:r2dbc")
     testImplementation("com.mysql:mysql-connector-j:8.0.33")
     testImplementation("io.kotest:kotest-assertions-core:5.6.1")
+    implementation("com.ninja-squad:springmockk:3.1.2")
 
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
