@@ -11,19 +11,20 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.security.Principal
+import javax.validation.Valid
 
 @RequestMapping("/user", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
 @RestController
 class UserController(private val userService: UserService) {
 
     @PostMapping("/register")
-    suspend fun registerUser(@RequestBody userRegistration: UserRegistration) : ResponseEntity<String>{
+    suspend fun registerUser(@Valid @RequestBody userRegistration: UserRegistration) : ResponseEntity<String>{
         userService.register(userRegistration)
         return ResponseEntity.ok("Success")
     }
 
     @PostMapping("/login")
-    suspend fun login(@RequestBody userCredentials: UserCredentials) : ResponseEntity<String>{
+    suspend fun login(@Valid @RequestBody userCredentials: UserCredentials) : ResponseEntity<String>{
         return ResponseEntity.ok(userService.login(userCredentials))
     }
 

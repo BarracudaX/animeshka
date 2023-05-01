@@ -5,14 +5,11 @@ import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.entity.UserCredentials
 import com.arslan.animeshka.entity.UserRegistration
 import com.arslan.animeshka.repository.UserRepository
-import kotlinx.coroutines.reactive.awaitFirst
 import org.slf4j.LoggerFactory
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import reactor.core.publisher.Mono
 
 @Service
 @Transactional
@@ -26,19 +23,22 @@ class UserServiceImpl(private val userRepository: UserRepository,private val pas
     }
 
     override suspend fun login(userCredentials: UserCredentials): String {
-        val user = userRepository.findByEmail(userCredentials.email)
-            ?:
-            kotlin.run {
-                logger.info("Failed authentication request. Email : ${userCredentials.email}. Cause : user not found.")
-                throw BadCredentialsException("User with email ${userCredentials.email} not found.")
-            }
+        val user = when(val user = userRepository.findByEmail(userCredentials.credentials)){
+            null -> userRepository.findByUsername(userCredentials.credentials)
+            else -> user
+        }
+
+        if(user == null){
+            logger.info("Failed authentication request. Email : ${userCredentials.credentials}. Cause : user not found.")
+            throw BadCredentialsException("User with email ${userCredentials.credentials} not found.")
+        }
 
         if(!passwordEncoder.matches(userCredentials.password,user.password)) {
-            logger.info("Failed authentication request. Email : ${userCredentials.email}. Cause : invalid credentials.")
+            logger.info("Failed authentication request. Email : ${userCredentials.credentials}. Cause : invalid credentials.")
             throw BadCredentialsException("Invalid Credentials.")
         }
 
-        logger.info("Successful authentication. Email : ${userCredentials.email}")
+        logger.info("Successful authentication. Email : ${userCredentials.credentials}")
         return jwtService.createToken(user)
     }
 

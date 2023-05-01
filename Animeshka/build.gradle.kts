@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-logging")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -40,7 +41,12 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:mysql")
     testImplementation("org.testcontainers:r2dbc")
+    testImplementation("com.mysql:mysql-connector-j:8.0.33")
+    testImplementation("io.kotest:kotest-assertions-core:5.6.1")
+
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
 }
