@@ -5,7 +5,7 @@ import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("USERS")
-class User(
+data class User(
 
     @Column("first_name")
     var firstName: String,
@@ -22,5 +22,5 @@ class User(
     var role: UserRole,
 
     @Id
-    var id: Long? = null
+    val id: Long? = null
 )

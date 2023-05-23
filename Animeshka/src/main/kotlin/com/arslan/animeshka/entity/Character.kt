@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("CHARACTERS")
-class Character(
+data class Character(
     val characterName: String,
 
     val isVerified: Boolean = false,

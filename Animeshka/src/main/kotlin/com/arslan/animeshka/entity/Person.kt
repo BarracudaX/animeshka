@@ -5,7 +5,7 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 
 @Table("PEOPLE")
-class Person(
+data class Person(
     val firstName: String,
 
     val lastName: String,

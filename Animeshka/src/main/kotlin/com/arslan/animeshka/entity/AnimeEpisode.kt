@@ -7,7 +7,7 @@ import java.math.BigDecimal
 import java.time.LocalDate
 
 @Table("ANIME_EPISODES")
-class AnimeEpisode(
+data class AnimeEpisode(
 
     @Column("episode_name")
     var episodeName: String,
@@ -24,5 +24,5 @@ class AnimeEpisode(
     var score: BigDecimal? = null,
 
     @Id
-    var id: Long? = null
+    val id: Long? = null
 )

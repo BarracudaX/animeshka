@@ -48,9 +48,7 @@ data class StudioEntry(
 
     val japaneseName: String,
 
-    val established: LocalDate,
-
-    val id: Long? = null
+    val established: LocalDate
 )
 
 @Serializable
@@ -78,12 +76,11 @@ data class AnimeEntry(
 
     val licensor: Long,
 
-    val season: AnimeSeasonDTO,
-
-    @Transient
-    val seasonID: Long = -1,
+    val synopsis: String,
 
     val animeType: AnimeType,
+
+    val background: String = "",
 
     val themes: Set<Theme> = emptySet(),
 
@@ -94,7 +91,6 @@ data class AnimeEntry(
     val animeRelations: Set<WorkRelation> = emptySet(),
 
     val characters: Set<AnimeCharacter> = emptySet(),
-
 
     val explicitGenre: ExplicitGenre? = null,
 

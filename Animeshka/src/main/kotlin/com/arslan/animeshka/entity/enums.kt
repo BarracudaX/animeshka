@@ -9,7 +9,13 @@ enum class UserRole{
 enum class Demographic{ JOSEI,KIDS,SEINEN,SHOUJO,SHOUNEN }
 
 enum class Season(val start: Month, val end: Month){
+
     WINTER(Month.JANUARY,Month.MARCH),SPRING(Month.APRIL,Month.JUNE),SUMMER(Month.JULY,Month.SEPTEMBER),FALL(Month.OCTOBER,Month.DECEMBER);
+
+    companion object{
+        fun seasonOf(month: Month) : Season = Season.values().first { season -> season.start >= month && month <= season.end }
+
+    }
 }
 
 enum class CharacterRole{ SUPPORTING,MAIN,PROTAGONIST,ANTAGONIST }

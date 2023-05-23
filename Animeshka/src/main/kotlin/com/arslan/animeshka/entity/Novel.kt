@@ -5,7 +5,7 @@ import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 
 @Table("NOVELS")
-class Novel(
+data class Novel(
     val synopsis: String,
 
     val published: LocalDate,

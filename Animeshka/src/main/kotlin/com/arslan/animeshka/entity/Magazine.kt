@@ -4,7 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("NOVEL_MAGAZINES")
-class Magazine(
+data class Magazine(
     val magazineName: String,
 
     val isVerified: Boolean = false,

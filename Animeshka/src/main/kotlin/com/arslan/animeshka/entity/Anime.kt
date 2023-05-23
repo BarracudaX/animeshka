@@ -23,14 +23,14 @@ data class Anime(
 
     val licensor: Long,
 
-    val season: Long,
-
     @Column("japanese_title")
     val japaneseTitle: String,
 
     val synopsis: String,
 
     val animeType: AnimeType = AnimeType.UNKNOWN,
+
+    val season: Long? = null,
 
     val explicitGenre: ExplicitGenre? = null,
 
