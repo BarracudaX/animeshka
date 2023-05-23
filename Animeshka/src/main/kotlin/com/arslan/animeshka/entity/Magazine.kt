@@ -7,6 +7,8 @@ import org.springframework.data.relational.core.mapping.Table
 class Magazine(
     val magazineName: String,
 
+    val isVerified: Boolean = false,
+
     @Id
     val id: Long? = null
 )

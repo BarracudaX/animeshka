@@ -7,9 +7,13 @@ import org.springframework.data.relational.core.mapping.Table
 class Character(
     val characterName: String,
 
+    val isVerified: Boolean = false,
+
     val japaneseName: String? = null,
 
     val description: String = "",
+
+    val characterRole: CharacterRole,
 
     @Id
     val id: Long? = null

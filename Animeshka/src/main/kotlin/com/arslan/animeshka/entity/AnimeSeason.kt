@@ -6,7 +6,6 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table("ANIME_SEASONS")
 class AnimeSeason(
-
     var season: Season,
 
     var year: Int,

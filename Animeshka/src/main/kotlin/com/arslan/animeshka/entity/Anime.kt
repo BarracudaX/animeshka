@@ -12,9 +12,10 @@ import java.time.LocalTime
 data class Anime(
     val title: String,
 
+    @Column("anime_status")
     val status: AnimeStatus,
 
-    val rating: BpoRating,
+    val rating: SeriesRating,
 
     val studio: Long,
 
@@ -24,11 +25,16 @@ data class Anime(
 
     val season: Long,
 
+    @Column("japanese_title")
     val japaneseTitle: String,
+
+    val synopsis: String,
 
     val animeType: AnimeType = AnimeType.UNKNOWN,
 
     val explicitGenre: ExplicitGenre? = null,
+
+    val isVerified: Boolean = false,
 
     val airingTime: LocalTime? = null,
 
@@ -38,13 +44,22 @@ data class Anime(
 
     val duration: Int? = null,
 
+    @Column("episodes_count")
     val episodesCount: Int? = null,
 
     val score: BigDecimal? = null,
 
-    val airedAt: LocalDate? = null,
+    @Column("published")
+    val publishedAt: LocalDate? = null,
 
+    @Column("finished")
     val finishedAt: LocalDate? = null,
+
+
+    val background: String = "",
+
+    @Column("additional_information")
+    val additionalInformation: String = "",
 
     @Id
     val id: Long? = null

@@ -16,6 +16,8 @@ class Novel(
 
     val novelType: NovelType,
 
+    val isVerified: Boolean = false,
+
     val explicitGenre: ExplicitGenre? = null,
 
     val magazine: Long? = null,

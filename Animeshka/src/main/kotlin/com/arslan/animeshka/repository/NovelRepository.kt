@@ -1,6 +1,6 @@
 package com.arslan.animeshka.repository
 
-import com.arslan.animeshka.entity.Anime
+import com.arslan.animeshka.entity.Novel
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-interface AnimeRepository : CoroutineCrudRepository<Anime,Long>
+interface NovelRepository : CoroutineCrudRepository<Novel,Long>

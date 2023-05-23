@@ -40,9 +40,8 @@ class SecurityConfig {
             }.anonymous{ }
             .authorizeExchange { authorization ->
                 authorization
-                    .pathMatchers("/user/register","/").permitAll()
-                    .pathMatchers("/user/login").permitAll()
-                    .pathMatchers(HttpMethod.GET,"/").permitAll()
+                    .pathMatchers("/user/register","/","/user/login").permitAll()
+                    .pathMatchers(HttpMethod.POST,"/anime").authenticated()
                     .anyExchange().authenticated()
             }.csrf { csrf ->
                 val csrfPathMatcher = ServerWebExchangeMatchers.pathMatchers("/csrf/**")

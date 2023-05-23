@@ -14,6 +14,8 @@ class Person(
 
     val givenName: String,
 
+    val isVerified: Boolean = false,
+
     val description: String = "",
 
     val birthDate: LocalDate? = null,
