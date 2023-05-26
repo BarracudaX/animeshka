@@ -7,8 +7,6 @@ import org.springframework.data.relational.core.mapping.Table
 data class Character(
     val characterName: String,
 
-    val isVerified: Boolean = false,
-
     val japaneseName: String? = null,
 
     val description: String = "",

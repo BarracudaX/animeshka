@@ -7,4 +7,7 @@ interface AnimeService {
 
     suspend fun insertAnimeEntry(animeEntry: AnimeEntry)
 
+    suspend fun verifyAnimeEntry(contentID: Long)
+
+    suspend fun acceptModeration(contentID: Long)
 }

@@ -19,8 +19,6 @@ data class AnimeEpisode(
 
     var synopsis: String,
 
-    val isVerified: Boolean = false,
-
     var score: BigDecimal? = null,
 
     @Id

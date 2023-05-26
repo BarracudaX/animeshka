@@ -5,6 +5,7 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import org.springframework.data.annotation.Id
 import java.time.DayOfWeek
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
@@ -58,7 +59,7 @@ data class AnimeSeasonDTO(val season: Season,val year: Int)
 data class AnimeCharacter(val characterID: Long,val voiceActorID: Long)
 
 @Serializable
-data class WorkRelation(val workID: Long,val relatedWorkID: Long,val relation: Relation)
+data class WorkRelation(val relatedWorkID: Long,val relation: Relation)
 
 @Serializable
 data class AnimeEntry(
@@ -82,6 +83,8 @@ data class AnimeEntry(
 
     val background: String = "",
 
+    val additionalInfo: String = "",
+
     val themes: Set<Theme> = emptySet(),
 
     val genres: Set<Genre> = emptySet(),
@@ -100,11 +103,11 @@ data class AnimeEntry(
 
     val duration: Int? = null,
 
-    val episodeCounts: Int? = null,
-
     val airedAt: LocalDate? = null,
 
     val finishedAt: LocalDate? = null,
 
-    val novelAdaptations: List<Long> = emptyList()
+    @Transient
+    @Id
+    val id: Long? = null
 )

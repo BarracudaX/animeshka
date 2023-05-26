@@ -12,8 +12,6 @@ data class Studio(
 
     val established: LocalDate,
 
-    val isVerified: Boolean = false,
-
     @Id
     val id: Long? = null
 )

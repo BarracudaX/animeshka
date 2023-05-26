@@ -1,6 +1,7 @@
 package com.arslan.animeshka.config
 
 import com.arslan.animeshka.entity.UserCredentials
+import com.arslan.animeshka.entity.UserRole
 import com.arslan.animeshka.service.UserService
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSSigner
@@ -22,8 +23,7 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
-import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter
+import org.springframework.security.oauth2.server.resource.authentication.*
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers
@@ -36,12 +36,19 @@ class SecurityConfig {
     fun securityWebFilterChain(http: ServerHttpSecurity,decoder: ReactiveJwtDecoder) : SecurityWebFilterChain {
         return http
             .oauth2ResourceServer { oauth ->
-                oauth.jwt { jwt -> jwt.jwtDecoder(decoder) }
+                oauth.jwt { jwt ->
+                    val grantedAuthorityConverter  = ReactiveJwtGrantedAuthoritiesConverterAdapter(JwtGrantedAuthoritiesConverter().apply { setAuthorityPrefix("ROLE_") })
+                    val jwtConverter = ReactiveJwtAuthenticationConverter().apply {
+                        setJwtGrantedAuthoritiesConverter(grantedAuthorityConverter)
+                    }
+                    jwt.jwtDecoder(decoder).jwtAuthenticationConverter(jwtConverter)
+                }
             }.anonymous{ }
             .authorizeExchange { authorization ->
                 authorization
                     .pathMatchers("/user/register","/","/user/login").permitAll()
                     .pathMatchers(HttpMethod.POST,"/anime").authenticated()
+                    .pathMatchers(HttpMethod.PUT,"/anime/*/accept").hasRole(UserRole.ANIME_ADMINISTRATOR.name)
                     .anyExchange().authenticated()
             }.csrf { csrf ->
                 val csrfPathMatcher = ServerWebExchangeMatchers.pathMatchers("/csrf/**")

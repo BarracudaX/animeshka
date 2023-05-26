@@ -26,6 +26,7 @@ class JwtServiceImpl(private val jwsAlgorithm: JWSAlgorithm,private val jwsSigne
             .subject(user.id!!.toString())
             .issueTime(Date.from(Instant.now()))
             .expirationTime(Date.from(Instant.now().plus(tokenDuration)))
+            .claim("scope",user.role.name)
             .audience("Animeshka")
             .build()
 

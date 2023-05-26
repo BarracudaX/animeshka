@@ -34,20 +34,14 @@ data class Anime(
 
     val explicitGenre: ExplicitGenre? = null,
 
-    val isVerified: Boolean = false,
-
     val airingTime: LocalTime? = null,
 
     val airingDay: DayOfWeek? = null,
-
-    val animeRank: Int? = null,
 
     val duration: Int? = null,
 
     @Column("episodes_count")
     val episodesCount: Int? = null,
-
-    val score: BigDecimal? = null,
 
     @Column("published")
     val publishedAt: LocalDate? = null,
@@ -60,6 +54,10 @@ data class Anime(
 
     @Column("additional_information")
     val additionalInformation: String = "",
+
+    val score: BigDecimal? = null,
+
+    val animeRank: Int? = null,
 
     @Id
     val id: Long? = null
