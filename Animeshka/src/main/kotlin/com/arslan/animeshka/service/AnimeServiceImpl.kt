@@ -1,6 +1,6 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.ContentAlreadyUnderModerationException
+import com.arslan.animeshka.AnimeEntry
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
 import kotlinx.coroutines.reactive.awaitFirst
@@ -35,7 +35,7 @@ class AnimeServiceImpl(
     }
 
     override suspend fun verifyAnimeEntry(contentID: Long) {
-        val animeContent = unverifiedNewContentRepository.findByIdAndContentType(contentID,NewContentType.ANIME) ?: throw EmptyResultDataAccessException("Anime content with id $contentID not found.",1)
+        val animeContent = unverifiedNewContentRepository.findById(contentID,NewContentType.ANIME) ?: throw EmptyResultDataAccessException("Anime content with id $contentID not found.",1)
         unverifiedNewContentRepository.save(animeContent.copy(contentStatus = ContentTypeStatus.VERIFIED))
         val animeEntry = json.decodeFromString<AnimeEntry>(animeContent.content)
         val season = getAnimeSeason(animeEntry)
@@ -63,15 +63,6 @@ class AnimeServiceImpl(
             animeCharacterRepository.createAnimeCharacterEntry(anime.id!!,characterID,voiceActorID)
         }
 
-    }
-
-    override suspend fun acceptModeration(contentID: Long) {
-        val animeContent = unverifiedNewContentRepository.findByIdAndContentType(contentID,NewContentType.ANIME) ?: throw EmptyResultDataAccessException("Anime content with id $contentID not found.",1)
-
-        if(animeContent.verifier != null) throw ContentAlreadyUnderModerationException()
-
-        val verifier = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        unverifiedNewContentRepository.save(animeContent.copy(verifier = verifier, contentStatus = ContentTypeStatus.UNDER_VERIFICATION))
     }
 
     private suspend fun getAnimeSeason(animeEntry: AnimeEntry): AnimeSeason? {

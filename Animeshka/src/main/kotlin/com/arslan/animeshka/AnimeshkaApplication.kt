@@ -1,23 +1,15 @@
 package com.arslan.animeshka
 
 import com.arslan.animeshka.entity.*
-import com.arslan.animeshka.repository.AnimeRepository
-import com.arslan.animeshka.repository.AnimeSeasonsRepository
-import com.arslan.animeshka.repository.StudioRepository
 import com.arslan.animeshka.repository.UserRepository
 import com.arslan.animeshka.service.StudioService
 import com.arslan.animeshka.service.UserService
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.datetime.DayOfWeek
-import kotlinx.datetime.LocalTime
 import kotlinx.datetime.toKotlinLocalDate
 import org.javers.core.Javers
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.security.crypto.password.PasswordEncoder
-import java.math.BigDecimal
-import java.time.Duration
 import java.time.LocalDate
 
 @SpringBootApplication

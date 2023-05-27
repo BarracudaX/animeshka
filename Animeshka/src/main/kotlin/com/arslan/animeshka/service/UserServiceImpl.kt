@@ -2,8 +2,8 @@ package com.arslan.animeshka.service
 
 import com.arslan.animeshka.entity.UserRole
 import com.arslan.animeshka.entity.User
-import com.arslan.animeshka.entity.UserCredentials
-import com.arslan.animeshka.entity.UserRegistration
+import com.arslan.animeshka.UserCredentials
+import com.arslan.animeshka.UserRegistration
 import com.arslan.animeshka.repository.UserRepository
 import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.BadCredentialsException

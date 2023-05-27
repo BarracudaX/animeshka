@@ -1,7 +1,7 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.entity.Studio
-import com.arslan.animeshka.entity.StudioEntry
+import com.arslan.animeshka.StudioEntry
 import com.arslan.animeshka.repository.StudioRepository
 import kotlinx.datetime.toJavaLocalDate
 import org.springframework.stereotype.Service

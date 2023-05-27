@@ -1,6 +1,6 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.entity.AnimeEntry
+import com.arslan.animeshka.AnimeEntry
 
 
 interface AnimeService {
@@ -9,5 +9,4 @@ interface AnimeService {
 
     suspend fun verifyAnimeEntry(contentID: Long)
 
-    suspend fun acceptModeration(contentID: Long)
 }

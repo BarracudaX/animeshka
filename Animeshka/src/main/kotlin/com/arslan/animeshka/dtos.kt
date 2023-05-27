@@ -1,6 +1,7 @@
-package com.arslan.animeshka.entity
+package com.arslan.animeshka
 
 import com.arslan.animeshka.constraints.EqualRegistrationPasswords
+import com.arslan.animeshka.entity.*
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
@@ -51,9 +52,6 @@ data class StudioEntry(
 
     val established: LocalDate
 )
-
-@Serializable
-data class AnimeSeasonDTO(val season: Season,val year: Int)
 
 @Serializable
 data class AnimeCharacter(val characterID: Long,val voiceActorID: Long)

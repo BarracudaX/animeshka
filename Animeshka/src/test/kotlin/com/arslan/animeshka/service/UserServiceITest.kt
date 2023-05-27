@@ -1,7 +1,7 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.entity.UserCredentials
-import com.arslan.animeshka.entity.UserRegistration
+import com.arslan.animeshka.UserCredentials
+import com.arslan.animeshka.UserRegistration
 import com.arslan.animeshka.repository.UserRepository
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
@@ -10,20 +10,16 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.maps.shouldContain
 import io.kotest.matchers.maps.shouldContainKey
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
-import javax.validation.ConstraintViolationException
 
 class UserServiceITest @Autowired constructor(
     private val userService: UserService,

@@ -1,10 +1,8 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.entity.User
-import com.arslan.animeshka.entity.UserCredentials
-import com.arslan.animeshka.entity.UserRegistration
-import org.springframework.validation.annotation.Validated
-import javax.validation.Valid
+import com.arslan.animeshka.UserCredentials
+import com.arslan.animeshka.UserRegistration
 
 interface UserService {
 

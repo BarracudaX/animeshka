@@ -1,26 +1,20 @@
 package com.arslan.animeshka.controller
 
 import com.arslan.animeshka.entity.User
-import com.arslan.animeshka.entity.UserCredentials
-import com.arslan.animeshka.entity.UserRegistration
+import com.arslan.animeshka.UserCredentials
+import com.arslan.animeshka.UserRegistration
 import com.arslan.animeshka.entity.UserRole
-import io.kotest.assertions.assertSoftly
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.security.authentication.BadCredentialsException
-import reactor.kotlin.test.test
-import kotlin.math.exp
 
 
 @OptIn(ExperimentalCoroutinesApi::class)

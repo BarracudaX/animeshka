@@ -1,6 +1,6 @@
 package com.arslan.animeshka.constraints
 
-import com.arslan.animeshka.entity.UserRegistration
+import com.arslan.animeshka.UserRegistration
 import org.springframework.stereotype.Component
 import javax.validation.Constraint
 import javax.validation.ConstraintValidator
@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 annotation class EqualRegistrationPasswords(val message: String = "",val groups: Array<KClass<*>> = [],val payload: Array<KClass<Payload>> = [])
 
 @Component
-class EqualRegistrationPasswordsConstraintValidator : ConstraintValidator<EqualRegistrationPasswords,UserRegistration>{
+class EqualRegistrationPasswordsConstraintValidator : ConstraintValidator<EqualRegistrationPasswords, UserRegistration>{
 
     override fun isValid(value: UserRegistration?, context: ConstraintValidatorContext?): Boolean {
         if(value == null) return true

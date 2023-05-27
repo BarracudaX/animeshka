@@ -1,6 +1,6 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.entity.StudioEntry
+import com.arslan.animeshka.StudioEntry
 
 interface StudioService {
 
