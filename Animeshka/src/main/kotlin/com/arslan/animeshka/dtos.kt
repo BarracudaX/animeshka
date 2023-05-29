@@ -43,7 +43,7 @@ data class UserCredentials(
 )
 
 @Serializable
-data class StudioEntry(
+data class UnverifiedStudio(
     val studioName: String,
 
     val japaneseName: String,
@@ -58,7 +58,7 @@ data class AnimeCharacter(val characterID: Long,val voiceActorID: Long)
 data class WorkRelation(val relatedWorkID: Long,val relation: Relation)
 
 @Serializable
-data class AnimeEntry(
+data class UnverifiedAnime(
     val title: String,
 
     val japaneseTitle: String,
@@ -105,8 +105,56 @@ data class AnimeEntry(
 )
 
 @Serializable
-data class PersonEntry(
+data class AnimeDTO(
+    val title: String,
 
+    val japaneseTitle: String,
+
+    val status: AnimeStatus,
+
+    val rating: SeriesRating,
+
+    val studio: Long,
+
+    val demographic: Demographic,
+
+    val licensor: Long,
+
+    val synopsis: String,
+
+    val animeType: AnimeType,
+
+    val background: String = "",
+
+    val additionalInfo: String = "",
+
+    val themes: Set<Theme> = emptySet(),
+
+    val genres: Set<Genre> = emptySet(),
+
+    val novelRelations: Set<WorkRelation> = emptySet(),
+
+    val animeRelations: Set<WorkRelation> = emptySet(),
+
+    val characters: Set<AnimeCharacter> = emptySet(),
+
+    val explicitGenre: ExplicitGenre? = null,
+
+    val airingTime: LocalTime? = null,
+
+    val airingDay: DayOfWeek? = null,
+
+    val duration: Int? = null,
+
+    val airedAt: LocalDate? = null,
+
+    val finishedAt: LocalDate? = null,
+
+    val id: Long
+)
+
+@Serializable
+data class PersonEntry(
     val firstName: String,
 
     val lastName: String,

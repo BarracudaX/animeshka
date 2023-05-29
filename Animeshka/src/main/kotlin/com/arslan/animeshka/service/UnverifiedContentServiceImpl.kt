@@ -1,10 +1,12 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.AnimeEntry
+import com.arslan.animeshka.UnverifiedAnime
+import com.arslan.animeshka.UnverifiedStudio
 import com.arslan.animeshka.entity.ContentTypeStatus
 import com.arslan.animeshka.entity.NewContentType
 import com.arslan.animeshka.entity.UnverifiedNewContent
 import com.arslan.animeshka.repository.ANIME_PREFIX_KEY
+import com.arslan.animeshka.repository.STUDIO_PREFIX_KEY
 import com.arslan.animeshka.repository.UnverifiedNewContentRepository
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.serialization.decodeFromString
@@ -23,13 +25,31 @@ class UnverifiedContentServiceImpl(
     private val unverifiedNewContentRepository: UnverifiedNewContentRepository
 ) : UnverifiedContentService {
 
-    override suspend fun createAnimeEntry(animeEntry: AnimeEntry) {
-        val content = json.encodeToString(animeEntry)
+    override suspend fun createAnimeEntry(unverifiedAnime: UnverifiedAnime) {
+        val content = json.encodeToString(unverifiedAnime)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        unverifiedNewContentRepository.save(UnverifiedNewContent(creatorID, NewContentType.ANIME,content, "$ANIME_PREFIX_KEY${animeEntry.title}"))
+        unverifiedNewContentRepository.save(UnverifiedNewContent(creatorID, NewContentType.ANIME,content, "$ANIME_PREFIX_KEY${unverifiedAnime.title}"))
     }
 
-    override suspend fun verifyAnimeContent(contentID: Long) : AnimeEntry {
+    override suspend fun verifyAnime(contentID: Long) : UnverifiedAnime {
+        val content = verifyContent(contentID)
+
+        return json.decodeFromString(content.content)
+    }
+
+    override suspend fun createStudioEntry(studio: UnverifiedStudio) {
+        val content = json.encodeToString(studio)
+        val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
+        unverifiedNewContentRepository.save(UnverifiedNewContent(creatorID,NewContentType.STUDIO,content,"$STUDIO_PREFIX_KEY${studio.studioName}"))
+    }
+
+    override suspend fun verifyStudio(contentID: Long): UnverifiedStudio {
+        val content = verifyContent(contentID)
+
+        return json.decodeFromString(content.content)
+    }
+
+    private suspend fun verifyContent(contentID: Long) : UnverifiedNewContent{
         val content = unverifiedNewContentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Anime content with id $contentID not found.",1)
         if(content.contentStatus != ContentTypeStatus.UNDER_VERIFICATION) throw IllegalStateException("Unverified content is currently not under verification. Current status: ${content.contentStatus}")
 
@@ -39,7 +59,7 @@ class UnverifiedContentServiceImpl(
 
         unverifiedNewContentRepository.save(content.copy(contentStatus = ContentTypeStatus.VERIFIED))
 
-        return json.decodeFromString(content.content)
+        return content
     }
 
 

@@ -1,6 +1,8 @@
 package com.arslan.animeshka
 
 import com.arslan.animeshka.entity.*
+import com.arslan.animeshka.repository.ContentRepository
+import com.arslan.animeshka.repository.StudioRepository
 import com.arslan.animeshka.repository.UserRepository
 import com.arslan.animeshka.service.StudioService
 import com.arslan.animeshka.service.UserService
@@ -25,9 +27,6 @@ fun main(args: Array<String>) : Unit = runBlocking{
     val userService = context.getBean(UserService::class.java)
     val userRepository = context.getBean(UserRepository::class.java)
     val passwordEncoder = context.getBean(PasswordEncoder::class.java)
-    val studioService = context.getBean(StudioService::class.java)
-
     userRepository.save(User("Test_Anime_Admin","Test_Anime_Admin","AnimeAdmin","anime@admin.com",passwordEncoder.encode("Pass123!"),UserRole.ANIME_ADMINISTRATOR))
     userService.register(UserRegistration("test@email.com","Pass123!","Pass123!","TestUser","test","test"))
-    studioService.createStudio(StudioEntry("Test","Test",LocalDate.now().toKotlinLocalDate()))
 }

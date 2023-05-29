@@ -1,17 +1,11 @@
 package com.arslan.animeshka.service
 
+import com.arslan.animeshka.UnverifiedStudio
+import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.entity.Studio
-import com.arslan.animeshka.StudioEntry
-import com.arslan.animeshka.entity.NewContentType
-import com.arslan.animeshka.entity.UnverifiedNewContent
-import com.arslan.animeshka.repository.STUDIO_PREFIX_KEY
+import com.arslan.animeshka.repository.ContentRepository
 import com.arslan.animeshka.repository.StudioRepository
-import com.arslan.animeshka.repository.UnverifiedNewContentRepository
-import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.datetime.toJavaLocalDate
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.validation.annotation.Validated
@@ -21,14 +15,21 @@ import org.springframework.validation.annotation.Validated
 @Validated
 class StudioServiceImpl(
     private val studioRepository: StudioRepository,
-    private val contentRepository: UnverifiedNewContentRepository,
-    private val json: Json
+    private val unverifiedContentService: UnverifiedContentService,
+    private val contentRepository: ContentRepository
 ) : StudioService {
 
-    override suspend fun createStudio(studio: StudioEntry) {
-        val content = json.encodeToString(studio)
-        val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        contentRepository.save(UnverifiedNewContent(creatorID,NewContentType.STUDIO,content,"${STUDIO_PREFIX_KEY}${studio.studioName}"))
+    override suspend fun createStudio(studio: UnverifiedStudio) {
+        unverifiedContentService.createStudioEntry(studio)
     }
+
+    override suspend fun verifyStudio(contentID: Long) {
+        val verifiedStudio = unverifiedContentService.verifyStudio(contentID)
+        val verifiedContent = contentRepository.save(Content(contentID,true))
+
+        with(verifiedStudio){ studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),verifiedContent.id,true)) }
+
+    }
+
 
 }

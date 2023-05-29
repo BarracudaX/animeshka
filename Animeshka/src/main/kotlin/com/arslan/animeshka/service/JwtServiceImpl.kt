@@ -7,17 +7,16 @@ import com.nimbusds.jose.JWSSigner
 import com.nimbusds.jose.crypto.MACSigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Duration
 import java.time.Instant
 import java.util.*
 
 @Service
-class JwtServiceImpl(private val jwsAlgorithm: JWSAlgorithm,private val jwsSigner: JWSSigner) : JwtService {
+class JwtServiceImpl(private val jwsAlgorithm: JWSAlgorithm,private val jwsSigner: JWSSigner,@Value("\${jwt.token.duration}") private val tokenDuration: Duration) : JwtService {
 
     private val header = JWSHeader.Builder(jwsAlgorithm).build()
-
-    private val tokenDuration = Duration.ofHours(24)
 
     override fun createToken(user: User): String {
         val claims = JWTClaimsSet

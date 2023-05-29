@@ -10,7 +10,8 @@ data class ContentChange(
     @Column("content_id")
     val contentID: Long,
 
-    val path: String,
+    @Column("property_path")
+    val propertyPath: String,
 
     val operation: ContentChangeOperation,
 

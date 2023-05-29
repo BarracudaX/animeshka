@@ -30,7 +30,7 @@ class ModerationServiceImpl(private val contentRepository: UnverifiedNewContentR
 
         if(content.verifier != verifier) throw AccessDeniedException("User with id $verifier is trying to modify content with id $contentID that is under moderation by user with id ${content.verifier}")
 
-        contentRepository.save(content.copy(rejectionReason = rejectionReason))
+        contentRepository.save(content.copy(rejectionReason = rejectionReason, contentStatus = ContentTypeStatus.REJECTED))
     }
 
 }

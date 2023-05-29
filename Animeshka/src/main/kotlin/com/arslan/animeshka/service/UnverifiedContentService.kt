@@ -1,10 +1,13 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.AnimeEntry
+import com.arslan.animeshka.UnverifiedStudio
+import com.arslan.animeshka.UnverifiedAnime
 
 interface UnverifiedContentService {
 
-    suspend fun createAnimeEntry(animeEntry: AnimeEntry)
+    suspend fun createAnimeEntry(unverifiedAnime: UnverifiedAnime)
 
-    suspend fun verifyAnimeContent(contentID: Long) : AnimeEntry
+    suspend fun verifyAnime(contentID: Long) : UnverifiedAnime
+    suspend fun createStudioEntry(studio: UnverifiedStudio)
+    suspend fun verifyStudio(contentID: Long): UnverifiedStudio
 }

@@ -1,4 +1,4 @@
-package com.arslan.animeshka.util
+package com.arslan.animeshka
 
 import io.r2dbc.spi.ConnectionFactory
 import kotlinx.coroutines.reactive.awaitFirst
@@ -9,8 +9,6 @@ class SchemaDropper(private val connectionFactory: ConnectionFactory) : Disposab
     override fun destroy() = runBlocking{
         val connection = connectionFactory.create().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS CONTENT_CHANGES").execute().awaitFirst()
-        connection.createStatement("DROP TABLE IF EXISTS CONTENT").execute().awaitFirst()
-        connection.createStatement("DROP TABLE IF EXISTS UNVERIFIED_NEW_CONTENT").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS ANIME_EPISODE_CHARACTER_APPEARANCES").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS NOVEL_ANIME_RELATIONS").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS ANIME_ANIME_RELATIONS").execute().awaitFirst()
@@ -30,6 +28,8 @@ class SchemaDropper(private val connectionFactory: ConnectionFactory) : Disposab
         connection.createStatement("DROP TABLE IF EXISTS NOVEL_MAGAZINES").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS CHARACTERS").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS PEOPLE").execute().awaitFirst()
+        connection.createStatement("DROP TABLE IF EXISTS CONTENT").execute().awaitFirst()
+        connection.createStatement("DROP TABLE IF EXISTS UNVERIFIED_NEW_CONTENT").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS USERS").execute().awaitFirst()
         Unit
     }

@@ -1,21 +1,17 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.AnimeCharacter
-import com.arslan.animeshka.AnimeEntry
-import com.arslan.animeshka.WorkRelation
+import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaLocalTime
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import kotlinx.datetime.toKotlinLocalDate
+import kotlinx.datetime.toKotlinLocalTime
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
-import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -26,19 +22,21 @@ class AnimeServiceImpl(
     private val animeSeasonsRepository: AnimeSeasonsRepository,
     private val contentRepository: ContentRepository,
     private val unverifiedContentService: UnverifiedContentService,
-    private val databaseClient: DatabaseClient
+    private val databaseClient: DatabaseClient,
+    private val contentChangeService: ContentChangeService
 ) : AnimeService {
 
-    override suspend fun insertAnimeEntry(animeEntry: AnimeEntry) {
-        unverifiedContentService.createAnimeEntry(animeEntry)
+    override suspend fun createUnverifiedAnime(unverifiedAnime: UnverifiedAnime) {
+        unverifiedContentService.createAnimeEntry(unverifiedAnime)
     }
 
     override suspend fun verifyAnimeEntry(contentID: Long) {
-        val animeEntry = unverifiedContentService.verifyAnimeContent(contentID)
-        val content = contentRepository.save(Content())
+        val animeEntry = unverifiedContentService.verifyAnime(contentID)
+        val verifiedContent = contentRepository.save(Content(contentID,true))
         val season = getAnimeSeason(animeEntry)
         val anime = with(animeEntry){
-            animeRepository.save(Anime(title,status,rating,studio,demographic,licensor,japaneseTitle, synopsis, animeType,season?.id,explicitGenre,airingTime?.toJavaLocalTime(),airingDay,duration,0,airedAt?.toJavaLocalDate(),finishedAt?.toJavaLocalDate(),background,additionalInfo, id = content.id!!))
+            val anime = Anime(title,status,rating,studio,demographic,licensor,japaneseTitle, synopsis, animeType,season?.id,explicitGenre,airingTime?.toJavaLocalTime(),airingDay,duration,0,airedAt?.toJavaLocalDate(),finishedAt?.toJavaLocalDate(),background,additionalInfo, id = verifiedContent.id).apply { isNewEntity = true }
+            animeRepository.save(anime)
         }
 
         createThemes(anime,animeEntry.themes)
@@ -47,6 +45,72 @@ class AnimeServiceImpl(
         createAnimeRelations(anime,animeEntry.animeRelations)
         createCharacterAssociations(anime,animeEntry.characters)
     }
+
+    override suspend fun updateAnime(anime: AnimeDTO) {
+        val animeBasicData = animeRepository.findById(anime.id) ?: throw EmptyResultDataAccessException("Anime with id ${anime.id} not found.",1)
+        val characters = getAnimeCharacters(animeBasicData)
+        val themes = getAnimeThemes(animeBasicData)
+        val genres = getAnimeGenres(animeBasicData)
+        val novelRelations = getAnimeNovelRelations(animeBasicData)
+        val animeRelations = getAnimeAnimeRelations(animeBasicData)
+
+        val currentAnimeState = with(animeBasicData) {
+            AnimeDTO(title,japaneseTitle,status,rating,studio,demographic,licensor,synopsis,animeType,background,additionalInformation,themes,genres,novelRelations,animeRelations,characters,explicitGenre,airingTime?.toKotlinLocalTime(),airingDay,duration,publishedAt?.toKotlinLocalDate(),finishedAt?.toKotlinLocalDate(),id)
+        }
+
+        contentChangeService.insertAnimeChanges(currentAnimeState,anime)
+    }
+
+    private suspend fun getAnimeAnimeRelations(anime: Anime) : Set<WorkRelation> =
+        databaseClient
+            .sql { "SELECT * FROM ANIME_ANIME_RELATIONS WHERE anime_id = :animeID" }
+            .bind("animeID",anime.id)
+            .map { row -> WorkRelation(row.getParam("related_anime_id"),Relation.valueOf(row.getParam("relation"))) }
+            .all()
+            .collectList()
+            .awaitFirst()
+            .toSet()
+
+    private suspend fun getAnimeNovelRelations(anime: Anime) : Set<WorkRelation> =
+        databaseClient
+            .sql { "SELECT * FROM NOVEL_ANIME_RELATIONS WHERE anime_id = :animeID" }
+            .bind("animeID",anime.id)
+            .map { row -> WorkRelation(row.getParam("novel_id"),Relation.valueOf(row.getParam("relation"))) }
+            .all()
+            .collectList()
+            .awaitFirst()
+            .toSet()
+
+    private suspend fun getAnimeGenres(anime: Anime) : Set<Genre> =
+        databaseClient
+            .sql { "SELECT * FROM ANIME_GENRES WHERE anime_id = :animeID" }
+            .bind("animeID",anime.id)
+            .map { row -> Genre.valueOf(row.getParam("genre")) }
+            .all()
+            .collectList()
+            .awaitFirst()
+            .toSet()
+
+
+    private suspend fun getAnimeThemes(anime: Anime) : Set<Theme> =
+        databaseClient
+            .sql { "SELECT * FROM ANIME_THEMES WHERE anime_id = :animeID" }
+            .bind("animeID",anime.id)
+            .map { row -> Theme.valueOf(row.getParam("theme")) }
+            .all()
+            .collectList()
+            .awaitFirst()
+            .toSet()
+
+    private suspend fun getAnimeCharacters(anime: Anime) : Set<AnimeCharacter> =
+        databaseClient
+            .sql { "SELECT * FROM ANIME_CHARACTERS WHERE anime_id = :animeID" }
+            .bind("animeID",anime.id)
+            .map { row -> AnimeCharacter(row.getParam("character_id"),row.getParam("voice_actor_id")) }
+            .all()
+            .collectList()
+            .awaitFirst()
+            .toSet()
 
     private suspend fun createCharacterAssociations(anime: Anime,characters: Set<AnimeCharacter>){
         for( (characterID,voiceActorID) in characters ){
@@ -101,12 +165,12 @@ class AnimeServiceImpl(
         }
     }
 
-    private suspend fun getAnimeSeason(animeEntry: AnimeEntry): AnimeSeason? {
-        return if(animeEntry.airedAt == null){
+    private suspend fun getAnimeSeason(unverifiedAnime: UnverifiedAnime): AnimeSeason? {
+        return if(unverifiedAnime.airedAt == null){
             null
         }else{
-            val year = animeEntry.airedAt.year
-            val season = Season.seasonOf(animeEntry.airedAt.month)
+            val year = unverifiedAnime.airedAt.year
+            val season = Season.seasonOf(unverifiedAnime.airedAt.month)
             try{
                 animeSeasonsRepository.save(AnimeSeason(season,year))
             }catch (ex: DataIntegrityViolationException){

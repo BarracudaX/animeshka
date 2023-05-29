@@ -4,6 +4,7 @@ import com.arslan.animeshka.entity.UserRole
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSSigner
 import com.nimbusds.jose.crypto.MACSigner
+import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,38 +12,55 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
+import org.springframework.security.oauth2.server.resource.BearerTokenAuthenticationToken
+import org.springframework.security.oauth2.server.resource.BearerTokenErrors
 import org.springframework.security.oauth2.server.resource.authentication.*
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers
+import reactor.core.publisher.Mono
 import javax.crypto.spec.SecretKeySpec
 
 @Configuration
 class SecurityConfig {
+
     @Bean
-    fun securityWebFilterChain(http: ServerHttpSecurity,decoder: ReactiveJwtDecoder) : SecurityWebFilterChain {
+    fun cookieAwareBearerTokenAuthenticationConverter() : ServerAuthenticationConverter = ServerAuthenticationConverter{ exchange ->
+        Mono.fromCallable {
+            val cookie = exchange.request.cookies["Authorization"] ?: return@fromCallable null
+            BearerTokenAuthenticationToken(cookie[0].value)
+        }
+    }
+
+    @Bean
+    fun securityWebFilterChain(http: ServerHttpSecurity,decoder: ReactiveJwtDecoder,bearerTokenConverter: ServerAuthenticationConverter) : SecurityWebFilterChain {
         return http
             .oauth2ResourceServer { oauth ->
+                oauth.bearerTokenConverter(bearerTokenConverter)
                 oauth.jwt { jwt ->
                     val grantedAuthorityConverter  = ReactiveJwtGrantedAuthoritiesConverterAdapter(JwtGrantedAuthoritiesConverter().apply { setAuthorityPrefix("ROLE_") })
-                    val jwtConverter = ReactiveJwtAuthenticationConverter().apply {
-                        setJwtGrantedAuthoritiesConverter(grantedAuthorityConverter)
-                    }
+                    val jwtConverter = ReactiveJwtAuthenticationConverter().apply { setJwtGrantedAuthoritiesConverter(grantedAuthorityConverter) }
                     jwt.jwtDecoder(decoder).jwtAuthenticationConverter(jwtConverter)
                 }
             }.anonymous{ }
             .authorizeExchange { authorization ->
                 authorization
                     .pathMatchers("/user/register","/","/user/login").permitAll()
-                    .pathMatchers(HttpMethod.POST,"/anime").authenticated()
-                    .pathMatchers(HttpMethod.PUT,"/anime/*/accept").hasRole(UserRole.ANIME_ADMINISTRATOR.name)
-                    .pathMatchers(HttpMethod.GET,"/").permitAll()
-                    .anyExchange().authenticated()
+                    .pathMatchers(HttpMethod.POST,"/anime","/studio").authenticated()
+                    .pathMatchers(HttpMethod.PUT,"/anime").authenticated()
+                    .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(UserRole.ANIME_ADMINISTRATOR.name)
+                    .pathMatchers(HttpMethod.GET,"/","/login","/logout").permitAll()
+                    .anyExchange().denyAll()
             }.csrf { csrf ->
-                val csrfPathMatcher = ServerWebExchangeMatchers.pathMatchers("/csrf/**")
-                csrf.requireCsrfProtectionMatcher(csrfPathMatcher)
+                val protectedWithCsrf = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST,"/login")
+                csrf.requireCsrfProtectionMatcher(protectedWithCsrf)
+            }
+            .logout { logout ->
+                logout.logoutUrl("/logout")
             }.build()
 
     }

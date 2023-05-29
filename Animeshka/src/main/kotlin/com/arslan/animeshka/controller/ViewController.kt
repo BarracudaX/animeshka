@@ -9,4 +9,6 @@ class ViewController {
     @GetMapping("/")
     fun homePage() : String = "index"
 
+    @GetMapping("/login")
+    fun loginPage() : String = "login"
 }
