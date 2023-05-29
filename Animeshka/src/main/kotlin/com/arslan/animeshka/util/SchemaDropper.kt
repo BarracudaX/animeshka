@@ -8,6 +8,8 @@ import org.springframework.beans.factory.DisposableBean
 class SchemaDropper(private val connectionFactory: ConnectionFactory) : DisposableBean{
     override fun destroy() = runBlocking{
         val connection = connectionFactory.create().awaitFirst()
+        connection.createStatement("DROP TABLE IF EXISTS CONTENT_CHANGES").execute().awaitFirst()
+        connection.createStatement("DROP TABLE IF EXISTS CONTENT").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS UNVERIFIED_NEW_CONTENT").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS ANIME_EPISODE_CHARACTER_APPEARANCES").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS NOVEL_ANIME_RELATIONS").execute().awaitFirst()

@@ -1,5 +1,6 @@
 package com.arslan.animeshka.controller
 
+import com.arslan.animeshka.ContentAlreadyUnderModerationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -14,4 +15,6 @@ class ControllerAdviser{
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.bindingResult.allErrors.mapNotNull { it.defaultMessage })
     }
 
+    @ExceptionHandler(ContentAlreadyUnderModerationException::class)
+    fun onContentAlreadyUnderModerationException() : ResponseEntity<Unit> = ResponseEntity.status(HttpStatus.CONFLICT).build()
 }

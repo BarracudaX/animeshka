@@ -1,6 +1,7 @@
 package com.arslan.animeshka.entity
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
@@ -16,5 +17,6 @@ data class Character(
     val characterRole: CharacterRole,
 
     @Id
+    @Transient
     val id: Long? = null
 )

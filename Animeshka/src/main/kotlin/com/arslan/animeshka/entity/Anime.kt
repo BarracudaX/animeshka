@@ -60,5 +60,5 @@ data class Anime(
     val animeRank: Int? = null,
 
     @Id
-    val id: Long? = null
+    val id: Long
 )

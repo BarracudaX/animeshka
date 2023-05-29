@@ -10,17 +10,17 @@ import java.time.LocalDate
 data class AnimeEpisode(
 
     @Column("episode_name")
-    var episodeName: String,
+    val episodeName: String,
 
     @Column("anime_id")
-    var animeId: Long,
+    val animeId: Long,
 
-    var aired: LocalDate,
+    val aired: LocalDate,
 
-    var synopsis: String,
+    val synopsis: String,
 
-    var score: BigDecimal? = null,
+    val score: BigDecimal? = null,
 
     @Id
-    val id: Long? = null
+    val id: Long
 )

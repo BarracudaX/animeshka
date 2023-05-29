@@ -9,6 +9,10 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 const val ANIME_PREFIX_KEY = "ANIME_"
 const val CHARACTER_PREFIX_KEY = "CHARACTER_"
+const val STUDIO_PREFIX_KEY = "STUDIO_"
+const val PERSON_PREFIX_KEY = "PERSON_"
+const val MAGAZINE_PREFIX_KEY = "MAGAZINE_"
+const val ANIME_EPISODE_PREFIX = "ANIME_EPISODE_"
 
 interface UnverifiedNewContentRepository : CoroutineCrudRepository<UnverifiedNewContent,Long>{
 

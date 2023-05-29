@@ -5,8 +5,6 @@ import com.arslan.animeshka.entity.*
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import org.springframework.data.annotation.Id
 import java.time.DayOfWeek
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
@@ -50,7 +48,7 @@ data class StudioEntry(
 
     val japaneseName: String,
 
-    val established: LocalDate
+    val established: LocalDate,
 )
 
 @Serializable
@@ -104,8 +102,32 @@ data class AnimeEntry(
     val airedAt: LocalDate? = null,
 
     val finishedAt: LocalDate? = null,
+)
 
-    @Transient
-    @Id
-    val id: Long? = null
+@Serializable
+data class PersonEntry(
+
+    val firstName: String,
+
+    val lastName: String,
+
+    val familyName: String,
+
+    val givenName: String,
+
+    val description: String = "",
+
+    val birthDate: LocalDate,
+)
+
+@Serializable
+data class AnimeEpisodeEntry(
+
+    val episodeName: String,
+
+    val animeId: Long,
+
+    val aired: LocalDate,
+
+    val synopsis: String
 )

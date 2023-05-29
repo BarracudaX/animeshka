@@ -19,5 +19,5 @@ data class Person(
     val birthDate: LocalDate? = null,
 
     @Id
-    val id: Long? = null
+    val id: Long
 )

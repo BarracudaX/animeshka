@@ -37,5 +37,5 @@ data class Novel(
     val volumes: Int? = null,
 
     @Id
-    val id: Long? = null
+    val id: Long
 )

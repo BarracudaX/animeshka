@@ -1,34 +1,30 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.entity.Studio
-import com.arslan.animeshka.StudioEntry
+import com.arslan.animeshka.AnimeEpisodeEntry
 import com.arslan.animeshka.entity.NewContentType
 import com.arslan.animeshka.entity.UnverifiedNewContent
-import com.arslan.animeshka.repository.STUDIO_PREFIX_KEY
-import com.arslan.animeshka.repository.StudioRepository
+import com.arslan.animeshka.repository.ANIME_EPISODE_PREFIX
+import com.arslan.animeshka.repository.AnimeEpisodeRepository
 import com.arslan.animeshka.repository.UnverifiedNewContentRepository
 import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.datetime.toJavaLocalDate
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.validation.annotation.Validated
 
-@Service
 @Transactional
-@Validated
-class StudioServiceImpl(
-    private val studioRepository: StudioRepository,
+@Service
+class AnimeEpisodeServiceImpl(
+    private val animeEpisodeRepository: AnimeEpisodeRepository,
     private val contentRepository: UnverifiedNewContentRepository,
     private val json: Json
-) : StudioService {
+) : AnimeEpisodeService {
 
-    override suspend fun createStudio(studio: StudioEntry) {
-        val content = json.encodeToString(studio)
+    override suspend fun createAnimeEpisodeEntry(animeEpisodeEntry: AnimeEpisodeEntry) {
+        val content = json.encodeToString(animeEpisodeEntry)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        contentRepository.save(UnverifiedNewContent(creatorID,NewContentType.STUDIO,content,"${STUDIO_PREFIX_KEY}${studio.studioName}"))
+        contentRepository.save(UnverifiedNewContent(creatorID,NewContentType.EPISODE,content,"${ANIME_EPISODE_PREFIX}${animeEpisodeEntry.animeId}_${animeEpisodeEntry.episodeName}"))
     }
 
 }

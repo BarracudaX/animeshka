@@ -13,5 +13,5 @@ data class Studio(
     val established: LocalDate,
 
     @Id
-    val id: Long? = null
+    val id: Long
 )
