@@ -1,4 +1,4 @@
-package com.arslan.animeshka.entity
+package com.arslan.animeshka
 
 import java.time.Month
 
@@ -44,6 +44,10 @@ enum class Relation{ SEQUEL,PREQUEL,ALTERNATIVE_SETTING,ALTERNATIVE_VERSION,SIDE
 
 enum class NewContentType{ ANIME,NOVEL,CHARACTER,PERSON,STUDIO,MAGAZINE,EPISODE }
 
-enum class ContentTypeStatus{ PENDING_VERIFICATION,UNDER_VERIFICATION,VERIFIED,REJECTED }
+enum class UnverifiedContentStatus{ PENDING_VERIFICATION,UNDER_VERIFICATION,VERIFIED,REJECTED }
+
+enum class VerifiedContentStatus{ VERIFIED,EDITING }
 
 enum class ContentChangeOperation{ REPLACE,ADD,REMOVE }
+
+enum class ContentChangeStatus{ ACCEPTED,REJECTED,PENDING }

@@ -1,8 +1,8 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.entity.Magazine
-import com.arslan.animeshka.entity.NewContentType
-import com.arslan.animeshka.entity.UnverifiedNewContent
+import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.entity.UnverifiedContent
 import com.arslan.animeshka.repository.MAGAZINE_PREFIX_KEY
 import com.arslan.animeshka.repository.MagazineRepository
 import com.arslan.animeshka.repository.UnverifiedNewContentRepository
@@ -24,6 +24,6 @@ class MagazineServiceImpl(
         val content = json.encodeToString(magazine)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
 
-        contentRepository.save(UnverifiedNewContent(creatorID,NewContentType.MAGAZINE,content,"${MAGAZINE_PREFIX_KEY}${magazine.magazineName}"))
+        contentRepository.save(UnverifiedContent(creatorID, NewContentType.MAGAZINE,content,"${MAGAZINE_PREFIX_KEY}${magazine.magazineName}"))
     }
 }

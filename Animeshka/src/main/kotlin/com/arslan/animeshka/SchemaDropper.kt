@@ -28,7 +28,7 @@ class SchemaDropper(private val connectionFactory: ConnectionFactory) : Disposab
         connection.createStatement("DROP TABLE IF EXISTS NOVEL_MAGAZINES").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS CHARACTERS").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS PEOPLE").execute().awaitFirst()
-        connection.createStatement("DROP TABLE IF EXISTS CONTENT").execute().awaitFirst()
+        connection.createStatement("DROP TABLE IF EXISTS VERIFIED_CONTENT").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS UNVERIFIED_NEW_CONTENT").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS USERS").execute().awaitFirst()
         Unit

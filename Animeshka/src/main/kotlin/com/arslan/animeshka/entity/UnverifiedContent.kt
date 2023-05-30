@@ -1,12 +1,14 @@
 package com.arslan.animeshka.entity
 
+import com.arslan.animeshka.UnverifiedContentStatus
+import com.arslan.animeshka.NewContentType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDateTime
 
 @Table("UNVERIFIED_NEW_CONTENT")
-data class UnverifiedNewContent(
+data class UnverifiedContent(
     @Column("creator_id")
     val creatorID: Long,
 
@@ -19,7 +21,7 @@ data class UnverifiedNewContent(
     val contentKey: String,
 
     @Column("content_status")
-    val contentStatus: ContentTypeStatus = ContentTypeStatus.PENDING_VERIFICATION,
+    val contentStatus: UnverifiedContentStatus = UnverifiedContentStatus.PENDING_VERIFICATION,
 
     val timestamp: LocalDateTime = LocalDateTime.now(),
 

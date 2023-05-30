@@ -1,5 +1,6 @@
 package com.arslan.animeshka.entity
 
+import com.arslan.animeshka.*
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
 import org.springframework.data.domain.Persistable
@@ -63,7 +64,7 @@ data class Anime(
     @Id
     val id: Long,
 
-) : Persistable<Long> {
+    ) : Persistable<Long> {
 
     @Transient
     var isNewEntity: Boolean = false

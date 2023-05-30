@@ -1,7 +1,8 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.UnverifiedStudio
-import com.arslan.animeshka.entity.Content
+import com.arslan.animeshka.VerifiedContentStatus
+import com.arslan.animeshka.entity.VerifiedContent
 import com.arslan.animeshka.entity.Studio
 import com.arslan.animeshka.repository.ContentRepository
 import com.arslan.animeshka.repository.StudioRepository
@@ -15,17 +16,15 @@ import org.springframework.validation.annotation.Validated
 @Validated
 class StudioServiceImpl(
     private val studioRepository: StudioRepository,
-    private val unverifiedContentService: UnverifiedContentService,
-    private val contentRepository: ContentRepository
+    private val contentService: ContentService
 ) : StudioService {
 
     override suspend fun createStudio(studio: UnverifiedStudio) {
-        unverifiedContentService.createStudioEntry(studio)
+        contentService.createStudioEntry(studio)
     }
 
     override suspend fun verifyStudio(contentID: Long) {
-        val verifiedStudio = unverifiedContentService.verifyStudio(contentID)
-        val verifiedContent = contentRepository.save(Content(contentID,true))
+        val (verifiedStudio,verifiedContent) = contentService.verifyStudio(contentID)
 
         with(verifiedStudio){ studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),verifiedContent.id,true)) }
 

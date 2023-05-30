@@ -1,5 +1,6 @@
 package com.arslan.animeshka.entity
 
+import com.arslan.animeshka.CharacterRole
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.springframework.data.annotation.Id

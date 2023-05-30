@@ -1,8 +1,8 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.PersonEntry
-import com.arslan.animeshka.entity.NewContentType
-import com.arslan.animeshka.entity.UnverifiedNewContent
+import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.entity.UnverifiedContent
 import com.arslan.animeshka.repository.PERSON_PREFIX_KEY
 import com.arslan.animeshka.repository.PeopleRepository
 import com.arslan.animeshka.repository.UnverifiedNewContentRepository
@@ -24,7 +24,8 @@ class PeopleServiceImpl(
     override suspend fun createPersonEntry(personEntry: PersonEntry) {
         val content = json.encodeToString(personEntry)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        contentRepository.save(UnverifiedNewContent(creatorID,NewContentType.PERSON,"${PERSON_PREFIX_KEY}${personEntry.firstName}_${personEntry.lastName}_(${personEntry.givenName}_${personEntry.familyName})",content,))
+        contentRepository.save(UnverifiedContent(creatorID,
+            NewContentType.PERSON,"${PERSON_PREFIX_KEY}${personEntry.firstName}_${personEntry.lastName}_(${personEntry.givenName}_${personEntry.familyName})",content,))
     }
     
 }

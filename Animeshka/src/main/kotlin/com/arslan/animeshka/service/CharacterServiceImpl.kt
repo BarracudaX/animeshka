@@ -1,8 +1,8 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.entity.Character
-import com.arslan.animeshka.entity.NewContentType
-import com.arslan.animeshka.entity.UnverifiedNewContent
+import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.entity.UnverifiedContent
 import com.arslan.animeshka.repository.CHARACTER_PREFIX_KEY
 import com.arslan.animeshka.repository.CharacterRepository
 import com.arslan.animeshka.repository.UnverifiedNewContentRepository
@@ -24,7 +24,7 @@ class CharacterServiceImpl(
     override suspend fun createCharacterEntry(character: Character) {
         val content = json.encodeToString(character)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        contentRepository.save(UnverifiedNewContent(creatorID,NewContentType.CHARACTER,content,"${CHARACTER_PREFIX_KEY}${character.characterName}"))
+        contentRepository.save(UnverifiedContent(creatorID, NewContentType.CHARACTER,content,"${CHARACTER_PREFIX_KEY}${character.characterName}"))
     }
 
 

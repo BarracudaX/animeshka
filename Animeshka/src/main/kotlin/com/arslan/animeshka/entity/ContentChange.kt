@@ -1,5 +1,7 @@
 package com.arslan.animeshka.entity
 
+import com.arslan.animeshka.ContentChangeOperation
+import com.arslan.animeshka.ContentChangeStatus
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
@@ -18,14 +20,12 @@ data class ContentChange(
     @Column("source_value")
     val sourceValue: String,
 
-    @Column("from_value")
-    val fromValue: String? = null,
-
     val creatorID: Long,
 
     val timestamp: LocalDateTime = LocalDateTime.now(),
 
-    val acceptorID: Long? = null,
+    @Column("moderator_id")
+    val moderatorID: Long? = null,
 
     @Id
     val id: Long? = null

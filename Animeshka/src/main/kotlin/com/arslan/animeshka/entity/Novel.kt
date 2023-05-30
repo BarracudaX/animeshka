@@ -1,5 +1,9 @@
 package com.arslan.animeshka.entity
 
+import com.arslan.animeshka.Demographic
+import com.arslan.animeshka.ExplicitGenre
+import com.arslan.animeshka.NovelStatus
+import com.arslan.animeshka.NovelType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate

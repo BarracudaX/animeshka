@@ -20,19 +20,18 @@ import org.springframework.transaction.annotation.Transactional
 class AnimeServiceImpl(
     private val animeRepository: AnimeRepository,
     private val animeSeasonsRepository: AnimeSeasonsRepository,
+    private val contentService: ContentService,
     private val contentRepository: ContentRepository,
-    private val unverifiedContentService: UnverifiedContentService,
     private val databaseClient: DatabaseClient,
     private val contentChangeService: ContentChangeService
 ) : AnimeService {
 
     override suspend fun createUnverifiedAnime(unverifiedAnime: UnverifiedAnime) {
-        unverifiedContentService.createAnimeEntry(unverifiedAnime)
+        contentService.createAnimeEntry(unverifiedAnime)
     }
 
     override suspend fun verifyAnimeEntry(contentID: Long) {
-        val animeEntry = unverifiedContentService.verifyAnime(contentID)
-        val verifiedContent = contentRepository.save(Content(contentID,true))
+        val (animeEntry,verifiedContent) = contentService.verifyAnime(contentID)
         val season = getAnimeSeason(animeEntry)
         val anime = with(animeEntry){
             val anime = Anime(title,status,rating,studio,demographic,licensor,japaneseTitle, synopsis, animeType,season?.id,explicitGenre,airingTime?.toJavaLocalTime(),airingDay,duration,0,airedAt?.toJavaLocalDate(),finishedAt?.toJavaLocalDate(),background,additionalInfo, id = verifiedContent.id).apply { isNewEntity = true }
@@ -47,6 +46,10 @@ class AnimeServiceImpl(
     }
 
     override suspend fun updateAnime(anime: AnimeDTO) {
+        val content = contentRepository.findById(anime.id) ?: throw EmptyResultDataAccessException("Could not find verified anime content with id ${anime.id}",1)
+
+        if(content.contentStatus != VerifiedContentStatus.VERIFIED) throw IllegalStateException("Cannot add change proposals for anime with id ${anime.id} because of it's current state : ${content.contentStatus}.")
+
         val animeBasicData = animeRepository.findById(anime.id) ?: throw EmptyResultDataAccessException("Anime with id ${anime.id} not found.",1)
         val characters = getAnimeCharacters(animeBasicData)
         val themes = getAnimeThemes(animeBasicData)
@@ -65,7 +68,7 @@ class AnimeServiceImpl(
         databaseClient
             .sql { "SELECT * FROM ANIME_ANIME_RELATIONS WHERE anime_id = :animeID" }
             .bind("animeID",anime.id)
-            .map { row -> WorkRelation(row.getParam("related_anime_id"),Relation.valueOf(row.getParam("relation"))) }
+            .map { row -> WorkRelation(row.getParam("related_anime_id"), Relation.valueOf(row.getParam("relation"))) }
             .all()
             .collectList()
             .awaitFirst()
@@ -75,7 +78,7 @@ class AnimeServiceImpl(
         databaseClient
             .sql { "SELECT * FROM NOVEL_ANIME_RELATIONS WHERE anime_id = :animeID" }
             .bind("animeID",anime.id)
-            .map { row -> WorkRelation(row.getParam("novel_id"),Relation.valueOf(row.getParam("relation"))) }
+            .map { row -> WorkRelation(row.getParam("novel_id"), Relation.valueOf(row.getParam("relation"))) }
             .all()
             .collectList()
             .awaitFirst()

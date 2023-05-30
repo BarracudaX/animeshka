@@ -1,6 +1,6 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.entity.UserRole
+import com.arslan.animeshka.UserRole
 import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.UserCredentials
 import com.arslan.animeshka.UserRegistration
@@ -18,7 +18,8 @@ class UserServiceImpl(private val userRepository: UserRepository,private val pas
     private val logger = LoggerFactory.getLogger(UserServiceImpl::class.java)
 
     override suspend fun register(userRegistration: UserRegistration): User {
-        val user = with(userRegistration){ User(firstName,lastName,username,email,passwordEncoder.encode(password),UserRole.USER) }
+        val user = with(userRegistration){ User(firstName,lastName,username,email,passwordEncoder.encode(password),
+            UserRole.USER) }
         return userRepository.save(user)
     }
 

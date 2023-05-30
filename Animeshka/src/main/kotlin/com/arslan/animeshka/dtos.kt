@@ -1,7 +1,6 @@
 package com.arslan.animeshka
 
 import com.arslan.animeshka.constraints.EqualRegistrationPasswords
-import com.arslan.animeshka.entity.*
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable

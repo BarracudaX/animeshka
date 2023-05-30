@@ -1,8 +1,8 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.AnimeEpisodeEntry
-import com.arslan.animeshka.entity.NewContentType
-import com.arslan.animeshka.entity.UnverifiedNewContent
+import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.entity.UnverifiedContent
 import com.arslan.animeshka.repository.ANIME_EPISODE_PREFIX
 import com.arslan.animeshka.repository.AnimeEpisodeRepository
 import com.arslan.animeshka.repository.UnverifiedNewContentRepository
@@ -24,7 +24,7 @@ class AnimeEpisodeServiceImpl(
     override suspend fun createAnimeEpisodeEntry(animeEpisodeEntry: AnimeEpisodeEntry) {
         val content = json.encodeToString(animeEpisodeEntry)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        contentRepository.save(UnverifiedNewContent(creatorID,NewContentType.EPISODE,content,"${ANIME_EPISODE_PREFIX}${animeEpisodeEntry.animeId}_${animeEpisodeEntry.episodeName}"))
+        contentRepository.save(UnverifiedContent(creatorID, NewContentType.EPISODE,content,"${ANIME_EPISODE_PREFIX}${animeEpisodeEntry.animeId}_${animeEpisodeEntry.episodeName}"))
     }
 
 }

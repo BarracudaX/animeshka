@@ -1,10 +1,9 @@
 package com.arslan.animeshka.config
 
-import com.arslan.animeshka.entity.UserRole
+import com.arslan.animeshka.UserRole
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSSigner
 import com.nimbusds.jose.crypto.MACSigner
-import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,12 +11,10 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
 import org.springframework.security.oauth2.server.resource.BearerTokenAuthenticationToken
-import org.springframework.security.oauth2.server.resource.BearerTokenErrors
 import org.springframework.security.oauth2.server.resource.authentication.*
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
@@ -52,7 +49,8 @@ class SecurityConfig {
                     .pathMatchers("/user/register","/","/user/login").permitAll()
                     .pathMatchers(HttpMethod.POST,"/anime","/studio").authenticated()
                     .pathMatchers(HttpMethod.PUT,"/anime").authenticated()
-                    .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(UserRole.ANIME_ADMINISTRATOR.name)
+                    .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(
+                        UserRole.ANIME_ADMINISTRATOR.name)
                     .pathMatchers(HttpMethod.GET,"/","/login","/logout").permitAll()
                     .anyExchange().denyAll()
             }.csrf { csrf ->

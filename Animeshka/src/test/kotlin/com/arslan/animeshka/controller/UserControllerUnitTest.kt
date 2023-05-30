@@ -3,7 +3,7 @@ package com.arslan.animeshka.controller
 import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.UserCredentials
 import com.arslan.animeshka.UserRegistration
-import com.arslan.animeshka.entity.UserRole
+import com.arslan.animeshka.UserRole
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -22,7 +22,7 @@ class UserControllerUnitTest : AbstractControllerUnitTest(){
 
     private val userRegistration = UserRegistration("ValidEmail@email.com","ValidPass123!","ValidPass123!","Username","FirstName","LastName")
     private val userCredentials = UserCredentials("CREDENTIALS","PASSWORD")
-    private val user = User("First Name","Last Name","Username","Email","Password",UserRole.USER,1)
+    private val user = User("First Name","Last Name","Username","Email","Password", UserRole.USER,1)
 
     @Test
     fun `should return 200(OK) response after successful user registration`() = runTest {
