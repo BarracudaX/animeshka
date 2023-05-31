@@ -14,4 +14,7 @@ class ViewController {
 
     @GetMapping("/insert/anime")
     fun insertAnimePage() : String = "insert_anime"
+
+    @GetMapping("/access_denied")
+    fun accessDenied() : String = "access_denied"
 }

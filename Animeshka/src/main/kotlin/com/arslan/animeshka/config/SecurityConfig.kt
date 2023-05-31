@@ -4,6 +4,8 @@ import com.arslan.animeshka.UserRole
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSSigner
 import com.nimbusds.jose.crypto.MACSigner
+import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -12,7 +14,9 @@ import org.springframework.http.HttpCookie
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseCookie
+import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
@@ -21,8 +25,10 @@ import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
 import org.springframework.security.oauth2.server.resource.BearerTokenAuthenticationToken
 import org.springframework.security.oauth2.server.resource.authentication.*
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers
+import org.springframework.web.server.WebFilter
 import reactor.core.publisher.Mono
 import java.net.URI
 import javax.crypto.spec.SecretKeySpec
@@ -41,6 +47,16 @@ class SecurityConfig {
     @Bean
     fun securityWebFilterChain(http: ServerHttpSecurity,decoder: ReactiveJwtDecoder,bearerTokenConverter: ServerAuthenticationConverter) : SecurityWebFilterChain {
         return http
+            .exceptionHandling { exceptionHandling ->
+                exceptionHandling.authenticationEntryPoint(RedirectServerAuthenticationEntryPoint("/user/login"))
+                exceptionHandling.accessDeniedHandler { exchange, _ ->
+                    mono {
+                        exchange.response.statusCode = HttpStatus.PERMANENT_REDIRECT
+                        exchange.response.headers.location = URI.create("/access_denied")
+                        null
+                    }
+                }
+            }
             .oauth2ResourceServer { oauth ->
                 oauth.bearerTokenConverter(bearerTokenConverter)
                 oauth.jwt { jwt ->
@@ -56,7 +72,7 @@ class SecurityConfig {
                     .pathMatchers(HttpMethod.GET,"/insert/anime","/novel/title/**").authenticated()
                     .pathMatchers(HttpMethod.PUT,"/anime").authenticated()
                     .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(UserRole.ANIME_ADMINISTRATOR.name)
-                    .pathMatchers(HttpMethod.GET,"/","/login","/logout").permitAll()
+                    .pathMatchers(HttpMethod.GET,"/","/login","/logout","/access_denied").permitAll()
                     .pathMatchers(HttpMethod.GET,"/resource/**").permitAll()
                     .anyExchange().denyAll()
             }.csrf { csrf ->
@@ -81,4 +97,17 @@ class SecurityConfig {
     @Bean
     fun passwordEncoder() : PasswordEncoder = BCryptPasswordEncoder()
 
+    @Bean
+    fun webFilter() : WebFilter = WebFilter { exchange, chain ->
+
+        mono {
+            if(exchange.request.path.value() == "/user/login" && ReactiveSecurityContextHolder.getContext().awaitSingle().authentication !is AnonymousAuthenticationToken){
+                exchange.response.statusCode = HttpStatus.PERMANENT_REDIRECT
+                exchange.response.headers.location = URI.create("/")
+                null
+            }else{
+                chain.filter(exchange).awaitSingleOrNull()
+            }
+        }
+    }
 }
