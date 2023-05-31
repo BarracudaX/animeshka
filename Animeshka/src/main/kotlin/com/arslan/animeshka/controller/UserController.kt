@@ -37,7 +37,7 @@ class UserController(private val userService: UserService,@Value("\${jwt.token.d
         val (email,password) = exchange.formData.awaitFirst().let { params -> params["email"]!![0] to params["password"]!![0] }
         val token = userService.login(UserCredentials(email,password))
         response.addCookie(ResponseCookie.from("Authorization",token).httpOnly(true).path("/").maxAge(tokenDuration).build())
-        return "redirect:index"
+        return "redirect:/"
     }
 
 }
