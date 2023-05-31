@@ -5,6 +5,7 @@ import com.arslan.animeshka.ExplicitGenre
 import com.arslan.animeshka.NovelStatus
 import com.arslan.animeshka.NovelType
 import org.springframework.data.annotation.Id
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 
@@ -16,7 +17,8 @@ data class Novel(
 
     val title: String,
 
-    val status: NovelStatus,
+    @Column("novel_status")
+    val novelStatus: NovelStatus,
 
     val novelType: NovelType,
 

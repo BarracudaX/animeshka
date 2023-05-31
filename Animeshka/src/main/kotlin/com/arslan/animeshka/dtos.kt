@@ -4,6 +4,7 @@ import com.arslan.animeshka.constraints.EqualRegistrationPasswords
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
+import org.springframework.data.annotation.Id
 import java.time.DayOfWeek
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
@@ -177,4 +178,40 @@ data class AnimeEpisodeEntry(
     val aired: LocalDate,
 
     val synopsis: String
+)
+
+@Serializable
+data class NovelDTO(
+    val synopsis: String,
+
+    val published: LocalDate,
+
+    val title: String,
+
+    val status: NovelStatus,
+
+    val novelType: NovelType,
+
+    val explicitGenre: ExplicitGenre? = null,
+
+    val magazine: Long? = null,
+
+    val japaneseTitle: String? = null,
+
+    val demographic: Demographic? = null,
+
+    val novelRank: Int? = null,
+
+    val score: Double? = null,
+
+    val background: String = "",
+
+    val finished: LocalDate? = null,
+
+    val chapters: Int? = null,
+
+    val volumes: Int? = null,
+
+    @Id
+    val id: Long
 )

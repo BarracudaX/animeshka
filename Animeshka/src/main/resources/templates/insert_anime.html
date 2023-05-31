@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layout::layout(#{insert.anime.page.title},~{this::#insert_anime})}">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+</head>
+<body>
+<nav class="navbar navbar-expand-sm bg-dark" data-bs-theme="dark">
+    <div class="container-fluid p-0">
+        <a class="navbar-brand" href="#" th:href="@{/}">Animeshka</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav_menu"
+                aria-controls="nav_menu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav_menu">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a href="#" class="nav-link">Anime</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Manga</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Login</a></li>
+                <li class="nav-item"><a href="#" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div id="insert_anime">
+    <form class="m-auto w-75 mt-2" th:action="@{/anime}" method="post">
+        <div>
+            <label th:text="#{insert.anime.page.title.label}" class="form-label" for="title">Title:</label>
+            <input type="text" id="title" name="title" placeholder="Anime's english title" class="form-control"
+                   th:placeholder="#{insert.anime.page.title.placeholder}"/>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.japanese.title.label}" class="form-label" for="japanese_title">Japanese
+                Title:</label>
+            <input type="text" id="japanese_title" name="japanese_title" placeholder="Anime's official japanese title"
+                   class="form-control" th:placeholder="#{insert.anime.page.japanese.title.placeholder}"/>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.airing.status.label}" class="form-label" for="anime_status">Airing
+                Status:</label>
+            <select th:remove="all-but-first" id="anime_status" name="anime_status" class="form-control">
+                <option th:each="animeStatus : ${T(com.arslan.animeshka.AnimeStatus).values()}"
+                        th:value="${animeStatus.name()}"
+                        th:text="${#strings.arrayJoin(#strings.arrayCapitalize(animeStatus.name().toLowerCase().split('_')),' ')}">Airing
+                </option>
+                <option>Not Yet Aired</option>
+                <option>Finished</option>
+            </select>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.rating.label}" class="form-label" for="rating">Rating:</label>
+            <select th:remove="all-but-first" id="rating" name="rating" class="form-control">
+                <option th:each="rating : ${T(com.arslan.animeshka.SeriesRating).values()}" th:value="${rating.name()}" th:text="${#strings.arrayJoin(rating.name().split('_'),' ')}">G
+                </option>
+                <option>PG 12</option>
+                <option>R 15</option>
+                <option>R 18</option>
+            </select>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.demographic.label}" class="form-label"
+                   for="demographic">Demographic:</label>
+            <select th:remove="all-but-first" id="demographic" name="demographic" class="form-control">
+                <option th:each="demographic : ${T(com.arslan.animeshka.Demographic).values()}" th:value="${demographic.name()}" th:text="${#strings.capitalize(demographic.name().toLowerCase())}">Josei
+                </option>
+                <option>Kids</option>
+                <option>Seinen</option>
+                <option>Shoujo</option>
+                <option>Shounen</option>
+            </select>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.series.type.label}" class="form-label" for="series_type">Series
+                Type:</label>
+            <select th:remove="all-but-first" id="series_type" name="series_type" class="form-control">
+                <option th:each="animeType : ${T(com.arslan.animeshka.AnimeType).values()}" th:value="${animeType.name()}" th:text="${#strings.capitalize(animeType.name().toLowerCase())}">TV
+                </option>
+                <option>OVA</option>
+                <option>ONA</option>
+            </select>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.studio.label}" class="form-label" for="rating">Studio:</label>
+            <div class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </div>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.licensor.label}" class="form-label" for="rating">Licensor:</label>
+            <div class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </div>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.synopsis.label}" class="form-label" for="synopsis">Synopsis:</label>
+            <textarea id="synopsis" class="form-control" rows="7" style="resize: none" name="synopsis"></textarea>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.background.label}" class="form-label" for="background">Synopsis:</label>
+            <textarea id="background" class="form-control" rows="7" style="resize: none" name="background"></textarea>
+        </div>
+
+        <div>
+            <label th:text="#{insert.anime.page.additional.info.label}" class="form-label" for="additional_information">Additional
+                Information:</label>
+            <textarea id="additional_information" class="form-control" rows="7" style="resize: none"
+                      name="additional_information"></textarea>
+        </div>
+
+        <div class="mt-3">
+            <div><label th:text="#{insert.anime.page.themes.label}">Themes:</label></div>
+            <div class="row">
+                <div th:each="theme : ${T(com.arslan.animeshka.Theme).values()}" class="form-check form-check-inline col-lg-2 col-md-4">
+                    <input type="checkbox" th:value="${theme.name()}" id="ADULT_CAST" th:id="${theme.name()}"/>
+                    <label th:for="${theme.name()}" for="ADULT_CAST" th:text="${#strings.arrayJoin(theme.name().split('_'),' ')}">Adult Cast</label>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="ANTHROPOMORPHIC"/>
+                        <label for="ANTHROPOMORPHIC">Anthropomorphic</label>
+                    </div>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="CHILDCARE"/>
+                        <label for="CHILDCARE">Childcare</label>
+                    </div>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="COMBAT_SPORTS"/>
+                        <label for="COMBAT_SPORTS">Combat Sports</label>
+                    </div>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="CROSS_DRESSING"/>
+                        <label for="CROSS_DRESSING">Cross Dressing</label>
+                    </div>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="DELINQUENTS"/>
+                        <label for="DELINQUENTS">Delinquents</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-3">
+            <div><label th:text="#{insert.anime.page.genres.label}">Genres:</label></div>
+            <div class="row">
+                <div th:each="genre : ${T(com.arslan.animeshka.Genre).values()}"  class="form-check form-check-inline col-lg-2 col-md-4">
+                    <input type="checkbox" th:value="${genre.name()}" id="ACTION" th:id="${genre.name()}"/>
+                    <label th:for="${genre.name()}" for="ACTION"
+                           th:text="${#strings.arrayJoin(genre.name().split('_'),' ')}">Action</label>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="ADVENTURE"/>
+                        <label for="ADVENTURE">Adventure</label>
+                    </div>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="AVANT_GARDE"/>
+                        <label for="AVANT_GARDE">Avant Garde</label>
+                    </div>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="BOYS_LOVE"/>
+                        <label for="BOYS_LOVE">Boys Love</label>
+                    </div>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="GIRLS_LOVE"/>
+                        <label for="GIRLS_LOVE">Girls Love</label>
+                    </div>
+                </div>
+
+                <div th:remove="all" class="form-check form-check-inline col-2">
+                    <div>
+                        <input type="checkbox" id="COMEDY"/>
+                        <label for="COMEDY">Comedy</label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="mt-3 border border-secondary p-2" id="novel_relations">
+            <label th:text="#{insert.anime.page.novel.relations.label}">Novel Relations:</label>
+            <div class="border border-secondary-subtle container-fluid p-2" id="novel_relation_1">
+                <div class="d-flex justify-content-end"><button class="btn btn-danger" type="button" onclick="removeNovelRelation('novel_relation_1')">X</button></div>
+                <div class="alerts"></div>
+                <label class="form-label" for="novel_relation_select_1" th:text="#{insert.anime.page.novel.relation.label}">Relation Type:</label>
+                <select class="form-control" th:remove="all-but-first" id="novel_relation_select_1">
+                    <option th:each="relation : ${T(com.arslan.animeshka.Relation).values()}" th:value="${relation.name()}" th:text="${#strings.arrayJoin(relation.name().toLowerCase().split('_'),' ')}">Sequel</option>
+                    <option>Prequel</option>
+                </select>
+                <label th:text="#{insert.anime.page.novel.label}" class="form-label" for="novel_relation_search_1">Novel:</label>
+                <div class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="novel_relation_search_1">
+                    <button class="btn btn-outline-success" type="button" th:text="#{insert.anime.page.search.button}" onclick="searchNovel(1)">Search</button>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-success w-100 mt-2" id="add_novel_relation_btn" onclick="addNovelRelation()">+</button>
+        </div>
+
+        <div class="mt-3 border border-secondary p-2" id="anime_relations">
+            <label th:text="#{insert.anime.page.anime.relations.label}">Anime Relations:</label>
+            <div class="border border-secondary-subtle container-fluid p-2" id="anime_relation_1">
+                <div class="d-flex justify-content-end"><button class="btn btn-danger" type="button" onclick="removeAnimeRelation('anime_relation_1')">X</button></div>
+                <div class="alerts"></div>
+                <label class="form-label" for="anime_relation_select_1" th:text="#{insert.anime.page.novel.relation.label}">Relation Type:</label>
+                <select class="form-control" th:remove="all-but-first" id="anime_relation_select_1">
+                    <option th:each="relation : ${T(com.arslan.animeshka.Relation).values()}" th:value="${relation.name()}" th:text="${#strings.arrayJoin(relation.name().toLowerCase().split('_'),' ')}">Sequel</option>
+                    <option>Prequel</option>
+                </select>
+                <label th:text="#{insert.anime.page.anime.label}" class="form-label" for="rating">Anime:</label>
+                <div class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="anime_relation_search_1">
+                    <button class="btn btn-outline-success" type="button" th:text="#{insert.anime.page.search.button}">Search</button>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-success w-100 mt-2" id="add_anime_relation_btn" onclick="addAnimeRelation()">+</button>
+        </div>
+
+        <div class="mt-3 border border-secondary p-2" id="characters">
+            <label th:text="#{insert.anime.page.anime.characters.label}">Characters:</label>
+            <div class="border border-secondary-subtle container-fluid p-2" id="anime_character_1">
+                <div class="d-flex justify-content-end"><button class="btn btn-danger" type="button" onclick="removeAnimeCharacter('anime_character_1')">X</button></div>
+                <div class="alerts"></div>
+                <label class="form-label" for="anime_character_select_1" th:text="#{insert.anime.page.character.role.label}">Role:</label>
+                <select class="form-control" th:remove="all-but-first" id="anime_character_select_1">
+                    <option th:each="role : ${T(com.arslan.animeshka.CharacterRole).values()}" th:value="${role.name()}" th:text="${role.name().toLowerCase()}">Main</option>
+                    <option>Supporting</option>
+                </select>
+                <div>
+                    <label th:text="#{insert.anime.page.character.label}" class="form-label" for="anime_character_search_1">Character:</label>
+                    <div class="d-flex" role="search">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="anime_character_search_1">
+                        <button class="btn btn-outline-success" type="button">Search</button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-success w-100 mt-2" onclick="addCharacterRelation()" id="add_character_relation_btn">+</button>
+        </div>
+        <div>
+            <label th:text="#{insert.anime.page.explicit.genre.label}" class="form-label" for="excplicit_genre">Explicit Genre:</label>
+            <select id="excplicit_genre" name="series_type" class="form-control">
+                <option value="-">-</option>
+                <option th:each="explicitGenre : ${T(com.arslan.animeshka.ExplicitGenre).values()}" th:value="${explicitGenre.name()}" th:text="${#strings.capitalize(explicitGenre.name().toLowerCase())}">Ecchi</option>
+                <option th:remove="all">Erotica</option>
+                <option th:remove="all">Hentai</option>
+                <option th:remove="all">None</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label" for="airing_time" th:text="#{insert.anime.page.airing.time.label}">Airing Time(JST):</label>
+            <input type="time" id="airing_time" class="form-control" />
+        </div>
+        <div>
+            <label class="form-label" for="airing_day" th:text="#{insert.anime.page.airing.day.label}">Airing Day:</label>
+            <select id="airing_day" class="form-control">
+                <option th:value="NONE">-</option>
+                <option th:each="day : ${T(java.time.DayOfWeek).values()}" th:text="${#messages.msg('day.'+day.name())}" th:value="${day.name()}">Monday</option>
+                <option th:remove="all">Tuesday</option>
+                <option th:remove="all">Wednesday</option>
+                <option th:remove="all">Thursday</option>
+                <option th:remove="all">Friday</option>
+                <option th:remove="all">Saturday</option>
+                <option th:remove="all">Sunday</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="form-label" for="episode_duration" th:text="#{insert.anime.page.episode.duration.label}">Episode Duration(Avg.)</label>
+            <input type="number" id="episode_duration" class="form-control"/>
+        </div>
+
+        <div>
+            <label class="form-label" for="aired_at" th:text="#{insert.anime.page.aired.at.label}">Aired At:</label>
+            <input type="date" id="aired_at" class="form-control" />
+        </div>
+
+        <div>
+            <label class="form-label" for="finished_at" th:text="#{insert.anime.page.finished.at.label}">Finished At:</label>
+            <input type="date" id="finished_at" class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-2 w-100" th:value="#{insert.anime.page.submit.button}">Submit
+        </button>
+    </form>
+    <script th:inline="javascript" type="text/javascript">
+        let nextNovelRelation = 2
+        let nextAnimeRelation = 2
+        let nextAnimeCharacter = 2
+        let relationOptions = /*[[${T(com.arslan.animeshka.Relation).values()}]]*/ ["Sequel","Prequel"];
+        let roleOptions = /*[[${T(com.arslan.animeshka.CharacterRole).values()}]]*/ ["protagonist","antagonist"];
+        let relationSelectLabelText = /*[[#{insert.anime.page.novel.relation.label}]]*/ "Relation Type:";
+        let roleSelectLabelText = /*[[#{insert.anime.page.character.role.label}]]*/ "Role:" ;
+        let removeBtnText = /*[[#{insert.anime.page.remove.relation.button}]]*/ "X";
+        let novelSearchLabelText = /*[[#{insert.anime.page.novel.label}]]*/ "Novel:";
+        let animeSearchLabelText = /*[[#{insert.anime.page.anime.label}]]*/ "Anime:";
+        let characterSearchLabelText = /*[[#{insert.anime.page.anime.character.label}]]*/ "Character:";
+        let searchBtnText = /*[[#{insert.anime.page.search.button}]]*/ "Search" ;
+
+        function addCharacterRelation(){
+            let characterRelationID = `character_relation_${nextAnimeCharacter}`
+
+            let removeBtnContainer = $("<div>")
+                .attr("class","d-flex justify-content-end")
+                .attr("for",``)
+                .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeAnimeCharacter(characterRelationID) }))
+
+            let alertsContainer = $("<div class='alerts'>")
+
+            let roleSelectLabel = $("<label>")
+                .attr("class","form-label")
+                .attr("for",`character_relation_select_${nextAnimeCharacter}`)
+                .text(roleSelectLabelText)
+
+            let roleSelect = $("<select>")
+                .attr("class","form-control")
+                .attr("id",`character_relation_select_${nextAnimeCharacter}`)
+
+            for (let i = 0; i < roleOptions.length; i++) {
+                $("<option>").text(roleOptions[i].toLowerCase().split("_").join(" ")).appendTo(roleSelect)
+            }
+
+            let searchLabel = $("<label>")
+                .attr("class","form-label")
+                .attr("for",`character_relation_search_${nextAnimeCharacter}`)
+                .text(characterSearchLabelText)
+
+            let searchContainer = $("<div>")
+                .attr("class","d-flex")
+                .attr("role","search")
+                .append($("<input>").attr("class","form-control me-2").attr("id",`character_relation_search_${nextAnimeCharacter}`).attr("type","search"))
+                .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText))
+
+            $("<div>")
+                .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
+                .attr("id",`character_relation_${nextAnimeCharacter}`)
+                .append(removeBtnContainer)
+                .append(alertsContainer)
+                .append(roleSelectLabel)
+                .append(roleSelect)
+                .append(searchLabel)
+                .append(searchContainer)
+                .insertBefore("#add_character_relation_btn")
+
+            nextAnimeCharacter = nextAnimeCharacter + 1
+        }
+
+        function addAnimeRelation(){
+            let animeRelationID = `anime_relation_${nextAnimeRelation}`
+
+            let removeBtnContainer = $("<div>")
+                .attr("class","d-flex justify-content-end")
+                .attr("for",``)
+                .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeAnimeCharacter(animeRelationID) }))
+
+            let alertsContainer = $("<div class='alerts'>")
+
+            let relationSelectLabel = $("<label>")
+                .attr("class","form-label")
+                .attr("for",`anime_relation_select_${nextAnimeRelation}`)
+                .text(relationSelectLabelText)
+
+            let relationSelect = $("<select>")
+                .attr("class","form-control")
+                .attr("id",`anime_relation_select_${nextAnimeRelation}`)
+
+            for (let i = 0; i < relationOptions.length; i++) {
+                $("<option>").text(relationOptions[i].toLowerCase().split("_").join(" ")).appendTo(relationSelect)
+            }
+
+            let searchLabel = $("<label>")
+                .attr("class","form-label")
+                .attr("for",`anime_relation_search_${nextAnimeRelation}`)
+                .text(animeSearchLabelText)
+
+            let searchContainer = $("<div>")
+                .attr("class","d-flex")
+                .attr("role","search")
+                .append($("<input>").attr("class","form-control me-2").attr("id",`anime_relation_search_${nextAnimeRelation}`).attr("type","search"))
+                .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText))
+
+            $("<div>")
+                .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
+                .attr("id",`anime_relation_${nextAnimeRelation}`)
+                .append(removeBtnContainer)
+                .append(alertsContainer)
+                .append(relationSelectLabel)
+                .append(relationSelect)
+                .append(searchLabel)
+                .append(searchContainer)
+                .insertBefore("#add_anime_relation_btn")
+
+            nextAnimeRelation = nextAnimeRelation + 1
+        }
+
+        function addNovelRelation() {
+
+            let novelRelationID = nextNovelRelation
+
+            let removeBtnContainer = $("<div>")
+                .attr("class","d-flex justify-content-end")
+                .attr("for",``)
+                .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeNovelRelation(`novel_relation_${novelRelationID}`) }))
+
+            let alertsContainer = $("<div class='alerts'>")
+
+            let relationSelectLabel = $("<label>")
+                .attr("class","form-label")
+                .attr("for",`novel_relation_select_${nextNovelRelation}`)
+                .text(relationSelectLabelText)
+
+            let relationSelect = $("<select>")
+                .attr("class","form-control")
+                .attr("id",`novel_relation_select_${nextNovelRelation}`)
+
+            for (let i = 0; i < relationOptions.length; i++) {
+                $("<option>").text(relationOptions[i].toLowerCase().split("_").join(" ")).appendTo(relationSelect)
+            }
+
+            let searchLabel = $("<label>")
+                .attr("class","form-label")
+                .attr("for",`novel_relation_search_${nextNovelRelation}`)
+                .text(novelSearchLabelText)
+
+            let searchContainer = $("<div>")
+                .attr("class","d-flex")
+                .attr("role","search")
+                .append($("<input>").attr("class","form-control me-2").attr("id",`novel_relation_search_${nextNovelRelation}`).attr("type","search"))
+                .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText).on("click",function(){ searchNovel(novelRelationID) }))
+
+            $("<div>")
+                .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
+                .attr("id",`novel_relation_${nextNovelRelation}`)
+                .append(removeBtnContainer)
+                .append(alertsContainer)
+                .append(relationSelectLabel)
+                .append(relationSelect)
+                .append(searchLabel)
+                .append(searchContainer)
+                .insertBefore("#add_novel_relation_btn")
+
+            nextNovelRelation = nextNovelRelation + 1
+        }
+
+    </script>
+    <script th:src="@{/resource/anime.js}" type="text/javascript" src="../static/anime.js"></script>
+</div>
+<footer>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
+            integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js"
+            integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+            crossorigin="anonymous"></script>
+</footer>
+</body>
+</html>

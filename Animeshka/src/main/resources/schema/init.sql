@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS NOVELS(
     id BIGINT PRIMARY KEY ,
     title VARCHAR(255) NOT NULL,
     japanese_title VARCHAR(255) DEFAULT NULL,
-    type VARCHAR(255) NOT NULL,
+    novel_type VARCHAR(255) NOT NULL,
     novel_status VARCHAR(255) NOT NULL,
     volumes INT DEFAULT NULL,
     chapters INT DEFAULT NULL,

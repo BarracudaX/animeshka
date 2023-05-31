@@ -1,6 +1,7 @@
 package com.arslan.animeshka.controller
 
 import com.arslan.animeshka.ContentAlreadyUnderModerationException
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -17,4 +18,7 @@ class ControllerAdviser{
 
     @ExceptionHandler(ContentAlreadyUnderModerationException::class)
     fun onContentAlreadyUnderModerationException() : ResponseEntity<Unit> = ResponseEntity.status(HttpStatus.CONFLICT).build()
+
+    @ExceptionHandler(EmptyResultDataAccessException::class)
+    fun onEmptyResultDataAccessException(ex: EmptyResultDataAccessException) : ResponseEntity<String> = ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.message)
 }

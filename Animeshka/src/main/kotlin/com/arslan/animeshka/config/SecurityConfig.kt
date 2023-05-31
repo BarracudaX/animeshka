@@ -48,10 +48,11 @@ class SecurityConfig {
                 authorization
                     .pathMatchers("/user/register","/","/user/login").permitAll()
                     .pathMatchers(HttpMethod.POST,"/anime","/studio").authenticated()
+                    .pathMatchers(HttpMethod.GET,"/insert/anime","/novel/title/**").authenticated()
                     .pathMatchers(HttpMethod.PUT,"/anime").authenticated()
-                    .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(
-                        UserRole.ANIME_ADMINISTRATOR.name)
+                    .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(UserRole.ANIME_ADMINISTRATOR.name)
                     .pathMatchers(HttpMethod.GET,"/","/login","/logout").permitAll()
+                    .pathMatchers(HttpMethod.GET,"/resource/**").permitAll()
                     .anyExchange().denyAll()
             }.csrf { csrf ->
                 val protectedWithCsrf = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST,"/login")

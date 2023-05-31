@@ -9,6 +9,9 @@ class ViewController {
     @GetMapping("/")
     fun homePage() : String = "index"
 
-    @GetMapping("/login")
+    @GetMapping("/user/login")
     fun loginPage() : String = "login"
+
+    @GetMapping("/insert/anime")
+    fun insertAnimePage() : String = "insert_anime"
 }

@@ -18,7 +18,7 @@ enum class Season(val start: Month, val end: Month){
     }
 }
 
-enum class CharacterRole{ SUPPORTING,MAIN,PROTAGONIST,ANTAGONIST }
+enum class CharacterRole{ SUPPORTING,PROTAGONIST,ANTAGONIST }
 
 enum class SeriesRating{ G,PG_12,R_15,R_18 }
 

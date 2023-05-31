@@ -24,16 +24,16 @@
   </div>
 </nav>
 <div id="login">
-  <form class="m-auto w-50" th:action="@{/login}" method="post">
+  <form class="m-auto w-50" th:action="@{/user/login}" method="post">
     <div>
-      <label class="form-label" for="username" th:value="#{login.page.username.label}">Email:</label>
-      <input id="username" class="form-control" type="email"/>
+      <label class="form-label" for="email" th:text="#{login.page.email.label}">Email:</label>
+      <input id="email" class="form-control" type="email" name="email"/>
     </div>
     <div>
-      <label class="form-label" for="password" th:value="#{login.page.password.label}">Password:</label>
-      <input id="password" class="form-control" type="password" />
+      <label class="form-label" for="password" th:text="#{login.page.password.label}">Password:</label>
+      <input id="password" class="form-control" type="password" name="password" />
     </div>
-    <button type="submit" class="btn btn-primary mt-2 w-100" th:value="#{login.page.login.button}">Login</button>
+    <button type="submit" class="btn btn-primary mt-2 w-100" th:text="#{login.page.login.button}">Login</button>
   </form>
 </div>
 <footer>
