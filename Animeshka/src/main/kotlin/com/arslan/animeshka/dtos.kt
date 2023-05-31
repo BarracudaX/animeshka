@@ -181,30 +181,59 @@ data class AnimeEpisodeEntry(
 )
 
 @Serializable
-data class NovelDTO(
+data class BasicNovelDTO(
+    val title: String,
+
+    val japaneseTitle: String,
+
     val synopsis: String,
 
     val published: LocalDate,
 
-    val title: String,
-
-    val status: NovelStatus,
+    val novelStatus: NovelStatus,
 
     val novelType: NovelType,
+
+    val demographic: Demographic,
+
+    val background: String,
+
+    val finished: LocalDate? = null,
+
+    val id: Long
+)
+
+@Serializable
+data class NovelDTO(
+    val title: String,
+
+    val japaneseTitle: String,
+
+    val synopsis: String,
+
+    val published: LocalDate,
+
+    val novelStatus: NovelStatus,
+
+    val novelType: NovelType,
+
+    val demographic: Demographic,
+
+    val background: String,
+
+    val characters: Set<Long> = emptySet(),
+
+    val animeRelations: Set<WorkRelation> = emptySet(),
+
+    val novelRelations: Set<WorkRelation> = emptySet(),
+
+    val themes: Set<Theme> = emptySet(),
+
+    val genres: Set<Genre> = emptySet(),
 
     val explicitGenre: ExplicitGenre? = null,
 
     val magazine: Long? = null,
-
-    val japaneseTitle: String? = null,
-
-    val demographic: Demographic? = null,
-
-    val novelRank: Int? = null,
-
-    val score: Double? = null,
-
-    val background: String = "",
 
     val finished: LocalDate? = null,
 
@@ -212,6 +241,44 @@ data class NovelDTO(
 
     val volumes: Int? = null,
 
-    @Id
     val id: Long
+)
+
+@Serializable
+data class UnverifiedNovel(
+    val title: String,
+
+    val japaneseTitle: String,
+
+    val synopsis: String,
+
+    val published: LocalDate,
+
+    val novelStatus: NovelStatus,
+
+    val novelType: NovelType,
+
+    val demographic: Demographic,
+
+    val background: String,
+
+    val characters: Set<Long> = emptySet(),
+
+    val animeRelations: Set<WorkRelation> = emptySet(),
+
+    val novelRelations: Set<WorkRelation> = emptySet(),
+
+    val themes: Set<Theme> = emptySet(),
+
+    val genres: Set<Genre> = emptySet(),
+
+    val explicitGenre: ExplicitGenre? = null,
+
+    val magazine: Long? = null,
+
+    val finished: LocalDate? = null,
+
+    val chapters: Int? = null,
+
+    val volumes: Int? = null
 )

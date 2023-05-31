@@ -5,30 +5,32 @@ import com.arslan.animeshka.ExplicitGenre
 import com.arslan.animeshka.NovelStatus
 import com.arslan.animeshka.NovelType
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
+import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.time.LocalDate
 
 @Table("NOVELS")
 data class Novel(
+    val title: String,
+
+    val japaneseTitle: String,
+
     val synopsis: String,
 
     val published: LocalDate,
-
-    val title: String,
 
     @Column("novel_status")
     val novelStatus: NovelStatus,
 
     val novelType: NovelType,
 
+    val demographic: Demographic,
+
     val explicitGenre: ExplicitGenre? = null,
 
     val magazine: Long? = null,
-
-    val japaneseTitle: String? = null,
-
-    val demographic: Demographic? = null,
 
     val novelRank: Int? = null,
 
@@ -44,4 +46,13 @@ data class Novel(
 
     @Id
     val id: Long
-)
+) : Persistable<Long> {
+
+    @Transient
+    var isNewEntity: Boolean = false
+
+    override fun getId(): Long = id
+
+    override fun isNew(): Boolean = isNewEntity
+
+}

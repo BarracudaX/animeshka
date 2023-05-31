@@ -230,9 +230,40 @@
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="novel_relation_search_1">
                     <button class="btn btn-outline-success" type="button" th:text="#{insert.anime.page.search.button}" onclick="searchNovel(1)">Search</button>
                 </div>
+                <button class="btn btn-secondary mt-2 w-100 d-none" type="button" data-bs-toggle="offcanvas" id="show_result_novel_relation_1" data-bs-target="#novel_relation_offcanvas_1" aria-controls="novel_relation_offcanvas_1">Show Result</button>
+                <div id="novel_relation_offcanvas_1" class="offcanvas offcanvas-start">
+                    <div class="offcanvas-header">
+                        <h5 class="offcanvas-title" id="novel_relation_title_1">Test/Test_JP</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    </div>
+                    <div class="offcanvas-body">
+                        <label class="form-label" for="novel_relation_offcanvas_novel_type_1">Novel Type:</label>
+                        <input readonly="readonly" class="form-control" id="novel_relation_offcanvas_novel_type_1" value="Light Novel" />
+
+                        <label class="form-label" for="novel_relation_offcanvas_novel_demographics_1">Demographics:</label>
+                        <input class="form-control" id="novel_relation_offcanvas_novel_demographics_1" readonly="readonly" value="Shounen" />
+
+                        <label class="form-label" for="novel_relation_offcanvas_novel_status_1">Novel Status:</label>
+                        <input class="form-control" readonly="readonly" value="Not Yet Aired" id="novel_relation_offcanvas_novel_status_1"/>
+
+                        <label class="form-label" for="novel_relation_offcanvas_novel_published_1">Publication Date:</label>
+                        <input class="form-control" readonly="readonly" type="date" value="2022-02-02" id="novel_relation_offcanvas_novel_published_1"/>
+
+                        <label class="form-label" for="novel_relation_offcanvas_novel_finished_1">Finished On:</label>
+                        <input id="novel_relation_offcanvas_novel_finished_1" class="form-control" readonly="readonly" type="date" value="2022-05-04" >
+
+                        <label class="form-label" for="novel_relation_offcanvas_novel_synopsis_1">Synopsis:</label>
+                        <textarea class="form-control"  id="novel_relation_offcanvas_novel_synopsis_1" readonly="readonly">Test</textarea>
+
+                        <label class="form-label" for="novel_relation_offcanvas_background_1">Background:</label>
+                        <textarea class="form-control" id="novel_relation_offcanvas_background_1" readonly="readonly">Background...</textarea>
+
+                        <a class="btn btn-primary mt-2 w-100" href="#" target="_blank" id="novel_relation_offcanvas_details_1">More Details</a>
+                    </div>
+                </div>
             </div>
 
-            <button type="button" class="btn btn-success w-100 mt-2" id="add_novel_relation_btn" onclick="addNovelRelation()">+</button>
+            <button type="button" class="btn btn-success w-100 mt-2" id="add_novel_relation_btn" onclick="onAddNovelRelation()">+</button>
         </div>
 
         <div class="mt-3 border border-secondary p-2" id="anime_relations">
@@ -252,7 +283,7 @@
                 </div>
             </div>
 
-            <button type="button" class="btn btn-success w-100 mt-2" id="add_anime_relation_btn" onclick="addAnimeRelation()">+</button>
+            <button type="button" class="btn btn-success w-100 mt-2" id="add_anime_relation_btn" onclick="onAddAnimeRelation()">+</button>
         </div>
 
         <div class="mt-3 border border-secondary p-2" id="characters">
@@ -273,7 +304,7 @@
                     </div>
                 </div>
             </div>
-            <button type="button" class="btn btn-success w-100 mt-2" onclick="addCharacterRelation()" id="add_character_relation_btn">+</button>
+            <button type="button" class="btn btn-success w-100 mt-2" onclick="onAddCharacterRelation()" id="add_character_relation_btn">+</button>
         </div>
         <div>
             <label th:text="#{insert.anime.page.explicit.genre.label}" class="form-label" for="excplicit_genre">Explicit Genre:</label>
@@ -334,148 +365,47 @@
         let animeSearchLabelText = /*[[#{insert.anime.page.anime.label}]]*/ "Anime:";
         let characterSearchLabelText = /*[[#{insert.anime.page.anime.character.label}]]*/ "Character:";
         let searchBtnText = /*[[#{insert.anime.page.search.button}]]*/ "Search" ;
+        let showResultBtnText = /*[[#{insert.anime.page.show.result.button}]]*/ "Show Result";
+        let novelRelationTypeLabelText = /*[[#{insert.anime.page.novel.type.label}]] */ "Novel Type";
+        let novelRelationDemographicsLabelText = /*[[#{insert.anime.page.novel.demographics.label}]]*/ "Demographics:"
+        let novelRelationStatusLabelText = /*[[#{insert.anime.page.novel.status.label}]]*/ "Novel Status:"
+        let novelRelationPublishedLabelText = /*[[#{insert.anime.page.novel.publication.label}]]*/ "Publication Date:";
+        let novelRelationFinishedLabelText = /*[[#{insert.anime.page.novel.finished.label}]]*/ "Publication Date:";
+        let novelRelationSynopsisLabelText = /*[[#{insert.anime.page.novel.synopsis.label}]]*/ "Synopsis:";
+        let novelRelationBackgroundLabelText = /*[[#{insert.anime.page.novel.background.label}]]*/ "Background:";
+        let novelRelationMoreDetailsBtnText = /*[[#{insert.anime.page.more.details.button}]]*/ "More Details:";
 
-        function addCharacterRelation(){
-            let characterRelationID = `character_relation_${nextAnimeCharacter}`
-
-            let removeBtnContainer = $("<div>")
-                .attr("class","d-flex justify-content-end")
-                .attr("for",``)
-                .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeAnimeCharacter(characterRelationID) }))
-
-            let alertsContainer = $("<div class='alerts'>")
-
-            let roleSelectLabel = $("<label>")
-                .attr("class","form-label")
-                .attr("for",`character_relation_select_${nextAnimeCharacter}`)
-                .text(roleSelectLabelText)
-
-            let roleSelect = $("<select>")
-                .attr("class","form-control")
-                .attr("id",`character_relation_select_${nextAnimeCharacter}`)
-
-            for (let i = 0; i < roleOptions.length; i++) {
-                $("<option>").text(roleOptions[i].toLowerCase().split("_").join(" ")).appendTo(roleSelect)
-            }
-
-            let searchLabel = $("<label>")
-                .attr("class","form-label")
-                .attr("for",`character_relation_search_${nextAnimeCharacter}`)
-                .text(characterSearchLabelText)
-
-            let searchContainer = $("<div>")
-                .attr("class","d-flex")
-                .attr("role","search")
-                .append($("<input>").attr("class","form-control me-2").attr("id",`character_relation_search_${nextAnimeCharacter}`).attr("type","search"))
-                .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText))
-
-            $("<div>")
-                .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
-                .attr("id",`character_relation_${nextAnimeCharacter}`)
-                .append(removeBtnContainer)
-                .append(alertsContainer)
-                .append(roleSelectLabel)
-                .append(roleSelect)
-                .append(searchLabel)
-                .append(searchContainer)
-                .insertBefore("#add_character_relation_btn")
+        function onAddCharacterRelation(){
+            addCharacterRelation(nextAnimeCharacter,roleSelectLabelText,roleOptions,characterSearchLabelText,searchBtnText,removeBtnText)
 
             nextAnimeCharacter = nextAnimeCharacter + 1
         }
 
-        function addAnimeRelation(){
-            let animeRelationID = `anime_relation_${nextAnimeRelation}`
-
-            let removeBtnContainer = $("<div>")
-                .attr("class","d-flex justify-content-end")
-                .attr("for",``)
-                .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeAnimeCharacter(animeRelationID) }))
-
-            let alertsContainer = $("<div class='alerts'>")
-
-            let relationSelectLabel = $("<label>")
-                .attr("class","form-label")
-                .attr("for",`anime_relation_select_${nextAnimeRelation}`)
-                .text(relationSelectLabelText)
-
-            let relationSelect = $("<select>")
-                .attr("class","form-control")
-                .attr("id",`anime_relation_select_${nextAnimeRelation}`)
-
-            for (let i = 0; i < relationOptions.length; i++) {
-                $("<option>").text(relationOptions[i].toLowerCase().split("_").join(" ")).appendTo(relationSelect)
-            }
-
-            let searchLabel = $("<label>")
-                .attr("class","form-label")
-                .attr("for",`anime_relation_search_${nextAnimeRelation}`)
-                .text(animeSearchLabelText)
-
-            let searchContainer = $("<div>")
-                .attr("class","d-flex")
-                .attr("role","search")
-                .append($("<input>").attr("class","form-control me-2").attr("id",`anime_relation_search_${nextAnimeRelation}`).attr("type","search"))
-                .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText))
-
-            $("<div>")
-                .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
-                .attr("id",`anime_relation_${nextAnimeRelation}`)
-                .append(removeBtnContainer)
-                .append(alertsContainer)
-                .append(relationSelectLabel)
-                .append(relationSelect)
-                .append(searchLabel)
-                .append(searchContainer)
-                .insertBefore("#add_anime_relation_btn")
+        function onAddAnimeRelation(){
+            addAnimeRelation(nextAnimeRelation,relationSelectLabelText,relationOptions,removeBtnText,animeSearchLabelText,searchBtnText)
 
             nextAnimeRelation = nextAnimeRelation + 1
         }
 
-        function addNovelRelation() {
-
-            let novelRelationID = nextNovelRelation
-
-            let removeBtnContainer = $("<div>")
-                .attr("class","d-flex justify-content-end")
-                .attr("for",``)
-                .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeNovelRelation(`novel_relation_${novelRelationID}`) }))
-
-            let alertsContainer = $("<div class='alerts'>")
-
-            let relationSelectLabel = $("<label>")
-                .attr("class","form-label")
-                .attr("for",`novel_relation_select_${nextNovelRelation}`)
-                .text(relationSelectLabelText)
-
-            let relationSelect = $("<select>")
-                .attr("class","form-control")
-                .attr("id",`novel_relation_select_${nextNovelRelation}`)
-
-            for (let i = 0; i < relationOptions.length; i++) {
-                $("<option>").text(relationOptions[i].toLowerCase().split("_").join(" ")).appendTo(relationSelect)
+        function onAddNovelRelation() {
+            let messages = {
+                removeBtnText : removeBtnText,
+                relationSelectLabelText : relationSelectLabelText,
+                relationOptions : relationOptions,
+                novelSearchLabelText : novelSearchLabelText,
+                searchBtnText : searchBtnText,
+                showResultBtnText : showResultBtnText,
+                novelRelationTypeLabelText : novelRelationTypeLabelText,
+                novelRelationDemographicsLabelText : novelRelationDemographicsLabelText,
+                novelRelationStatusLabelText : novelRelationStatusLabelText,
+                novelRelationPublishedLabelText : novelRelationPublishedLabelText,
+                novelRelationFinishedLabelText : novelRelationFinishedLabelText,
+                novelRelationSynopsisLabelText : novelRelationSynopsisLabelText,
+                novelRelationBackgroundLabelText : novelRelationBackgroundLabelText,
+                novelRelationMoreDetailsBtnText : novelRelationMoreDetailsBtnText
             }
 
-            let searchLabel = $("<label>")
-                .attr("class","form-label")
-                .attr("for",`novel_relation_search_${nextNovelRelation}`)
-                .text(novelSearchLabelText)
-
-            let searchContainer = $("<div>")
-                .attr("class","d-flex")
-                .attr("role","search")
-                .append($("<input>").attr("class","form-control me-2").attr("id",`novel_relation_search_${nextNovelRelation}`).attr("type","search"))
-                .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText).on("click",function(){ searchNovel(novelRelationID) }))
-
-            $("<div>")
-                .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
-                .attr("id",`novel_relation_${nextNovelRelation}`)
-                .append(removeBtnContainer)
-                .append(alertsContainer)
-                .append(relationSelectLabel)
-                .append(relationSelect)
-                .append(searchLabel)
-                .append(searchContainer)
-                .insertBefore("#add_novel_relation_btn")
+            addNovelRelation(nextNovelRelation,messages)
 
             nextNovelRelation = nextNovelRelation + 1
         }

@@ -3,10 +3,7 @@ package com.arslan.animeshka.service
 import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.UnverifiedContent
 import com.arslan.animeshka.entity.VerifiedContent
-import com.arslan.animeshka.repository.ANIME_PREFIX_KEY
-import com.arslan.animeshka.repository.ContentRepository
-import com.arslan.animeshka.repository.STUDIO_PREFIX_KEY
-import com.arslan.animeshka.repository.UnverifiedNewContentRepository
+import com.arslan.animeshka.repository.*
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -49,6 +46,20 @@ class ContentServiceImpl(
         val verifiedContent = contentRepository.save(VerifiedContent(VerifiedContentStatus.VERIFIED,unverifiedContent.id!!).apply { isNewEntity = true })
 
         return json.decodeFromString<UnverifiedStudio>(unverifiedContent.content) to verifiedContent
+    }
+
+    override suspend fun createNovelEntry(novel: UnverifiedNovel): UnverifiedContent {
+        val content = json.encodeToString(novel)
+        val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
+
+        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.ANIME,content, "${NOVEL_PREFIX_KEY}_${novel.title}"))
+    }
+
+    override suspend fun verifyNovel(novelID: Long): Pair<UnverifiedNovel, VerifiedContent> {
+        val unverifiedContent = verifyContent(novelID)
+        val verifiedContent = contentRepository.save(VerifiedContent(VerifiedContentStatus.VERIFIED,unverifiedContent.id!!).apply { isNewEntity = true })
+
+        return json.decodeFromString<UnverifiedNovel>(unverifiedContent.content) to verifiedContent
     }
 
     private suspend fun verifyContent(contentID: Long) : UnverifiedContent{

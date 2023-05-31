@@ -12,6 +12,7 @@ const val STUDIO_PREFIX_KEY = "STUDIO_"
 const val PERSON_PREFIX_KEY = "PERSON_"
 const val MAGAZINE_PREFIX_KEY = "MAGAZINE_"
 const val ANIME_EPISODE_PREFIX = "ANIME_EPISODE_"
+const val NOVEL_PREFIX_KEY = "NOVEL_"
 
 interface UnverifiedNewContentRepository : CoroutineCrudRepository<UnverifiedContent,Long>{
 
