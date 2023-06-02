@@ -31,6 +31,9 @@ data class Anime(
 
     val synopsis: String,
 
+    @Column("image_path")
+    val posterPath: String,
+
     val animeType: AnimeType = AnimeType.UNKNOWN,
 
     val season: Long? = null,

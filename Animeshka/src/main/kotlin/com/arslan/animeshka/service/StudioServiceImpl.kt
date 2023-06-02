@@ -4,6 +4,7 @@ import com.arslan.animeshka.UnverifiedStudio
 import com.arslan.animeshka.VerifiedContentStatus
 import com.arslan.animeshka.entity.VerifiedContent
 import com.arslan.animeshka.entity.Studio
+import com.arslan.animeshka.entity.UnverifiedContent
 import com.arslan.animeshka.repository.ContentRepository
 import com.arslan.animeshka.repository.StudioRepository
 import kotlinx.datetime.toJavaLocalDate
@@ -19,8 +20,8 @@ class StudioServiceImpl(
     private val contentService: ContentService
 ) : StudioService {
 
-    override suspend fun createStudio(studio: UnverifiedStudio) {
-        contentService.createStudioEntry(studio)
+    override suspend fun createStudio(studio: UnverifiedStudio) : UnverifiedContent{
+        return contentService.createStudioEntry(studio)
     }
 
     override suspend fun verifyStudio(contentID: Long) {

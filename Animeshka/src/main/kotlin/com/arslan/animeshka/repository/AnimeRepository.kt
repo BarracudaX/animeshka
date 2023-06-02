@@ -6,4 +6,8 @@ import org.springframework.data.relational.core.sql.LockMode
 import org.springframework.data.relational.repository.Lock
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-interface AnimeRepository : CoroutineCrudRepository<Anime,Long>
+interface AnimeRepository : CoroutineCrudRepository<Anime,Long>{
+
+    suspend fun findByTitleOrJapaneseTitle(title: String, japaneseTitle: String) : Anime?
+
+}

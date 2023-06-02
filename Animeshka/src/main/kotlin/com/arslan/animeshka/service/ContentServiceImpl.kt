@@ -22,10 +22,10 @@ class ContentServiceImpl(
     private val contentRepository: ContentRepository
 ) : ContentService {
 
-    override suspend fun createAnimeEntry(unverifiedAnime: UnverifiedAnime) {
+    override suspend fun createAnimeEntry(unverifiedAnime: UnverifiedAnime) : UnverifiedContent{
         val content = json.encodeToString(unverifiedAnime)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.ANIME,content, "$ANIME_PREFIX_KEY${unverifiedAnime.title}"))
+        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.ANIME,content, "$ANIME_PREFIX_KEY${unverifiedAnime.title}"))
     }
 
     override suspend fun verifyAnime(contentID: Long) : Pair<UnverifiedAnime,VerifiedContent> {
@@ -35,10 +35,10 @@ class ContentServiceImpl(
         return json.decodeFromString<UnverifiedAnime>(unverifiedContent.content) to verifiedContent
     }
 
-    override suspend fun createStudioEntry(studio: UnverifiedStudio) {
+    override suspend fun createStudioEntry(studio: UnverifiedStudio): UnverifiedContent {
         val content = json.encodeToString(studio)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.STUDIO,content,"$STUDIO_PREFIX_KEY${studio.studioName}"))
+        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.STUDIO,content,"$STUDIO_PREFIX_KEY${studio.studioName}"))
     }
 
     override suspend fun verifyStudio(contentID: Long): Pair<UnverifiedStudio,VerifiedContent> {
@@ -63,7 +63,7 @@ class ContentServiceImpl(
     }
 
     private suspend fun verifyContent(contentID: Long) : UnverifiedContent{
-        val content = unverifiedNewContentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Anime content with id $contentID not found.",1)
+        val content = unverifiedNewContentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Content with id $contentID not found.",1)
         if(content.contentStatus != UnverifiedContentStatus.UNDER_VERIFICATION) throw IllegalStateException("Unverified content is currently not under verification. Current status: ${content.contentStatus}")
 
         val verifier = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()

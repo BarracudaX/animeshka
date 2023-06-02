@@ -5,13 +5,17 @@ import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.UserCredentials
 import com.arslan.animeshka.UserRegistration
 import com.arslan.animeshka.repository.UserRepository
+import kotlinx.coroutines.reactor.mono
 import org.slf4j.LoggerFactory
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException
 import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.core.Authentication
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.oauth2.server.resource.BearerTokenAuthenticationToken
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import reactor.core.publisher.Mono
 
-@Service
 @Transactional
 class UserServiceImpl(private val userRepository: UserRepository,private val passwordEncoder: PasswordEncoder,private val jwtService: JwtService) : UserService {
 
@@ -23,24 +27,27 @@ class UserServiceImpl(private val userRepository: UserRepository,private val pas
         return userRepository.save(user)
     }
 
-    override suspend fun login(userCredentials: UserCredentials): String {
-        val user = when(val user = userRepository.findByEmail(userCredentials.credentials)){
-            null -> userRepository.findByUsername(userCredentials.credentials)
+    override fun authenticate(authentication: Authentication): Mono<Authentication> = mono{
+        val emailOrUsername = authentication.principal?.toString() ?: throw AuthenticationCredentialsNotFoundException("Email/Username is not provided.")
+        val password = authentication.credentials?.toString() ?: throw AuthenticationCredentialsNotFoundException("Password is not provided.")
+
+        val user = when(val user = userRepository.findByEmail(emailOrUsername)){
+            null -> userRepository.findByUsername(emailOrUsername)
             else -> user
         }
 
         if(user == null){
-            logger.info("Failed authentication request. Email : ${userCredentials.credentials}. Cause : user not found.")
-            throw BadCredentialsException("User with email ${userCredentials.credentials} not found.")
+            logger.info("Failed authentication request. Email/Username : ${emailOrUsername}. Cause : user not found.")
+            throw BadCredentialsException("User with email/username $emailOrUsername not found.")
         }
 
-        if(!passwordEncoder.matches(userCredentials.password,user.password)) {
-            logger.info("Failed authentication request. Email : ${userCredentials.credentials}. Cause : invalid credentials.")
+        if(!passwordEncoder.matches(password,user.password)) {
+            logger.info("Failed authentication request. Email/Username : ${emailOrUsername}. Cause : invalid credentials.")
             throw BadCredentialsException("Invalid Credentials.")
         }
 
-        logger.info("Successful authentication. Email : ${userCredentials.credentials}")
-        return jwtService.createToken(user)
+        BearerTokenAuthenticationToken(jwtService.createToken(user))
     }
+
 
 }

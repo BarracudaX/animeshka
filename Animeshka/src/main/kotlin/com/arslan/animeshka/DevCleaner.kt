@@ -4,10 +4,21 @@ import io.r2dbc.spi.ConnectionFactory
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.DisposableBean
+import org.springframework.beans.factory.annotation.Value
+import java.nio.file.DirectoryStream
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.deleteExisting
+import kotlin.io.path.isRegularFile
 
-class SchemaDropper(private val connectionFactory: ConnectionFactory) : DisposableBean{
+class DevCleaner(private val connectionFactory: ConnectionFactory) : DisposableBean{
+
+    @Value("\${image.path.location}")
+    private lateinit var imageLocation: Path
+
     override fun destroy() = runBlocking{
         val connection = connectionFactory.create().awaitFirst()
+        connection.createStatement("DROP TABLE IF EXISTS IMAGE_ID_GENERATOR").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS CONTENT_CHANGES").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS ANIME_EPISODE_CHARACTER_APPEARANCES").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS NOVEL_ANIME_RELATIONS").execute().awaitFirst()
@@ -31,6 +42,12 @@ class SchemaDropper(private val connectionFactory: ConnectionFactory) : Disposab
         connection.createStatement("DROP TABLE IF EXISTS VERIFIED_CONTENT").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS UNVERIFIED_NEW_CONTENT").execute().awaitFirst()
         connection.createStatement("DROP TABLE IF EXISTS USERS").execute().awaitFirst()
+
+        Files.newDirectoryStream(imageLocation){ path -> path.isRegularFile() }.use { stream ->
+            for(path in stream){
+                path.deleteExisting()
+            }
+        }
         Unit
     }
 

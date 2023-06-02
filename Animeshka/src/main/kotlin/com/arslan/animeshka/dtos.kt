@@ -4,7 +4,6 @@ import com.arslan.animeshka.constraints.EqualRegistrationPasswords
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
-import org.springframework.data.annotation.Id
 import java.time.DayOfWeek
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
@@ -91,6 +90,8 @@ data class UnverifiedAnime(
 
     val characters: Set<AnimeCharacter> = emptySet(),
 
+    val imagePath: String = "",
+
     val explicitGenre: ExplicitGenre? = null,
 
     val airingTime: LocalTime? = null,
@@ -154,6 +155,31 @@ data class AnimeDTO(
 )
 
 @Serializable
+data class BasicAnimeDTO(
+    val title: String,
+
+    val japaneseTitle: String,
+
+    val status: AnimeStatus,
+
+    val demographic: Demographic,
+
+    val synopsis: String,
+
+    val animeType: AnimeType,
+
+    val posterPath: String,
+
+    val id: Long,
+
+    val background: String = "",
+
+    val airedAt: LocalDate? = null,
+
+    val finishedAt: LocalDate? = null,
+)
+
+@Serializable
 data class PersonEntry(
     val firstName: String,
 
@@ -198,48 +224,9 @@ data class BasicNovelDTO(
 
     val background: String,
 
-    val finished: LocalDate? = null,
-
-    val id: Long
-)
-
-@Serializable
-data class NovelDTO(
-    val title: String,
-
-    val japaneseTitle: String,
-
-    val synopsis: String,
-
-    val published: LocalDate,
-
-    val novelStatus: NovelStatus,
-
-    val novelType: NovelType,
-
-    val demographic: Demographic,
-
-    val background: String,
-
-    val characters: Set<Long> = emptySet(),
-
-    val animeRelations: Set<WorkRelation> = emptySet(),
-
-    val novelRelations: Set<WorkRelation> = emptySet(),
-
-    val themes: Set<Theme> = emptySet(),
-
-    val genres: Set<Genre> = emptySet(),
-
-    val explicitGenre: ExplicitGenre? = null,
-
-    val magazine: Long? = null,
+    val posterPath: String,
 
     val finished: LocalDate? = null,
-
-    val chapters: Int? = null,
-
-    val volumes: Int? = null,
 
     val id: Long
 )
@@ -261,6 +248,8 @@ data class UnverifiedNovel(
     val demographic: Demographic,
 
     val background: String,
+
+    val posterPath: String = "",
 
     val characters: Set<Long> = emptySet(),
 

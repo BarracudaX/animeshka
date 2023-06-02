@@ -11,5 +11,5 @@ import org.springframework.http.codec.ServerCodecConfigurer
 class GeneralConfig {
 
     @Bean
-    fun json() : Json = Json.Default
+    fun json() : Json = Json{ encodeDefaults = true }
 }
