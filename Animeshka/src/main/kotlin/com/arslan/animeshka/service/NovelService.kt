@@ -9,7 +9,7 @@ interface NovelService {
 
     suspend fun findByTitle(title: String) : BasicNovelDTO
 
-    suspend fun createNovel(novel: UnverifiedNovel,image: FilePart) : UnverifiedContent
+    suspend fun createNovel(novel: UnverifiedNovel, poster: FilePart) : UnverifiedContent
 
     suspend fun verifyNovel(novelID: Long)
 }

@@ -1,12 +1,9 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.*
-import com.arslan.animeshka.entity.Image
 import com.arslan.animeshka.entity.Novel
 import com.arslan.animeshka.entity.UnverifiedContent
-import com.arslan.animeshka.repository.ImageRepository
 import com.arslan.animeshka.repository.NovelRepository
-import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import org.springframework.beans.factory.annotation.Value
@@ -18,9 +15,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.util.UriComponentsBuilder
 import java.nio.file.Path
-import kotlin.io.path.exists
 
 @Transactional
 @Service
@@ -29,7 +24,7 @@ class NovelServiceImpl(
     private val databaseClient: DatabaseClient,
     private val messageSource: MessageSource,
     private val contentService: ContentService,
-    private val imageRepository: ImageRepository
+    private val imageService: ImageService
 ) : NovelService {
 
 
@@ -43,14 +38,10 @@ class NovelServiceImpl(
         return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background, posterURL, finished?.toKotlinLocalDate(),id) }
     }
 
-    override suspend fun createNovel(novel: UnverifiedNovel,image: FilePart): UnverifiedContent {
-        val imagePath = getImagePath(imageLocation,image,imageRepository.save(Image()).id!!)
+    override suspend fun createNovel(novel: UnverifiedNovel, poster: FilePart): UnverifiedContent {
+        val posterPath = imageService.saveImage(poster)
 
-        if(imagePath.exists()) throw IllegalStateException("Image already exists.")
-
-        image.transferTo(imagePath).awaitFirstOrNull()
-
-        return contentService.createNovelEntry(novel.copy(posterPath = imagePath.toString()))
+        return contentService.createNovelEntry(novel.copy(posterPath = posterPath.toString()))
     }
 
     override suspend fun verifyNovel(novelID: Long) {

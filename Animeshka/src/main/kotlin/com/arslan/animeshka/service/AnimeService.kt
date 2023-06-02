@@ -9,7 +9,7 @@ import org.springframework.http.codec.multipart.FilePart
 
 interface AnimeService {
 
-    suspend fun createUnverifiedAnime(unverifiedAnime: UnverifiedAnime,image: FilePart) : UnverifiedContent
+    suspend fun createUnverifiedAnime(unverifiedAnime: UnverifiedAnime, poster: FilePart) : UnverifiedContent
 
     suspend fun verifyAnimeEntry(contentID: Long)
 

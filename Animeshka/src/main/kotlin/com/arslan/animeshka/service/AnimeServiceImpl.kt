@@ -4,12 +4,10 @@ import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
 import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaLocalTime
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinLocalTime
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.DataIntegrityViolationException
@@ -19,8 +17,6 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.nio.file.Path
-import kotlin.io.path.exists
 
 @Transactional
 @Service
@@ -31,29 +27,21 @@ class AnimeServiceImpl(
     private val contentRepository: ContentRepository,
     private val databaseClient: DatabaseClient,
     private val contentChangeService: ContentChangeService,
-    private val imageRepository: ImageRepository,
-    private val messageSource: MessageSource
+    private val messageSource: MessageSource,
+    private val imageService: ImageService
 ) : AnimeService {
 
-    @Value("\${image.path.location}")
-    private lateinit var imageLocation: Path
 
-
-    override suspend fun createUnverifiedAnime(unverifiedAnime: UnverifiedAnime,image: FilePart): UnverifiedContent {
-        val imagePath = getImagePath(imageLocation,image,imageRepository.save(Image()).id!!)
-
-        if(imagePath.exists()) throw IllegalStateException("File for anime already exists. File path $imagePath.")
-
-        image.transferTo(imagePath).awaitFirstOrNull()
-
-        return contentService.createAnimeEntry(unverifiedAnime.copy(imagePath = imagePath.toString()))
+    override suspend fun createUnverifiedAnime(unverifiedAnime: UnverifiedAnime, poster: FilePart): UnverifiedContent {
+        val posterPath = imageService.saveImage(poster)
+        return contentService.createAnimeEntry(unverifiedAnime.copy(posterPath = posterPath.toString()))
     }
 
     override suspend fun verifyAnimeEntry(contentID: Long) {
         val (animeEntry,verifiedContent) = contentService.verifyAnime(contentID)
         val season = getAnimeSeason(animeEntry)
         val anime = with(animeEntry){
-            val anime = Anime(title,status,rating,studio,demographic,licensor,japaneseTitle, synopsis, imagePath,animeType,season?.id,explicitGenre,airingTime?.toJavaLocalTime(),airingDay,duration,0,airedAt?.toJavaLocalDate(),finishedAt?.toJavaLocalDate(),background,additionalInfo, id = verifiedContent.id).apply { isNewEntity = true }
+            val anime = Anime(title,status,rating,studio,demographic,licensor,japaneseTitle, synopsis, posterPath,animeType,season?.id,explicitGenre,airingTime?.toJavaLocalTime(),airingDay,duration,0,airedAt?.toJavaLocalDate(),finishedAt?.toJavaLocalDate(),background,additionalInfo, id = verifiedContent.id).apply { isNewEntity = true }
             animeRepository.save(anime)
         }
 

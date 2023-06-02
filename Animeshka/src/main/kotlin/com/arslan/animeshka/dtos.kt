@@ -90,7 +90,7 @@ data class UnverifiedAnime(
 
     val characters: Set<AnimeCharacter> = emptySet(),
 
-    val imagePath: String = "",
+    val posterPath: String = "",
 
     val explicitGenre: ExplicitGenre? = null,
 
