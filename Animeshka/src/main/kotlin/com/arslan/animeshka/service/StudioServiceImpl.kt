@@ -1,11 +1,8 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.UnverifiedStudio
-import com.arslan.animeshka.VerifiedContentStatus
-import com.arslan.animeshka.entity.VerifiedContent
+import com.arslan.animeshka.StudioContent
 import com.arslan.animeshka.entity.Studio
-import com.arslan.animeshka.entity.UnverifiedContent
-import com.arslan.animeshka.repository.ContentRepository
+import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.repository.StudioRepository
 import kotlinx.datetime.toJavaLocalDate
 import org.springframework.stereotype.Service
@@ -20,15 +17,14 @@ class StudioServiceImpl(
     private val contentService: ContentService
 ) : StudioService {
 
-    override suspend fun createStudio(studio: UnverifiedStudio) : UnverifiedContent{
+    override suspend fun createStudio(studio: StudioContent) : Content{
         return contentService.createStudioEntry(studio)
     }
 
     override suspend fun verifyStudio(contentID: Long) {
-        val (verifiedStudio,verifiedContent) = contentService.verifyStudio(contentID)
+        val studioContent = contentService.verifyStudio(contentID)
 
-        with(verifiedStudio){ studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),verifiedContent.id,true)) }
-
+        with(studioContent){ studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),id!!,true)) }
     }
 
 

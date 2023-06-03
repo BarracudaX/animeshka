@@ -1,6 +1,6 @@
 package com.arslan.animeshka.controller
 
-import com.arslan.animeshka.UnverifiedStudio
+import com.arslan.animeshka.StudioContent
 import com.arslan.animeshka.service.StudioService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController
 class StudioController(private val studioService: StudioService) {
 
     @PostMapping
-    suspend fun createStudio(@RequestBody unverifiedStudio: UnverifiedStudio) : ResponseEntity<Unit>{
-        studioService.createStudio(unverifiedStudio)
+    suspend fun createStudio(@RequestBody studioContent: StudioContent) : ResponseEntity<Unit>{
+        studioService.createStudio(studioContent)
         return ResponseEntity.ok(Unit)
     }
 

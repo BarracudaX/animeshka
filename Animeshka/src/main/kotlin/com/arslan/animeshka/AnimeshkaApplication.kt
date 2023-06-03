@@ -37,14 +37,14 @@ fun main(args: Array<String>) : Unit = runBlocking{
     mono {
         val headers = HttpHeaders().apply { add(HttpHeaders.CONTENT_DISPOSITION,"image;filename=image.jpg") }
         val testPoster = AppFilePart(headers, Path("/animeshka/test.jpg"))
-        val studio = studioService.createStudio(UnverifiedStudio("studio","studio_jp",LocalDate.now().toKotlinLocalDate()))
+        val studio = studioService.createStudio(StudioContent("studio","studio_jp",LocalDate.now().toKotlinLocalDate()))
         val novel = novelService.createNovel(
-            UnverifiedNovel("test","test_jp","test_syn",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)),
+            NovelContent("test","test_jp","test_syn",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)),
             testPoster
         )
-        val character = characterService.createCharacterEntry(UnverifiedCharacter("test","test_jp","test_desc",CharacterRole.ANTAGONIST),testPoster)
+        val character = characterService.createCharacterEntry(CharacterContent("test","test_jp","test_desc",CharacterRole.ANTAGONIST),testPoster)
         val anime = animeService.createUnverifiedAnime(
-            UnverifiedAnime("test","test_jp",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
+            AnimeContent("test","test_jp",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
             testPoster
         )
         moderationService.acceptModeration(novel.id!!)

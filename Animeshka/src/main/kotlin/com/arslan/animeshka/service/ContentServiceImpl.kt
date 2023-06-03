@@ -1,8 +1,7 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.*
-import com.arslan.animeshka.entity.UnverifiedContent
-import com.arslan.animeshka.entity.VerifiedContent
+import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.repository.*
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.serialization.decodeFromString
@@ -18,72 +17,67 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ContentServiceImpl(
     private val json: Json,
-    private val unverifiedNewContentRepository: UnverifiedNewContentRepository,
     private val contentRepository: ContentRepository
 ) : ContentService {
 
-    override suspend fun createAnimeEntry(unverifiedAnime: UnverifiedAnime) : UnverifiedContent{
-        val content = json.encodeToString(unverifiedAnime)
+    override suspend fun createAnimeEntry(animeContent: AnimeContent) : Content{
+        val content = json.encodeToString(animeContent)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.ANIME,content, "$ANIME_PREFIX_KEY${unverifiedAnime.title}"))
+        return contentRepository.save(Content(creatorID, NewContentType.ANIME,content, "$ANIME_PREFIX_KEY${animeContent.title}"))
     }
 
-    override suspend fun verifyAnime(contentID: Long) : Pair<UnverifiedAnime,VerifiedContent> {
-        val unverifiedContent = verifyContent(contentID)
-        val verifiedContent = contentRepository.save(VerifiedContent(VerifiedContentStatus.VERIFIED,unverifiedContent.id!!).apply { isNewEntity = true })
+    override suspend fun verifyAnime(contentID: Long) : AnimeContent {
+        val content = verifyContent(contentID)
 
-        return json.decodeFromString<UnverifiedAnime>(unverifiedContent.content) to verifiedContent
+        return json.decodeFromString<AnimeContent>(content.content).copy(id = content.id)
     }
 
-    override suspend fun createStudioEntry(studio: UnverifiedStudio): UnverifiedContent {
+    override suspend fun createStudioEntry(studio: StudioContent): Content {
         val content = json.encodeToString(studio)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.STUDIO,content,"$STUDIO_PREFIX_KEY${studio.studioName}"))
+        return contentRepository.save(Content(creatorID, NewContentType.STUDIO,content,"$STUDIO_PREFIX_KEY${studio.studioName}"))
     }
 
-    override suspend fun verifyStudio(contentID: Long): Pair<UnverifiedStudio,VerifiedContent> {
-        val unverifiedContent = verifyContent(contentID)
-        val verifiedContent = contentRepository.save(VerifiedContent(VerifiedContentStatus.VERIFIED,unverifiedContent.id!!).apply { isNewEntity = true })
+    override suspend fun verifyStudio(contentID: Long): StudioContent {
+        val content = verifyContent(contentID)
 
-        return json.decodeFromString<UnverifiedStudio>(unverifiedContent.content) to verifiedContent
+        return json.decodeFromString<StudioContent>(content.content).copy(id = content.id)
     }
 
-    override suspend fun createNovelEntry(novel: UnverifiedNovel): UnverifiedContent {
+    override suspend fun createNovelEntry(novel: NovelContent): Content {
         val content = json.encodeToString(novel)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
 
-        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.NOVEL,content, "${NOVEL_PREFIX_KEY}_${novel.title}"))
+        return contentRepository.save(Content(creatorID, NewContentType.NOVEL,content, "${NOVEL_PREFIX_KEY}_${novel.title}"))
     }
 
-    override suspend fun verifyNovel(novelID: Long): Pair<UnverifiedNovel, VerifiedContent> {
-        val unverifiedContent = verifyContent(novelID)
-        val verifiedContent = contentRepository.save(VerifiedContent(VerifiedContentStatus.VERIFIED,unverifiedContent.id!!).apply { isNewEntity = true })
+    override suspend fun verifyNovel(novelID: Long): NovelContent {
+        val content = verifyContent(novelID)
 
-        return json.decodeFromString<UnverifiedNovel>(unverifiedContent.content) to verifiedContent
+        return json.decodeFromString<NovelContent>(content.content).copy(id = content.id)
     }
 
-    override suspend fun createCharacterEntry(character: UnverifiedCharacter): UnverifiedContent {
+    override suspend fun createCharacterEntry(character: CharacterContent): Content {
         val content = json.encodeToString(character)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.CHARACTER,content, "${CHARACTER_PREFIX_KEY}_${character.characterName}"))
+        return contentRepository.save(Content(creatorID, NewContentType.CHARACTER,content, "${CHARACTER_PREFIX_KEY}_${character.characterName}"))
     }
 
-    override suspend fun verifyCharacter(contentID: Long): Pair<UnverifiedCharacter, VerifiedContent> {
-        val unverifiedCharacterData = verifyContent(contentID)
-        val verifiedContent = contentRepository.save(VerifiedContent(VerifiedContentStatus.VERIFIED,unverifiedCharacterData.id!!).apply { isNewEntity = true })
+    override suspend fun verifyCharacter(contentID: Long): CharacterContent {
+        val content = verifyContent(contentID)
 
-        return json.decodeFromString<UnverifiedCharacter>(unverifiedCharacterData.content) to verifiedContent
+        return json.decodeFromString<CharacterContent>(content.content).copy(id = content.id)
     }
 
-    private suspend fun verifyContent(contentID: Long) : UnverifiedContent{
-        val content = unverifiedNewContentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Content with id $contentID not found.",1)
-        if(content.contentStatus != UnverifiedContentStatus.UNDER_VERIFICATION) throw IllegalStateException("Unverified content is currently not under verification. Current status: ${content.contentStatus}")
+    private suspend fun verifyContent(contentID: Long) : Content{
+        val content = contentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Content with id $contentID not found.",1)
+        if(content.contentStatus != ContentStatus.UNDER_VERIFICATION) throw IllegalStateException("Unverified content is currently not under verification. Current status: ${content.contentStatus}")
 
         val verifier = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
 
         if(content.verifier != verifier) throw AccessDeniedException("User with id ${content.verifier} is trying to verify content with id $contentID that is under verification by different user with id ${content.verifier}.")
 
-        unverifiedNewContentRepository.save(content.copy(contentStatus = UnverifiedContentStatus.VERIFIED))
+        contentRepository.save(content.copy(contentStatus = ContentStatus.VERIFIED))
 
         return content
     }

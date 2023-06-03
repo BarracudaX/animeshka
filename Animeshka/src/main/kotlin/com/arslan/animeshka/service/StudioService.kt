@@ -1,11 +1,11 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.UnverifiedStudio
-import com.arslan.animeshka.entity.UnverifiedContent
+import com.arslan.animeshka.StudioContent
+import com.arslan.animeshka.entity.Content
 
 interface StudioService {
 
-    suspend fun createStudio(studio: UnverifiedStudio) : UnverifiedContent
+    suspend fun createStudio(studio: StudioContent) : Content
 
     suspend fun verifyStudio(contentID: Long)
 }

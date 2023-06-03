@@ -2,7 +2,7 @@ package com.arslan.animeshka.service
 
 import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.Novel
-import com.arslan.animeshka.entity.UnverifiedContent
+import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.repository.NovelRepository
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
@@ -38,23 +38,23 @@ class NovelServiceImpl(
         return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background, posterURL, finished?.toKotlinLocalDate(),id) }
     }
 
-    override suspend fun createNovel(novel: UnverifiedNovel, poster: FilePart): UnverifiedContent {
+    override suspend fun createNovel(novel: NovelContent, poster: FilePart): Content {
         val posterPath = imageService.saveImage(poster)
 
         return contentService.createNovelEntry(novel.copy(posterPath = posterPath.toString()))
     }
 
     override suspend fun verifyNovel(novelID: Long) {
-        val (novelData,verifiedContent) = contentService.verifyNovel(novelID)
-        val novel = with(novelData){
-            novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,posterPath,explicitGenre,magazine,null,null,background,finished?.toJavaLocalDate(),chapters,volumes,verifiedContent.id).apply { isNewEntity = true })
+        val novelContent = contentService.verifyNovel(novelID)
+        val novel = with(novelContent){
+            novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,posterPath,explicitGenre,magazine,null,null,background,finished?.toJavaLocalDate(),chapters,volumes,id!!).apply { isNewEntity = true })
         }
 
-        createNovelRelations(novel,novelData.novelRelations)
-        createAnimeRelations(novel,novelData.animeRelations)
-        createCharacterRelations(novel,novelData.characters)
-        createThemes(novel,novelData.themes)
-        createGenres(novel,novelData.genres)
+        createNovelRelations(novel,novelContent.novelRelations)
+        createAnimeRelations(novel,novelContent.animeRelations)
+        createCharacterRelations(novel,novelContent.characters)
+        createThemes(novel,novelContent.themes)
+        createGenres(novel,novelContent.genres)
     }
 
 

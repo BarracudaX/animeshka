@@ -2,10 +2,10 @@ package com.arslan.animeshka.service
 
 import com.arslan.animeshka.PersonEntry
 import com.arslan.animeshka.NewContentType
-import com.arslan.animeshka.entity.UnverifiedContent
+import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.repository.PERSON_PREFIX_KEY
 import com.arslan.animeshka.repository.PeopleRepository
-import com.arslan.animeshka.repository.UnverifiedNewContentRepository
+import com.arslan.animeshka.repository.ContentRepository
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -18,14 +18,13 @@ import org.springframework.transaction.annotation.Transactional
 class PeopleServiceImpl(
     private val peopleRepository: PeopleRepository,
     private val json: Json,
-    private val contentRepository: UnverifiedNewContentRepository
+    private val contentRepository: ContentRepository
 ) : PeopleService {
     
     override suspend fun createPersonEntry(personEntry: PersonEntry) {
         val content = json.encodeToString(personEntry)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        contentRepository.save(UnverifiedContent(creatorID,
-            NewContentType.PERSON,"${PERSON_PREFIX_KEY}${personEntry.firstName}_${personEntry.lastName}_(${personEntry.givenName}_${personEntry.familyName})",content,))
+        contentRepository.save(Content(creatorID, NewContentType.PERSON,"${PERSON_PREFIX_KEY}${personEntry.firstName}_${personEntry.lastName}_(${personEntry.givenName}_${personEntry.familyName})",content,))
     }
     
 }

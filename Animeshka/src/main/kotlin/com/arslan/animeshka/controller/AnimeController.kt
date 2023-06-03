@@ -2,7 +2,7 @@ package com.arslan.animeshka.controller
 
 import com.arslan.animeshka.AnimeDTO
 import com.arslan.animeshka.BasicAnimeDTO
-import com.arslan.animeshka.UnverifiedAnime
+import com.arslan.animeshka.AnimeContent
 import com.arslan.animeshka.service.AnimeService
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 class AnimeController(private val animeService: AnimeService) {
 
     @PostMapping
-    suspend fun newAnime(@RequestPart("data") anime: UnverifiedAnime,@RequestPart("image") image: FilePart) : ResponseEntity<Unit>{
+    suspend fun newAnime(@RequestPart("data") anime: AnimeContent, @RequestPart("image") image: FilePart) : ResponseEntity<Unit>{
         animeService.createUnverifiedAnime(anime,image)
 
         return ResponseEntity.ok(Unit)

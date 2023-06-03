@@ -32,30 +32,30 @@ class AnimeServiceImpl(
 ) : AnimeService {
 
 
-    override suspend fun createUnverifiedAnime(unverifiedAnime: UnverifiedAnime, poster: FilePart): UnverifiedContent {
+    override suspend fun createUnverifiedAnime(animeContent: AnimeContent, poster: FilePart): Content {
         val posterPath = imageService.saveImage(poster)
-        return contentService.createAnimeEntry(unverifiedAnime.copy(posterPath = posterPath.toString()))
+        return contentService.createAnimeEntry(animeContent.copy(posterPath = posterPath.toString()))
     }
 
     override suspend fun verifyAnimeEntry(contentID: Long) {
-        val (animeEntry,verifiedContent) = contentService.verifyAnime(contentID)
-        val season = getAnimeSeason(animeEntry)
-        val anime = with(animeEntry){
-            val anime = Anime(title,status,rating,studio,demographic,licensor,japaneseTitle, synopsis, posterPath,animeType,season?.id,explicitGenre,airingTime?.toJavaLocalTime(),airingDay,duration,0,airedAt?.toJavaLocalDate(),finishedAt?.toJavaLocalDate(),background,additionalInfo, id = verifiedContent.id).apply { isNewEntity = true }
+        val animeContent = contentService.verifyAnime(contentID)
+        val season = getAnimeSeason(animeContent)
+        val anime = with(animeContent){
+            val anime = Anime(title,status,rating,studio,demographic,licensor,japaneseTitle, synopsis, posterPath,animeType,season?.id,explicitGenre,airingTime?.toJavaLocalTime(),airingDay,duration,0,airedAt?.toJavaLocalDate(),finishedAt?.toJavaLocalDate(),background,additionalInfo, id = id!!).apply { isNewEntity = true }
             animeRepository.save(anime)
         }
 
-        createThemes(anime,animeEntry.themes)
-        createGenres(anime,animeEntry.genres)
-        createNovelRelations(anime,animeEntry.novelRelations)
-        createAnimeRelations(anime,animeEntry.animeRelations)
-        createCharacterAssociations(anime,animeEntry.characters)
+        createThemes(anime,animeContent.themes)
+        createGenres(anime,animeContent.genres)
+        createNovelRelations(anime,animeContent.novelRelations)
+        createAnimeRelations(anime,animeContent.animeRelations)
+        createCharacterAssociations(anime,animeContent.characters)
     }
 
     override suspend fun updateAnime(anime: AnimeDTO) {
         val content = contentRepository.findById(anime.id) ?: throw EmptyResultDataAccessException("Could not find verified anime content with id ${anime.id}",1)
 
-        if(content.contentStatus != VerifiedContentStatus.VERIFIED) throw IllegalStateException("Cannot add change proposals for anime with id ${anime.id} because of it's current state : ${content.contentStatus}.")
+        if(content.contentStatus != ContentStatus.VERIFIED) throw IllegalStateException("Cannot add change proposals for anime with id ${anime.id} because of it's current state : ${content.contentStatus}.")
 
         val animeBasicData = animeRepository.findById(anime.id) ?: throw EmptyResultDataAccessException("Anime with id ${anime.id} not found.",1)
         val characters = getAnimeCharacters(animeBasicData)
@@ -184,12 +184,12 @@ class AnimeServiceImpl(
         }
     }
 
-    private suspend fun getAnimeSeason(unverifiedAnime: UnverifiedAnime): AnimeSeason? {
-        return if(unverifiedAnime.airedAt == null){
+    private suspend fun getAnimeSeason(animeContent: AnimeContent): AnimeSeason? {
+        return if(animeContent.airedAt == null){
             null
         }else{
-            val year = unverifiedAnime.airedAt.year
-            val season = Season.seasonOf(unverifiedAnime.airedAt.month)
+            val year = animeContent.airedAt.year
+            val season = Season.seasonOf(animeContent.airedAt.month)
             try{
                 animeSeasonsRepository.save(AnimeSeason(season,year))
             }catch (ex: DataIntegrityViolationException){

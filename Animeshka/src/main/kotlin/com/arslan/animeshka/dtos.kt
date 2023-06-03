@@ -42,12 +42,14 @@ data class UserCredentials(
 )
 
 @Serializable
-data class UnverifiedStudio(
+data class StudioContent(
     val studioName: String,
 
     val japaneseName: String,
 
     val established: LocalDate,
+
+    val id: Long? = null
 )
 
 @Serializable
@@ -57,7 +59,7 @@ data class AnimeCharacter(val characterID: Long,val voiceActorID: Long)
 data class WorkRelation(val relatedWorkID: Long,val relation: Relation)
 
 @Serializable
-data class UnverifiedAnime(
+data class AnimeContent(
     val title: String,
 
     val japaneseTitle: String,
@@ -103,6 +105,8 @@ data class UnverifiedAnime(
     val airedAt: LocalDate? = null,
 
     val finishedAt: LocalDate? = null,
+
+    val id: Long? = null
 )
 
 @Serializable
@@ -232,7 +236,7 @@ data class BasicNovelDTO(
 )
 
 @Serializable
-data class UnverifiedNovel(
+data class NovelContent(
     val title: String,
 
     val japaneseTitle: String,
@@ -269,11 +273,13 @@ data class UnverifiedNovel(
 
     val chapters: Int? = null,
 
-    val volumes: Int? = null
+    val volumes: Int? = null,
+
+    val id: Long? = null
 )
 
 @Serializable
-data class UnverifiedCharacter(
+data class CharacterContent(
     val characterName: String,
 
     val japaneseName: String? = null,
@@ -282,5 +288,7 @@ data class UnverifiedCharacter(
 
     val characterRole: CharacterRole,
 
-    val posterPath: String = ""
+    val posterPath: String = "",
+
+    val id: Long? = null
 )
