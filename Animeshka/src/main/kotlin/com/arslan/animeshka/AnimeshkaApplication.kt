@@ -28,6 +28,7 @@ fun main(args: Array<String>) : Unit = runBlocking{
     val studioService = context.getBean(StudioService::class.java)
     val novelService = context.getBean(NovelService::class.java)
     val animeService = context.getBean(AnimeService::class.java)
+    val characterService = context.getBean(CharacterService::class.java)
     val user = userRepository.save(User("Test_Anime_Admin","Test_Anime_Admin","AnimeAdmin","anime@admin.com",passwordEncoder.encode("Pass123!"),UserRole.ANIME_ADMINISTRATOR))
     userService.register(UserRegistration("test@email.com","Pass123!","Pass123!","TestUser","test","test"))
 
@@ -35,19 +36,22 @@ fun main(args: Array<String>) : Unit = runBlocking{
 
     mono {
         val headers = HttpHeaders().apply { add(HttpHeaders.CONTENT_DISPOSITION,"image;filename=image.jpg") }
-        val filePart = AppFilePart(headers, Path("/animeshka/test.jpg"))
+        val testPoster = AppFilePart(headers, Path("/animeshka/test.jpg"))
         val studio = studioService.createStudio(UnverifiedStudio("studio","studio_jp",LocalDate.now().toKotlinLocalDate()))
         val novel = novelService.createNovel(
             UnverifiedNovel("test","test_jp","test_syn",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)),
-            filePart
+            testPoster
         )
+        val character = characterService.createCharacterEntry(UnverifiedCharacter("test","test_jp","test_desc",CharacterRole.ANTAGONIST),testPoster)
         val anime = animeService.createUnverifiedAnime(
             UnverifiedAnime("test","test_jp",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
-            filePart
+            testPoster
         )
         moderationService.acceptModeration(novel.id!!)
         moderationService.acceptModeration(studio.id)
         moderationService.acceptModeration(anime.id!!)
+        moderationService.acceptModeration(character.id!!)
+        characterService.verifyCharacter(character.id)
         studioService.verifyStudio(studio.id)
         novelService.verifyNovel(novel.id)
         animeService.verifyAnimeEntry(anime.id)

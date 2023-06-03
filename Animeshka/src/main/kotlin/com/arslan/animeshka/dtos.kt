@@ -271,3 +271,16 @@ data class UnverifiedNovel(
 
     val volumes: Int? = null
 )
+
+@Serializable
+data class UnverifiedCharacter(
+    val characterName: String,
+
+    val japaneseName: String? = null,
+
+    val description: String = "",
+
+    val characterRole: CharacterRole,
+
+    val posterPath: String = ""
+)

@@ -52,7 +52,7 @@ class ContentServiceImpl(
         val content = json.encodeToString(novel)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
 
-        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.ANIME,content, "${NOVEL_PREFIX_KEY}_${novel.title}"))
+        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.NOVEL,content, "${NOVEL_PREFIX_KEY}_${novel.title}"))
     }
 
     override suspend fun verifyNovel(novelID: Long): Pair<UnverifiedNovel, VerifiedContent> {
@@ -60,6 +60,19 @@ class ContentServiceImpl(
         val verifiedContent = contentRepository.save(VerifiedContent(VerifiedContentStatus.VERIFIED,unverifiedContent.id!!).apply { isNewEntity = true })
 
         return json.decodeFromString<UnverifiedNovel>(unverifiedContent.content) to verifiedContent
+    }
+
+    override suspend fun createCharacterEntry(character: UnverifiedCharacter): UnverifiedContent {
+        val content = json.encodeToString(character)
+        val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
+        return unverifiedNewContentRepository.save(UnverifiedContent(creatorID, NewContentType.CHARACTER,content, "${CHARACTER_PREFIX_KEY}_${character.characterName}"))
+    }
+
+    override suspend fun verifyCharacter(contentID: Long): Pair<UnverifiedCharacter, VerifiedContent> {
+        val unverifiedCharacterData = verifyContent(contentID)
+        val verifiedContent = contentRepository.save(VerifiedContent(VerifiedContentStatus.VERIFIED,unverifiedCharacterData.id!!).apply { isNewEntity = true })
+
+        return json.decodeFromString<UnverifiedCharacter>(unverifiedCharacterData.content) to verifiedContent
     }
 
     private suspend fun verifyContent(contentID: Long) : UnverifiedContent{
