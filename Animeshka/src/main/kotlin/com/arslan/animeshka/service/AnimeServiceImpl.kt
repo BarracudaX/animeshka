@@ -3,7 +3,6 @@ package com.arslan.animeshka.service
 import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
-import com.arslan.animeshka.solr.AnimeDocument
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaLocalTime

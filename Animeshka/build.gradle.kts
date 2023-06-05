@@ -52,7 +52,6 @@ dependencies {
 
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
-
 }
 
 dependencyManagement {

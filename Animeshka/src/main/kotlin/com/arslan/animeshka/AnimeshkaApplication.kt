@@ -9,8 +9,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.toKotlinLocalDate
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
-import org.springframework.data.solr.core.SolrOperations
-import org.springframework.data.solr.repository.config.EnableSolrRepositories
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
@@ -18,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDate
 import kotlin.io.path.Path
 
-@EnableSolrRepositories
 @SpringBootApplication
 class AnimeshkaApplication
 
