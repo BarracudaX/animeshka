@@ -9,6 +9,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.toKotlinLocalDate
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.data.solr.core.SolrOperations
+import org.springframework.data.solr.repository.config.EnableSolrRepositories
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDate
 import kotlin.io.path.Path
 
+@EnableSolrRepositories
 @SpringBootApplication
 class AnimeshkaApplication
 
@@ -34,7 +37,6 @@ fun main(args: Array<String>) : Unit = runBlocking{
     userService.register(UserRegistration("test@email.com","Pass123!","Pass123!","TestUser","test","test"))
 
     val securityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(user.id,""))
-
     mono {
         val headers = HttpHeaders().apply { add(HttpHeaders.CONTENT_DISPOSITION,"image;filename=image.jpg") }
         val testPoster = AppFilePart(headers, Path("/animeshka/test.jpg"))

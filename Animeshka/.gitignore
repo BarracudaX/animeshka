@@ -37,3 +37,10 @@ out/
 .vscode/
 
 logs
+
+solr/data/anime/data
+solr/data/character/data
+solr/data/magazine/data
+solr/data/novel/data
+solr/data/people/data
+solr/data/studio/data

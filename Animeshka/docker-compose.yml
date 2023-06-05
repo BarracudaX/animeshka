@@ -3,8 +3,15 @@ services:
     image: mysql:8.0.29
     ports:
       - "3306:3306"
-    expose:
-      - 3306
     environment:
       - "MYSQL_ROOT_PASSWORD=root"
       - "MYSQL_DATABASE=animeshka"
+  solr:
+    image: solr:latest
+    volumes:
+      - type: bind
+        source: ./solr/solr.xml
+        target: /opt/solr/server/solr/solr.xml
+      - ./solr/data:/var/solr/data
+    ports:
+      - "8983:8983"

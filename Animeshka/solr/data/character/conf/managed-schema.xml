@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<schema name="default-config" version="1.6">
+
+    <field name="_nest_path_" type="_nest_path_" /><fieldType name="_nest_path_" class="solr.NestPathField" />
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true" />
+    <fieldType name="strings" class="solr.StrField" sortMissingLast="true" multiValued="true" docValues="true" />
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true"/>
+    <fieldType name="booleans" class="solr.BoolField" sortMissingLast="true" multiValued="true"/>
+    <fieldType name="pint" class="solr.IntPointField" docValues="true"/>
+    <fieldType name="pfloat" class="solr.FloatPointField" docValues="true"/>
+    <fieldType name="plong" class="solr.LongPointField" docValues="true"/>
+    <fieldType name="pdouble" class="solr.DoublePointField" docValues="true"/>
+    <fieldType name="pints" class="solr.IntPointField" docValues="true" multiValued="true"/>
+    <fieldType name="pfloats" class="solr.FloatPointField" docValues="true" multiValued="true"/>
+    <fieldType name="plongs" class="solr.LongPointField" docValues="true" multiValued="true"/>
+    <fieldType name="pdoubles" class="solr.DoublePointField" docValues="true" multiValued="true"/>
+    <fieldType name="random" class="solr.RandomSortField" indexed="true"/>
+    <fieldType name="pdate" class="solr.DatePointField" docValues="true"/>
+    <fieldType name="pdates" class="solr.DatePointField" docValues="true" multiValued="true"/>
+    <fieldType name="binary" class="solr.BinaryField"/>
+    <fieldType name="rank" class="solr.RankField"/>
+    <fieldType name="text_general" class="solr.TextField" positionIncrementGap="100" multiValued="true"/>
+
+    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+    <field name="_version_" type="plong" indexed="false" stored="false"/>
+
+    <uniqueKey>id</uniqueKey>
+
+    <!-- since fields of this type are by default not stored or indexed,
+       any data added to them will be ignored outright.  -->
+    <fieldType name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
+
+<!--    &lt;!&ndash; A text field with defaults appropriate for English: it tokenizes with StandardTokenizer,-->
+<!--         removes English stop words (lang/stopwords_en.txt), down cases, protects words from protwords.txt, and-->
+<!--         finally applies Porter's stemming.  The query time analyzer also applies synonyms from synonyms.txt. &ndash;&gt;-->
+<!--    <dynamicField name="*_txt_en" type="text_en"  indexed="true"  stored="true"/>-->
+<!--    <fieldType name="text_en" class="solr.TextField" positionIncrementGap="100">-->
+<!--      <analyzer type="index">-->
+<!--        <tokenizer name="standard"/>-->
+<!--        &lt;!&ndash; in this example, we will only use synonyms at query time-->
+<!--        <filter name="synonymGraph" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>-->
+<!--        <filter name="flattenGraph"/>-->
+<!--        &ndash;&gt;-->
+<!--        &lt;!&ndash; Case insensitive stop word removal.-->
+<!--        &ndash;&gt;-->
+<!--        <filter name="stop"-->
+<!--                ignoreCase="true"-->
+<!--                words="lang/stopwords_en.txt"-->
+<!--            />-->
+<!--        <filter name="lowercase"/>-->
+<!--        <filter name="englishPossessive"/>-->
+<!--        <filter name="keywordMarker" protected="protwords.txt"/>-->
+<!--        &lt;!&ndash; Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:-->
+<!--        <filter name="englishMinimalStem"/>-->
+<!--        &ndash;&gt;-->
+<!--        <filter name="porterStem"/>-->
+<!--      </analyzer>-->
+<!--      <analyzer type="query">-->
+<!--        <tokenizer name="standard"/>-->
+<!--        <filter name="synonymGraph" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>-->
+<!--        <filter name="stop"-->
+<!--                ignoreCase="true"-->
+<!--                words="lang/stopwords_en.txt"-->
+<!--        />-->
+<!--        <filter name="lowercase"/>-->
+<!--        <filter name="englishPossessive"/>-->
+<!--        <filter name="keywordMarker" protected="protwords.txt"/>-->
+<!--        &lt;!&ndash; Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:-->
+<!--        <filter name="englishMinimalStem"/>-->
+<!--        &ndash;&gt;-->
+<!--        <filter name="porterStem"/>-->
+<!--      </analyzer>-->
+<!--    </fieldType>-->
+
+
+    <!-- some examples for different languages (generally ordered by ISO code) -->
+
+    <!-- Japanese using morphological analysis (see text_cjk for a configuration using bigramming)
+
+         NOTE: If you want to optimize search for precision, use default operator AND in your request
+         handler config (q.op) Use OR if you would like to optimize for recall (default).
+    -->
+<!--    <dynamicField name="*_txt_ja" type="text_ja"  indexed="true"  stored="true"/>-->
+<!--    <fieldType name="text_ja" class="solr.TextField" positionIncrementGap="100" autoGeneratePhraseQueries="false">-->
+<!--      <analyzer>-->
+<!--        &lt;!&ndash; Kuromoji Japanese morphological analyzer/tokenizer (JapaneseTokenizer)-->
+
+<!--           Kuromoji has a search mode (default) that does segmentation useful for search.  A heuristic-->
+<!--           is used to segment compounds into its parts and the compound itself is kept as synonym.-->
+
+<!--           Valid values for attribute mode are:-->
+<!--              normal: regular segmentation-->
+<!--              search: segmentation useful for search with synonyms compounds (default)-->
+<!--            extended: same as search mode, but unigrams unknown words (experimental)-->
+
+<!--           For some applications it might be good to use search mode for indexing and normal mode for-->
+<!--           queries to reduce recall and prevent parts of compounds from being matched and highlighted.-->
+<!--           Use <analyzer type="index"> and <analyzer type="query"> for this and mode normal in query.-->
+
+<!--           Kuromoji also has a convenient user dictionary feature that allows overriding the statistical-->
+<!--           model with your own entries for segmentation, part-of-speech tags and readings without a need-->
+<!--           to specify weights.  Notice that user dictionaries have not been subject to extensive testing.-->
+
+<!--           User dictionary attributes are:-->
+<!--                     userDictionary: user dictionary filename-->
+<!--             userDictionaryEncoding: user dictionary encoding (default is UTF-8)-->
+
+<!--           See lang/userdict_ja.txt for a sample user dictionary file.-->
+
+<!--           Punctuation characters are discarded by default.  Use discardPunctuation="false" to keep them.-->
+<!--        &ndash;&gt;-->
+<!--        <tokenizer name="japanese" mode="search"/>-->
+<!--        &lt;!&ndash;<tokenizer name="japanese" mode="search" userDictionary="lang/userdict_ja.txt"/>&ndash;&gt;-->
+<!--        &lt;!&ndash; Reduces inflected verbs and adjectives to their base/dictionary forms (辞書形) &ndash;&gt;-->
+<!--        <filter name="japaneseBaseForm"/>-->
+<!--        &lt;!&ndash; Removes tokens with certain part-of-speech tags &ndash;&gt;-->
+<!--        <filter name="japanesePartOfSpeechStop" tags="lang/stoptags_ja.txt" />-->
+<!--        &lt;!&ndash; Normalizes full-width romaji to half-width and half-width kana to full-width (Unicode NFKC subset) &ndash;&gt;-->
+<!--        <filter name="cjkWidth"/>-->
+<!--        &lt;!&ndash; Removes common tokens typically not useful for search, but have a negative effect on ranking &ndash;&gt;-->
+<!--        <filter name="stop" ignoreCase="true" words="lang/stopwords_ja.txt" />-->
+<!--        &lt;!&ndash; Normalizes common katakana spelling variations by removing any last long sound character (U+30FC) &ndash;&gt;-->
+<!--        <filter name="japaneseKatakanaStem" minimumLength="4"/>-->
+<!--        &lt;!&ndash; Lower-cases romaji characters &ndash;&gt;-->
+<!--        <filter name="lowercase"/>-->
+<!--      </analyzer>-->
+<!--    </fieldType>-->
+
+<!--    &lt;!&ndash; Russian &ndash;&gt;-->
+<!--    <dynamicField name="*_txt_ru" type="text_ru"  indexed="true"  stored="true"/>-->
+<!--    <fieldType name="text_ru" class="solr.TextField" positionIncrementGap="100">-->
+<!--      <analyzer>-->
+<!--        <tokenizer name="standard"/>-->
+<!--        <filter name="lowercase"/>-->
+<!--        <filter name="stop" ignoreCase="true" words="lang/stopwords_ru.txt" format="snowball" />-->
+<!--        <filter name="snowballPorter" language="Russian"/>-->
+<!--        &lt;!&ndash; less aggressive: <filter name="russianLightStem"/> &ndash;&gt;-->
+<!--      </analyzer>-->
+<!--    </fieldType>-->
+
+    <!-- Similarity is the scoring routine for each document vs. a query.
+       A custom Similarity or SimilarityFactory may be specified here, but
+       the default is fine for most applications.
+       For more info: https://solr.apache.org/guide/solr/latest/indexing-guide/schema-elements.html#similarity
+    -->
+    <!--
+     <similarity class="com.example.solr.CustomSimilarityFactory">
+       <str name="paramkey">param value</str>
+     </similarity>
+    -->
+
+</schema>
