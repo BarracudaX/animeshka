@@ -8,6 +8,7 @@ import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("CHARACTERS")
+@Serializable
 data class Character(
     val characterName: String,
 
@@ -15,14 +16,13 @@ data class Character(
 
     val description: String = "",
 
-    val characterRole: CharacterRole,
-
     val posterPath: String,
 
     @Id
     val id: Long
 ) : Persistable<Long> {
 
+    @kotlinx.serialization.Transient
     @Transient
     var isNewEntity: Boolean = false
 

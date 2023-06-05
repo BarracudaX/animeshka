@@ -53,7 +53,7 @@ data class StudioContent(
 )
 
 @Serializable
-data class AnimeCharacter(val characterID: Long,val voiceActorID: Long)
+data class AnimeCharacter(val characterID: Long,val voiceActorID: Long,val role: CharacterRole)
 
 @Serializable
 data class WorkRelation(val relatedWorkID: Long,val relation: Relation)

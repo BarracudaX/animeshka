@@ -416,9 +416,19 @@
         let seriesTypeLabel = /*[[#{series.type.label}]]*/ "Series Type:" ;
         let animeRelationStatusLabelText = /*[[#{airing.status.label}]]*/ "Airing Status:";
         let animeRelationPublishedLabelText = /*[[#{aired.at.label}]]*/ "Aired At:";
+        let voiceActorLabel = /*[[#{voice.actor.label}]]*/ "Voice Actor:";
 
         function onAddCharacterRelation(){
-            addCharacterRelation(nextAnimeCharacter,roleSelectLabelText,roleOptions,characterSearchLabelText,searchBtnText,removeBtnText)
+            let messages = {
+                roleLabelText : roleSelectLabelText,
+                roleOptions : roleOptions,
+                characterSearchLabelText : characterSearchLabelText,
+                searchBtnText : searchBtnText,
+                showResultBtnText : showResultBtnText,
+                moreDetailsBtnText : moreDetailsLabel,
+                voiceActorLabel : voiceActorLabel
+            }
+            addCharacterRelation(nextAnimeCharacter,messages)
 
             nextAnimeCharacter = nextAnimeCharacter + 1
         }

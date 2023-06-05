@@ -125,19 +125,20 @@ class AnimeServiceImpl(
         databaseClient
             .sql { "SELECT * FROM ANIME_CHARACTERS WHERE anime_id = :animeID" }
             .bind("animeID",anime.id)
-            .map { row -> AnimeCharacter(row.getParam("character_id"),row.getParam("voice_actor_id")) }
+            .map { row -> AnimeCharacter(row.getParam("character_id"),row.getParam("voice_actor_id"),CharacterRole.valueOf(row.getParam("character_role"))) }
             .all()
             .collectList()
             .awaitFirst()
             .toSet()
 
     private suspend fun createCharacterAssociations(anime: Anime,characters: Set<AnimeCharacter>){
-        for( (characterID,voiceActorID) in characters ){
+        for( (characterID,voiceActorID,role) in characters ){
             databaseClient
-                .sql { "INSERT INTO ANIME_CHARACTERS(character_id,anime_id,voice_actor_id) VALUES(:characterID,:animeID,:voiceActorID)" }
+                .sql { "INSERT INTO ANIME_CHARACTERS(character_id,anime_id,voice_actor_id,character_role) VALUES(:characterID,:animeID,:voiceActorID,:characterRole)" }
                 .bind("characterID",characterID)
                 .bind("animeID",anime.id)
                 .bind("voiceActorID",voiceActorID)
+                .bind("characterRole",role.name)
                 .await()
         }
     }
