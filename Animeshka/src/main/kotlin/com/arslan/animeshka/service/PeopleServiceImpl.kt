@@ -1,30 +1,30 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.PersonEntry
-import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.PersonContent
 import com.arslan.animeshka.entity.Content
-import com.arslan.animeshka.repository.PERSON_PREFIX_KEY
+import com.arslan.animeshka.entity.Person
 import com.arslan.animeshka.repository.PeopleRepository
-import com.arslan.animeshka.repository.ContentRepository
-import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import org.springframework.security.core.context.ReactiveSecurityContextHolder
+import kotlinx.datetime.toJavaLocalDate
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
 class PeopleServiceImpl(
-    private val peopleRepository: PeopleRepository,
-    private val json: Json,
-    private val contentRepository: ContentRepository
+    private val contentService: ContentService,
+    private val imageService: ImageService,
+    private val peopleRepository: PeopleRepository
 ) : PeopleService {
     
-    override suspend fun createPersonEntry(personEntry: PersonEntry) {
-        val content = json.encodeToString(personEntry)
-        val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        contentRepository.save(Content(creatorID, NewContentType.PERSON,"${PERSON_PREFIX_KEY}${personEntry.firstName}_${personEntry.lastName}_(${personEntry.givenName}_${personEntry.familyName})",content,))
+    override suspend fun createPersonEntry(personContent: PersonContent, image: FilePart) : Content{
+        val posterPath = imageService.saveImage(image)
+        return contentService.createPersonEntry(personContent.copy(posterPath = posterPath.toString()))
     }
-    
+
+    override suspend fun verifyPerson(id: Long) {
+        val personContent = contentService.verifyPerson(id)
+        with(personContent){ peopleRepository.save(Person(firstName,lastName,familyName,givenName,description,birthDate?.toJavaLocalDate(),id).apply { isNewEntity = true }) }
+    }
+
 }

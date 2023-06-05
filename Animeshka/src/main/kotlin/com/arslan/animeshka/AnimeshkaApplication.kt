@@ -29,6 +29,7 @@ fun main(args: Array<String>) : Unit = runBlocking{
     val novelService = context.getBean(NovelService::class.java)
     val animeService = context.getBean(AnimeService::class.java)
     val characterService = context.getBean(CharacterService::class.java)
+    val peopleService = context.getBean(PeopleService::class.java)
     val user = userRepository.save(User("Test_Anime_Admin","Test_Anime_Admin","AnimeAdmin","anime@admin.com",passwordEncoder.encode("Pass123!"),UserRole.ANIME_ADMINISTRATOR))
     userService.register(UserRegistration("test@email.com","Pass123!","Pass123!","TestUser","test","test"))
 
@@ -42,11 +43,13 @@ fun main(args: Array<String>) : Unit = runBlocking{
             NovelContent("test","test_jp","test_syn",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)),
             testPoster
         )
+        val person = peopleService.createPersonEntry(PersonContent("test","test_ln","test_fn","test_gn","test_desc",LocalDate.now().toKotlinLocalDate()),testPoster)
         val character = characterService.createCharacterEntry(CharacterContent("test","test_jp","test_desc",CharacterRole.ANTAGONIST),testPoster)
         val anime = animeService.createUnverifiedAnime(
             AnimeContent("test","test_jp",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
             testPoster
         )
+        moderationService.acceptModeration(person.id!!)
         moderationService.acceptModeration(novel.id!!)
         moderationService.acceptModeration(studio.id)
         moderationService.acceptModeration(anime.id!!)
@@ -55,6 +58,7 @@ fun main(args: Array<String>) : Unit = runBlocking{
         studioService.verifyStudio(studio.id)
         novelService.verifyNovel(novel.id)
         animeService.verifyAnimeEntry(anime.id)
+        peopleService.verifyPerson(person.id)
     }.contextWrite(securityContext).awaitFirst()
 
 

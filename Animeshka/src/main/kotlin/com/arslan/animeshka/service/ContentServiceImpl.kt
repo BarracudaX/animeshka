@@ -69,6 +69,18 @@ class ContentServiceImpl(
         return json.decodeFromString<CharacterContent>(content.content).copy(id = content.id)
     }
 
+    override suspend fun createPersonEntry(personContent: PersonContent): Content {
+        val content = json.encodeToString(personContent)
+        val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
+        return contentRepository.save(Content(creatorID, NewContentType.PERSON,content, "${PERSON_PREFIX_KEY}_${personContent.firstName}_${personContent.lastName}_${personContent.givenName}_${personContent.familyName}"))
+    }
+
+    override suspend fun verifyPerson(id: Long): PersonContent {
+        val content = verifyContent(id)
+
+        return json.decodeFromString<PersonContent>(content.content).copy(id = content.id)
+    }
+
     private suspend fun verifyContent(contentID: Long) : Content{
         val content = contentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Content with id $contentID not found.",1)
         if(content.contentStatus != ContentStatus.UNDER_VERIFICATION) throw IllegalStateException("Unverified content is currently not under verification. Current status: ${content.contentStatus}")

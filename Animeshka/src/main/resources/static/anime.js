@@ -168,6 +168,25 @@ function addCharacterRelation(id,messages){
                 .append($("<textarea>").attr("class","form-control").attr("readonly","readonly").attr("id",`character_relation_offcanvas_description_${id}`))
                 .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`character_relation_offcanvas_details_${id}`).text(messages.moreDetailsBtnText))
         )
+
+
+    let voiceActorOffcanvasContainer = $("<div>")
+        .attr("class","offcanvas offcanvas-start")
+        .attr("id",`voice_actor_relation_offcanvas_${id}`)
+        .append(
+            $("<div>").attr("class","offcanvas-header")
+                .append($("<h5>").attr("class","offcanvas-title w-100 text-center").attr("id",`voice_actor_relation_offcanvas_title_${id}`))
+                .append($("<button>").attr("class","btn-close").attr("type","button").attr("data-bs-dismiss","offcanvas").attr("aria-label","Close"))
+        ).append(
+            $("<div>")
+                .attr("class","offcanvas-body")
+                .append($("<img>").attr("class","img-fluid m-auto d-block").attr("id",`voice_actor_relation_offcanvas_image_${id}`))
+                .append($("<label>").attr("class","form-label").attr("for",`voice_actor_relation_offcanvas_birthdate_${id}`).text(messages.birthDateLabel))
+                .append($("<input>").attr("class","form-control").attr("readonly","readonly").attr("type","date").attr("id",`voice_actor_relation_offcanvas_birthdate_${id}`))
+                .append($("<label>").attr("class","form-label").attr("for",`voice_actor_relation_offcanvas_description_${id}`).text(messages.descriptionLabel))
+                .append($("<textarea>").attr("class","form-control").attr("readonly","readonly").attr("id",`voice_actor_relation_offcanvas_description_${id}`))
+                .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`voic_actor_relation_offcanvas_details_${id}`).text(messages.moreDetailsBtnText))
+        )
     $("<div>")
         .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
         .attr("id",`character_relation_${id}`)
@@ -182,6 +201,7 @@ function addCharacterRelation(id,messages){
         .append(searchVoiceActorContainer)
         .append(showVoiceActorSearchResultBtn)
         .append(characterOffcanvasContainer)
+        .append(voiceActorOffcanvasContainer)
         .insertBefore("#add_character_relation_btn")
 }
 

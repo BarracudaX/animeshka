@@ -184,7 +184,7 @@ data class BasicAnimeDTO(
 )
 
 @Serializable
-data class PersonEntry(
+data class PersonContent(
     val firstName: String,
 
     val lastName: String,
@@ -195,7 +195,11 @@ data class PersonEntry(
 
     val description: String = "",
 
-    val birthDate: LocalDate,
+    val birthDate: LocalDate? = null,
+
+    val posterPath: String = "",
+
+    val id: Long? = null
 )
 
 @Serializable

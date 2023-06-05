@@ -1,9 +1,6 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.StudioContent
-import com.arslan.animeshka.AnimeContent
-import com.arslan.animeshka.CharacterContent
-import com.arslan.animeshka.NovelContent
+import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.Content
 
 interface ContentService {
@@ -17,5 +14,7 @@ interface ContentService {
     suspend fun verifyNovel(novelID: Long): NovelContent
     suspend fun createCharacterEntry(character: CharacterContent): Content
     suspend fun verifyCharacter(contentID: Long) : CharacterContent
+    suspend fun createPersonEntry(personContent: PersonContent): Content
+    suspend fun verifyPerson(id: Long): PersonContent
 
 }
