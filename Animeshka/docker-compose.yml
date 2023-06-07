@@ -6,12 +6,7 @@ services:
     environment:
       - "MYSQL_ROOT_PASSWORD=root"
       - "MYSQL_DATABASE=animeshka"
-  solr:
-    image: solr:latest
-    volumes:
-      - type: bind
-        source: ./solr/solr.xml
-        target: /opt/solr/server/solr/solr.xml
-      - ./solr/data:/var/solr/data
+  elastic:
+    image: elasticsearch:8.7.1
     ports:
-      - "8983:8983"
+      - "9200:9200"
