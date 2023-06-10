@@ -4,6 +4,7 @@ import com.arslan.animeshka.AnimeDTO
 import com.arslan.animeshka.BasicAnimeDTO
 import com.arslan.animeshka.AnimeContent
 import com.arslan.animeshka.service.AnimeService
+import kotlinx.coroutines.flow.Flow
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.GetMapping
@@ -40,6 +41,6 @@ class AnimeController(private val animeService: AnimeService) {
     }
 
     @GetMapping("/title")
-    suspend fun findByTitle(@RequestParam("title") title: String) : ResponseEntity<BasicAnimeDTO> = ResponseEntity.ok(animeService.findAnimeByTitle(title))
+    suspend fun findByTitle(@RequestParam("title") title: String) : ResponseEntity<Flow<BasicAnimeDTO>> = ResponseEntity.ok(animeService.findAnimeByTitle(title))
 
 }

@@ -1,13 +1,13 @@
 package com.arslan.animeshka
 
 import com.arslan.animeshka.constraints.EqualRegistrationPasswords
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Pattern
 
 @Serializable
 @EqualRegistrationPasswords(message = "{UserRegistration.EqualRegistrationPasswords.message}")

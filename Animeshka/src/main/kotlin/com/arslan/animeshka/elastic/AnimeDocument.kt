@@ -5,7 +5,7 @@ import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 
 @Document(indexName = "anime")
-class AnimeDocument(
+data class AnimeDocument(
     @Field
     val title: String,
 

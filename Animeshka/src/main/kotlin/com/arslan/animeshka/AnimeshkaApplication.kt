@@ -1,9 +1,12 @@
 package com.arslan.animeshka
 
+import com.arslan.animeshka.elastic.AnimeDocument
 import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.repository.UserRepository
+import com.arslan.animeshka.repository.elastic.AnimeDocumentRepository
 import com.arslan.animeshka.service.*
 import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.toKotlinLocalDate
@@ -30,6 +33,7 @@ fun main(args: Array<String>) : Unit = runBlocking{
     val animeService = context.getBean(AnimeService::class.java)
     val characterService = context.getBean(CharacterService::class.java)
     val peopleService = context.getBean(PeopleService::class.java)
+    val animeDocumentRepository = context.getBean(AnimeDocumentRepository::class.java)
     val user = userRepository.save(User("Test_Anime_Admin","Test_Anime_Admin","AnimeAdmin","anime@admin.com",passwordEncoder.encode("Pass123!"),UserRole.ANIME_ADMINISTRATOR))
     userService.register(UserRegistration("test@email.com","Pass123!","Pass123!","TestUser","test","test"))
 
@@ -45,7 +49,7 @@ fun main(args: Array<String>) : Unit = runBlocking{
         val person = peopleService.createPersonEntry(PersonContent("test","test_ln","test_fn","test_gn","test_desc",LocalDate.now().toKotlinLocalDate()),testPoster)
         val character = characterService.createCharacterEntry(CharacterContent("test","test_jp","test_desc",CharacterRole.ANTAGONIST),testPoster)
         val anime = animeService.createUnverifiedAnime(
-            AnimeContent("test","test_jp",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
+            AnimeContent("anime_title_test","anime_title_test_jp",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
             testPoster
         )
         moderationService.acceptModeration(person.id!!)
@@ -56,7 +60,8 @@ fun main(args: Array<String>) : Unit = runBlocking{
         characterService.verifyCharacter(character.id)
         studioService.verifyStudio(studio.id)
         novelService.verifyNovel(novel.id)
-        animeService.verifyAnimeEntry(anime.id)
+        val savedAnime = animeService.verifyAnimeEntry(anime.id)
+        println(animeDocumentRepository.save(AnimeDocument(savedAnime.title,savedAnime.japaneseTitle,savedAnime.id)).awaitSingleOrNull())
         peopleService.verifyPerson(person.id)
     }.contextWrite(securityContext).awaitFirst()
 

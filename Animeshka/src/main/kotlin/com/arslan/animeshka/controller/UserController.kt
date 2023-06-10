@@ -3,6 +3,7 @@ package com.arslan.animeshka.controller
 import com.arslan.animeshka.UserCredentials
 import com.arslan.animeshka.UserRegistration
 import com.arslan.animeshka.service.UserService
+import jakarta.validation.Valid
 import kotlinx.coroutines.reactive.awaitFirst
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
@@ -20,7 +21,6 @@ import org.springframework.web.method.support.ModelAndViewContainer
 import org.springframework.web.reactive.result.view.View
 import org.springframework.web.server.ServerWebExchange
 import java.time.Duration
-import javax.validation.Valid
 
 @RequestMapping("/user", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
 @Controller

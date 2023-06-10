@@ -3,6 +3,11 @@ package com.arslan.animeshka.service
 import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
+import com.arslan.animeshka.repository.elastic.AnimeDocumentRepository
+import io.r2dbc.spi.Readable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaLocalTime
@@ -27,7 +32,7 @@ class AnimeServiceImpl(
     private val contentRepository: ContentRepository,
     private val databaseClient: DatabaseClient,
     private val contentChangeService: ContentChangeService,
-    private val messageSource: MessageSource,
+    private val animeDocumentRepository: AnimeDocumentRepository,
     private val imageService: ImageService
 ) : AnimeService {
 
@@ -37,7 +42,7 @@ class AnimeServiceImpl(
         return contentService.createAnimeEntry(animeContent.copy(posterPath = posterPath.toString()))
     }
 
-    override suspend fun verifyAnimeEntry(contentID: Long) {
+    override suspend fun verifyAnimeEntry(contentID: Long) : Anime {
         val animeContent = contentService.verifyAnime(contentID)
         val season = getAnimeSeason(animeContent)
         val anime = with(animeContent){
@@ -50,6 +55,8 @@ class AnimeServiceImpl(
         createNovelRelations(anime,animeContent.novelRelations)
         createAnimeRelations(anime,animeContent.animeRelations)
         createCharacterAssociations(anime,animeContent.characters)
+
+        return anime
     }
 
     override suspend fun updateAnime(anime: AnimeDTO) {
@@ -71,12 +78,12 @@ class AnimeServiceImpl(
         contentChangeService.insertAnimeChanges(currentAnimeState,anime)
     }
 
-    override suspend fun findAnimeByTitle(title: String): BasicAnimeDTO {
-        val anime = animeRepository.findByTitleOrJapaneseTitle(title,title) ?: throw EmptyResultDataAccessException(messageSource.getMessage("anime.not.found.by.title.message",arrayOf(title),LocaleContextHolder.getLocale()),1)
-
-        val posterPath = "/poster/${anime.posterPath.substring(anime.posterPath.lastIndexOf("/")+1)}"
-
-        return with(anime){ BasicAnimeDTO(title,japaneseTitle,status,demographic,synopsis,animeType,posterPath,id,background,publishedAt?.toKotlinLocalDate(),finishedAt?.toKotlinLocalDate()) }
+    override suspend fun findAnimeByTitle(title: String): Flow<BasicAnimeDTO> {
+        return animeDocumentRepository.findByTitleOrJapaneseTitle(title,title).asFlow().map {animeDoc ->
+            val anime = animeRepository.findById(animeDoc.id)!!
+            val posterPath = "/poster/${anime.posterPath.substring(anime.posterPath.lastIndexOf("/")+1)}"
+            with(anime){ BasicAnimeDTO(title,japaneseTitle,status,demographic,synopsis,animeType,posterPath,id,background,publishedAt?.toKotlinLocalDate(),finishedAt?.toKotlinLocalDate()) }
+        }
     }
 
 
