@@ -34,7 +34,7 @@ class CharacterServiceImpl(
     override suspend fun findByName(name: String): Character {
         val character = characterRepository.findByCharacterNameOrJapaneseName(name,name) ?: throw EmptyResultDataAccessException(messageSource.getMessage("character.not.found.by.name.message",arrayOf(name),LocaleContextHolder.getLocale()),1)
 
-        val posterPath = "/poster/${character.posterPath.substring(character.posterPath.lastIndexOf("\\")+1)}"
+        val posterPath = "/poster/${character.posterPath.substring(character.posterPath.lastIndexOf("/")+1)}"
 
         return character.copy(posterPath = posterPath)
     }

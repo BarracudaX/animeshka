@@ -36,7 +36,7 @@ fun main(args: Array<String>) : Unit = runBlocking{
     val securityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(user.id,""))
     mono {
         val headers = HttpHeaders().apply { add(HttpHeaders.CONTENT_DISPOSITION,"image;filename=image.jpg") }
-        val testPoster = AppFilePart(headers, Path("/animeshka/test.jpg"))
+        val testPoster = AppFilePart(headers, Path("./images/test.jpg"))
         val studio = studioService.createStudio(StudioContent("studio","studio_jp",LocalDate.now().toKotlinLocalDate()))
         val novel = novelService.createNovel(
             NovelContent("test","test_jp","test_syn",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)),

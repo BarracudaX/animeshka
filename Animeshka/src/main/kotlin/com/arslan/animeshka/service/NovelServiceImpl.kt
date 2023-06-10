@@ -34,7 +34,7 @@ class NovelServiceImpl(
     override suspend fun findByTitle(title: String) : BasicNovelDTO {
         val novel = novelRepository.findByTitleOrJapaneseTitle(title,title) ?: throw EmptyResultDataAccessException(messageSource.getMessage("novel.not.found.by.title.message",arrayOf(title),LocaleContextHolder.getLocale()),1)
 
-        val posterURL = "/poster/${novel.posterPath.substring(novel.posterPath.lastIndexOf("\\")+1)}"
+        val posterURL = "/poster/${novel.posterPath.substring(novel.posterPath.lastIndexOf("/")+1)}"
         return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background, posterURL, finished?.toKotlinLocalDate(),id) }
     }
 

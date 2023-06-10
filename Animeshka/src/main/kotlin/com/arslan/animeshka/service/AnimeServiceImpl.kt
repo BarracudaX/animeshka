@@ -74,7 +74,7 @@ class AnimeServiceImpl(
     override suspend fun findAnimeByTitle(title: String): BasicAnimeDTO {
         val anime = animeRepository.findByTitleOrJapaneseTitle(title,title) ?: throw EmptyResultDataAccessException(messageSource.getMessage("anime.not.found.by.title.message",arrayOf(title),LocaleContextHolder.getLocale()),1)
 
-        val posterPath = "/poster/${anime.posterPath.substring(anime.posterPath.lastIndexOf("\\")+1)}"
+        val posterPath = "/poster/${anime.posterPath.substring(anime.posterPath.lastIndexOf("/")+1)}"
 
         return with(anime){ BasicAnimeDTO(title,japaneseTitle,status,demographic,synopsis,animeType,posterPath,id,background,publishedAt?.toKotlinLocalDate(),finishedAt?.toKotlinLocalDate()) }
     }
