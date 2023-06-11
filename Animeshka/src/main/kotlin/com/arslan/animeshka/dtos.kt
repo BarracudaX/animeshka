@@ -296,3 +296,6 @@ data class CharacterContent(
 
     val id: Long? = null
 )
+
+@Serializable
+data class PagedBasicAnimeDTO(val content: List<BasicAnimeDTO>,val hasNext: Boolean,val hasPrevious: Boolean)

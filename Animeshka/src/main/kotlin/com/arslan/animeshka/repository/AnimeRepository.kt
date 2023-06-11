@@ -8,6 +8,4 @@ import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
 interface AnimeRepository : CoroutineCrudRepository<Anime,Long>{
 
-    suspend fun findByTitleOrJapaneseTitle(title: String, japaneseTitle: String) : Anime?
-
 }

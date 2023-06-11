@@ -1,0 +1,6 @@
+cluster.name: "animeshka-cluster"
+network.host: 0.0.0.0
+path:
+  data: /var/elasticsearch/data
+  logs: /var/elasticsearch/logs
+node.name: animeshka-elasticsearch-1

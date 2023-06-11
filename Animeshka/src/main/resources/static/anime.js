@@ -1,4 +1,6 @@
-
+let animeRelations = new Map()
+let currentAnimePage = 0
+let pageSize = 2
 
 function removeNovelRelation(id) {
     document.getElementById('novel_relations').removeChild(document.getElementById(id))
@@ -38,9 +40,9 @@ async function searchNovel(containerID){
 
 }
 
-async function searchAnime(containerID){
+async function searchAnime(containerID,isPreviousBtnRequest = false){
     let searchTitle = $(`#anime_relation_search_${containerID}`).val()
-    let response = await fetch("/anime/title?"+ new URLSearchParams({ title : searchTitle }),{ method : "GET",credentials: "same-origin" })
+    let response = await fetch("/anime/title?"+ new URLSearchParams({ title : searchTitle, page : `${currentAnimePage}` , size : `${pageSize}`}),{ method : "GET",credentials: "same-origin" })
 
     if(response.status !== 200){
         addAlert($(`#anime_relation_${containerID}`).children(".alerts"),await response.text())
@@ -50,17 +52,81 @@ async function searchAnime(containerID){
 
     let result = JSON.parse(await response.text())
 
-    $(`#show_result_anime_relation_${containerID}`).removeClass("d-none").addClass("d-block")
-    $(`#anime_relation_offcanvas_image_${containerID}`).attr("src",result.posterPath)
-    $(`#anime_relation_offcanvas_title_${containerID}`).text(`${result.title}/${result.japaneseTitle}`)
-    $(`#anime_relation_offcanvas_type_${containerID}`).val(result.animeType.split("_").map(value => value.toLowerCase()).join(" "))
-    $(`#anime_relation_offcanvas_demographics_${containerID}`).val(result.demographic.toLowerCase())
-    $(`#anime_relation_offcanvas_status_${containerID}`).val(result.status.split("_").map(value => value.toLowerCase()).join(" "))
-    $(`#anime_relation_offcanvas_published_${containerID}`).val(result.airedAt)
-    $(`#anime_relation_offcanvas_finished_${containerID}`).val(result.finishedAt)
-    $(`#anime_relation_offcanvas_synopsis_${containerID}`).text(result.synopsis)
-    $(`#anime_relation_offcanvas_background_${containerID}`).text(result.background)
-    $(`#anime_relation_offcanvas_details_${containerID}`).attr("href",`/anime/${result.id}`)
+    if(result.content.length === 0){
+        $(`#anime_relation_non_found_alert_${containerID}`).removeClass("d-none").addClass("d-block")
+        return
+    }
+
+    let currentAnimeSelectedPosition = 0
+    let previousBtn = $(`#anime_relation_offcanvas_previous_btn_${containerID}`)
+    let nextBtn = $(`#anime_relation_offcanvas_next_btn_${containerID}`)
+    previousBtn.off("click")
+    nextBtn.off("click")
+
+    /**
+     * Go to the last anime of the search request since request was initiated by user clicking on previous btn, and user wants to see the previous anime which was the last of the previous requested page.
+     */
+    if(isPreviousBtnRequest){
+        currentAnimeSelectedPosition = result.content.length - 1
+    }
+
+    if(!result.hasNext && result.content.length === 1){
+        nextBtn.addClass("disabled")
+    }else{
+        nextBtn.removeClass("disabled")
+    }
+
+    if(currentAnimeSelectedPosition === 0 && !result.hasPrevious){
+        previousBtn.addClass("disabled")
+    }else{
+        previousBtn.removeClass("disabled")
+    }
+
+    nextBtn.on("click",function (){
+        if(currentAnimeSelectedPosition === result.content.length - 1 && result.hasNext){
+            currentAnimePage = currentAnimePage + 1
+            searchAnime(containerID)
+            return
+        }
+        currentAnimeSelectedPosition = currentAnimeSelectedPosition + 1
+        if(currentAnimeSelectedPosition === result.content.length - 1 && !result.hasNext){
+            nextBtn.addClass("disabled")
+        }
+        setOffcanvasAnimeDetails(containerID,result.content[currentAnimeSelectedPosition])
+        previousBtn.removeClass("disabled")
+    })
+
+    previousBtn.on("click",function() {
+        if(currentAnimeSelectedPosition === 0 && result.hasPrevious){
+            currentAnimePage = currentAnimePage - 1
+            searchAnime(containerID,true)
+            return
+        }
+        currentAnimeSelectedPosition = currentAnimeSelectedPosition - 1
+        if(currentAnimeSelectedPosition === 0 && !result.hasPrevious){
+            previousBtn.addClass("disabled")
+        }
+
+        setOffcanvasAnimeDetails(containerID,result.content[currentAnimeSelectedPosition])
+        nextBtn.removeClass("disabled")
+    })
+
+    setOffcanvasAnimeDetails(containerID,result.content[currentAnimeSelectedPosition])
+}
+
+function setOffcanvasAnimeDetails(containerID,content){
+    $(`#anime_relation_non_found_alert_${containerID}`).addClass("d-none").removeClass("d-block")
+    $(`#anime_relation_choose_btn_${containerID}`).removeClass("d-none").addClass("d-block").text(`${content.title}/${content.japaneseTitle}`)
+    $(`#anime_relation_offcanvas_image_${containerID}`).attr("src",content.posterPath)
+    $(`#anime_relation_offcanvas_title_${containerID}`).text(`${content.title}/${content.japaneseTitle}`)
+    $(`#anime_relation_offcanvas_type_${containerID}`).val(content.animeType.split("_").map(value => value.toLowerCase()).join(" "))
+    $(`#anime_relation_offcanvas_demographics_${containerID}`).val(content.demographic.toLowerCase())
+    $(`#anime_relation_offcanvas_status_${containerID}`).val(content.status.split("_").map(value => value.toLowerCase()).join(" "))
+    $(`#anime_relation_offcanvas_published_${containerID}`).val(content.airedAt)
+    $(`#anime_relation_offcanvas_finished_${containerID}`).val(content.finishedAt)
+    $(`#anime_relation_offcanvas_synopsis_${containerID}`).text(content.synopsis)
+    $(`#anime_relation_offcanvas_background_${containerID}`).text(content.background)
+    $(`#anime_relation_offcanvas_details_${containerID}`).attr("href",`/anime/${content.id}`)
 }
 
 async function searchCharacter(containerID){
@@ -213,7 +279,7 @@ function addAnimeRelation(id,messages){
         .attr("for",``)
         .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeAnimeRelation(animeRelationID) }))
 
-    let alertsContainer = $("<div class='alerts'>")
+    let alertsContainer = $("<div class='alerts mt-1'>").append($("<div class='alert alert-warning d-none'>").text(messages.animeSearchNotFound).attr("id",`anime_relation_non_found_alert_${id}`))
 
     let relationSelectLabel = $("<label>")
         .attr("class","form-label")
@@ -244,11 +310,11 @@ function addAnimeRelation(id,messages){
         .attr("type","button")
         .attr("data-bs-toggle","offcanvas")
         .attr("data-bs-target",`#anime_relation_offcanvas_${id}`)
-        .attr("id",`show_result_anime_relation_${id}`)
+        .attr("id",`anime_relation_choose_btn_${id}`)
         .text(messages.showResultBtnText)
 
     let offcanvasContainer = $("<div>")
-        .attr("class","offcanvas offcanvas-start")
+        .attr("class","offcanvas offcanvas-start w-50")
         .attr("id",`anime_relation_offcanvas_${id}`)
         .append(
             $("<div>").attr("class","offcanvas-header")
@@ -273,6 +339,11 @@ function addAnimeRelation(id,messages){
                 .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_background_${id}`).text(messages.animeRelationBackgroundLabelText))
                 .append($("<textarea>").attr("class","form-control").attr("readonly","readonly").attr("id",`anime_relation_offcanvas_background_${id}`))
                 .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`anime_relation_offcanvas_details_${id}`).text(messages.animeRelationMoreDetailsBtnText))
+                .append(
+                    $("<div>").attr("class","d-flex mt-1")
+                        .append($("<button>").attr("class","btn btn-primary").attr("type","button").attr("id",`anime_relation_offcanvas_previous_btn_${id}`).text(messages.previousBtnText))
+                        .append($("<button>").attr("class","btn btn-primary ms-auto").attr("type","button").attr("id",`anime_relation_offcanvas_next_btn_${id}`).text(messages.nextBtnText))
+                )
         )
 
     $("<div>")

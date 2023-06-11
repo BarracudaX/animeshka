@@ -7,9 +7,20 @@ services:
       - "MYSQL_ROOT_PASSWORD=root"
       - "MYSQL_DATABASE=animeshka"
   elastic:
-    image: elasticsearch:8.7.0
+    build:
+      dockerfile: elasticsearch/Dockerfile
+    volumes:
+      - elastic-data:/var/elasticsearch/data/
+      - elastic-logs:/var/elasticsearch/logs/
+      - type: bind
+        source: ./elasticsearch/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - "9200:9200"
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+
+volumes:
+  elastic-data:
+  elastic-logs:

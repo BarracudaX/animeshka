@@ -49,19 +49,34 @@ fun main(args: Array<String>) : Unit = runBlocking{
         val person = peopleService.createPersonEntry(PersonContent("test","test_ln","test_fn","test_gn","test_desc",LocalDate.now().toKotlinLocalDate()),testPoster)
         val character = characterService.createCharacterEntry(CharacterContent("test","test_jp","test_desc",CharacterRole.ANTAGONIST),testPoster)
         val anime = animeService.createUnverifiedAnime(
-            AnimeContent("anime_title_test","anime_title_test_jp",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
+            AnimeContent("anime title test here in other world","japanese anime title here in other world",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
             testPoster
+        )
+        val anime2 = animeService.createUnverifiedAnime(
+                AnimeContent("another anime different title here in parallel world","japanese anime different title here in parallel world",AnimeStatus.AIRING,SeriesRating.R_15,studio.id!!,Demographic.SHOUJO,studio.id,"test_synopsis_2",AnimeType.TV,"test_bg_2","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
+                testPoster
+        )
+
+        val anime3 = animeService.createUnverifiedAnime(
+                AnimeContent("anime sword art online","japanese anime sword art online",AnimeStatus.AIRING,SeriesRating.PG_12,studio.id!!,Demographic.SEINEN,studio.id,"test_synopsis_3",AnimeType.SPECIAL,"test_bg_3","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()),
+                testPoster
         )
         moderationService.acceptModeration(person.id!!)
         moderationService.acceptModeration(novel.id!!)
         moderationService.acceptModeration(studio.id)
         moderationService.acceptModeration(anime.id!!)
+        moderationService.acceptModeration(anime2.id!!)
+        moderationService.acceptModeration(anime3.id!!)
         moderationService.acceptModeration(character.id!!)
         characterService.verifyCharacter(character.id)
         studioService.verifyStudio(studio.id)
         novelService.verifyNovel(novel.id)
         val savedAnime = animeService.verifyAnimeEntry(anime.id)
-        println(animeDocumentRepository.save(AnimeDocument(savedAnime.title,savedAnime.japaneseTitle,savedAnime.id)).awaitSingleOrNull())
+        val savedAnime2 = animeService.verifyAnimeEntry(anime2.id)
+        val savedAnime3 = animeService.verifyAnimeEntry(anime3.id)
+        animeDocumentRepository.save(AnimeDocument(savedAnime.title,savedAnime.japaneseTitle,savedAnime.synopsis,savedAnime.id)).awaitSingleOrNull()
+        animeDocumentRepository.save(AnimeDocument(savedAnime2.title,savedAnime2.japaneseTitle,savedAnime.synopsis,savedAnime2.id)).awaitSingleOrNull()
+        animeDocumentRepository.save(AnimeDocument(savedAnime3.title,savedAnime3.japaneseTitle,savedAnime.synopsis,savedAnime3.id)).awaitSingleOrNull()
         peopleService.verifyPerson(person.id)
     }.contextWrite(securityContext).awaitFirst()
 

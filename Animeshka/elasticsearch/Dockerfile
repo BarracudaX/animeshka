@@ -1,0 +1,9 @@
+FROM elasticsearch:8.7.0
+USER root
+RUN ["mkdir","/var/elasticsearch"]
+RUN ["chown","elasticsearch","/var/elasticsearch/"]
+RUN ["mkdir","/var/elasticsearch/data"]
+RUN ["chown","elasticsearch","/var/elasticsearch/data/"]
+RUN ["mkdir","/var/elasticsearch/logs"]
+RUN ["chown","elasticsearch","/var/elasticsearch/logs/"]
+USER elasticsearch

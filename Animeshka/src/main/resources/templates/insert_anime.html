@@ -288,8 +288,8 @@
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="anime_relation_search_1">
                     <button class="btn btn-outline-success" type="button" th:text="#{search.button}">Search</button>
                 </div>
-                <button class="btn btn-secondary mt-2 w-100 d-none" type="button" data-bs-toggle="offcanvas" id="show_result_anime_relation_1" data-bs-target="#anime_relation_offcanvas_1" aria-controls="anime_relation_offcanvas_1">Show Result</button>
-                <div id="anime_relation_offcanvas_1" class="offcanvas offcanvas-start">
+                <button class="btn btn-secondary mt-2 w-100" type="button" data-bs-toggle="offcanvas" id="show_result_anime_relation_1" data-bs-target="#anime_relation_offcanvas_1" aria-controls="anime_relation_offcanvas_1">Show Result</button>
+                <div id="anime_relation_offcanvas_1" class="offcanvas offcanvas-start w-50">
                     <div class="offcanvas-header">
                         <h5 class="offcanvas-title" id="anime_relation_title_1">Test/Test_JP</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -319,6 +319,10 @@
                         <textarea class="form-control" id="anime_relation_offcanvas_background_1" readonly="readonly">Background...</textarea>
 
                         <a class="btn btn-primary mt-2 w-100" href="#" target="_blank" id="anime_relation_offcanvas_details_1">More Details</a>
+                        <div class="d-flex mt-1">
+                            <button class="btn btn-primary">Previous</button>
+                            <Button class="btn btn-primary ms-auto">Next</Button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -417,6 +421,9 @@
         let animeRelationStatusLabelText = /*[[#{airing.status.label}]]*/ "Airing Status:";
         let animeRelationPublishedLabelText = /*[[#{aired.at.label}]]*/ "Aired At:";
         let voiceActorLabel = /*[[#{voice.actor.label}]]*/ "Voice Actor:";
+        let previousBtnText = /*[[#{previous.btn.text}]]*/ "Previous";
+        let nextBtnText = /*[[#{next.btn.text}]]*/ "Next";
+        let animeSearchNotFound = /*[[#{anime.not.found.messages}]]*/ "Not a single anime was found.";
 
         function onAddCharacterRelation(){
             let messages = {
@@ -447,6 +454,9 @@
                 animeRelationSynopsisLabelText : synopsisLabelText,
                 animeRelationBackgroundLabelText : backgroundLabelText,
                 animeRelationMoreDetailsBtnText : moreDetailsLabel,
+                previousBtnText : previousBtnText,
+                nextBtnText : nextBtnText,
+                animeSearchNotFound : animeSearchNotFound
             }
             addAnimeRelation(nextAnimeRelation,messages)
 

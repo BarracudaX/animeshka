@@ -1,10 +1,10 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.*
+import com.arslan.animeshka.elastic.AnimeDocument
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
 import com.arslan.animeshka.repository.elastic.AnimeDocumentRepository
-import io.r2dbc.spi.Readable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.reactive.asFlow
@@ -13,10 +13,9 @@ import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaLocalTime
 import kotlinx.datetime.toKotlinLocalDate
 import kotlinx.datetime.toKotlinLocalTime
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.data.domain.Pageable
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
@@ -78,12 +77,15 @@ class AnimeServiceImpl(
         contentChangeService.insertAnimeChanges(currentAnimeState,anime)
     }
 
-    override suspend fun findAnimeByTitle(title: String): Flow<BasicAnimeDTO> {
-        return animeDocumentRepository.findByTitleOrJapaneseTitle(title,title).asFlow().map {animeDoc ->
-            val anime = animeRepository.findById(animeDoc.id)!!
-            val posterPath = "/poster/${anime.posterPath.substring(anime.posterPath.lastIndexOf("/")+1)}"
-            with(anime){ BasicAnimeDTO(title,japaneseTitle,status,demographic,synopsis,animeType,posterPath,id,background,publishedAt?.toKotlinLocalDate(),finishedAt?.toKotlinLocalDate()) }
-        }
+    override suspend fun findAnimeByTitle(searchTitle: String,pageable: Pageable): PagedBasicAnimeDTO {
+        val result = animeDocumentRepository.findAnime(searchTitle,pageable)
+        return with(result){ PagedBasicAnimeDTO(result.searchHits.searchHits.map { it.content.toBasicAnimeDTO() },hasNext(),hasPrevious()) }
+    }
+
+    private suspend fun AnimeDocument.toBasicAnimeDTO() : BasicAnimeDTO{
+        val anime = animeRepository.findById(id)!!
+        val posterPath = "/poster/${anime.posterPath.substring(anime.posterPath.lastIndexOf("/")+1)}"
+        return with(anime){ BasicAnimeDTO(title,japaneseTitle,status,demographic,synopsis,animeType,posterPath,id,background,publishedAt?.toKotlinLocalDate(),finishedAt?.toKotlinLocalDate()) }
     }
 
 
