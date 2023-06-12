@@ -1,5 +1,3 @@
-let animeRelations = new Map()
-let currentAnimePage = 0
 let pageSize = 2
 
 function removeNovelRelation(id) {
@@ -40,9 +38,15 @@ async function searchNovel(containerID){
 
 }
 
-async function searchAnime(containerID,isPreviousBtnRequest = false){
+/**
+ *
+ * @param containerID - used to get the user's input and to present the result of the search.
+ * @param pageNumber - the number of the page that will be requested. Default - 0.
+ * @param isPrevBtnSource - whether the request was triggered by user clicking the previous btn. If true, instead of showing the first item of the page, user will be presented with the last item of the page.
+ */
+async function searchAnime(containerID,pageNumber = 0,isPrevBtnSource = false){
     let searchTitle = $(`#anime_relation_search_${containerID}`).val()
-    let response = await fetch("/anime/title?"+ new URLSearchParams({ title : searchTitle, page : `${currentAnimePage}` , size : `${pageSize}`}),{ method : "GET",credentials: "same-origin" })
+    let response = await fetch("/anime/title?"+ new URLSearchParams({ title : searchTitle, page : `${pageNumber}` , size : `${pageSize}`}),{ method : "GET",credentials: "same-origin" })
 
     if(response.status !== 200){
         addAlert($(`#anime_relation_${containerID}`).children(".alerts"),await response.text())
@@ -50,9 +54,10 @@ async function searchAnime(containerID,isPreviousBtnRequest = false){
         return
     }
 
-    let result = JSON.parse(await response.text())
+    let page = JSON.parse(await response.text())
 
-    if(result.content.length === 0){
+    //0 search hits.
+    if(page.content.length === 0){
         $(`#anime_relation_non_found_alert_${containerID}`).removeClass("d-none").addClass("d-block")
         return
     }
@@ -60,58 +65,57 @@ async function searchAnime(containerID,isPreviousBtnRequest = false){
     let currentAnimeSelectedPosition = 0
     let previousBtn = $(`#anime_relation_offcanvas_previous_btn_${containerID}`)
     let nextBtn = $(`#anime_relation_offcanvas_next_btn_${containerID}`)
+    //remove any previously registered click events.
     previousBtn.off("click")
     nextBtn.off("click")
 
     /**
-     * Go to the last anime of the search request since request was initiated by user clicking on previous btn, and user wants to see the previous anime which was the last of the previous requested page.
+     * Go to the last anime of the search request since request was initiated by user clicking on previous btn.
      */
-    if(isPreviousBtnRequest){
-        currentAnimeSelectedPosition = result.content.length - 1
+    if(isPrevBtnSource){
+        currentAnimeSelectedPosition = page.content.length - 1
     }
 
-    if(!result.hasNext && result.content.length === 1){
+    if(!page.hasNext && page.content.length === 1){
         nextBtn.addClass("disabled")
     }else{
         nextBtn.removeClass("disabled")
     }
 
-    if(currentAnimeSelectedPosition === 0 && !result.hasPrevious){
+    if(currentAnimeSelectedPosition === 0 && !page.hasPrevious){
         previousBtn.addClass("disabled")
     }else{
         previousBtn.removeClass("disabled")
     }
 
     nextBtn.on("click",function (){
-        if(currentAnimeSelectedPosition === result.content.length - 1 && result.hasNext){
-            currentAnimePage = currentAnimePage + 1
-            searchAnime(containerID)
+        if(currentAnimeSelectedPosition === page.content.length - 1 && page.hasNext){
+            searchAnime(containerID,pageNumber + 1)
             return
         }
         currentAnimeSelectedPosition = currentAnimeSelectedPosition + 1
-        if(currentAnimeSelectedPosition === result.content.length - 1 && !result.hasNext){
+        if(currentAnimeSelectedPosition === page.content.length - 1 && !page.hasNext){
             nextBtn.addClass("disabled")
         }
-        setOffcanvasAnimeDetails(containerID,result.content[currentAnimeSelectedPosition])
+        setOffcanvasAnimeDetails(containerID,page.content[currentAnimeSelectedPosition])
         previousBtn.removeClass("disabled")
     })
 
     previousBtn.on("click",function() {
-        if(currentAnimeSelectedPosition === 0 && result.hasPrevious){
-            currentAnimePage = currentAnimePage - 1
-            searchAnime(containerID,true)
+        if(currentAnimeSelectedPosition === 0 && page.hasPrevious){
+            searchAnime(containerID,pageNumber - 1,true)
             return
         }
         currentAnimeSelectedPosition = currentAnimeSelectedPosition - 1
-        if(currentAnimeSelectedPosition === 0 && !result.hasPrevious){
+        if(currentAnimeSelectedPosition === 0 && !page.hasPrevious){
             previousBtn.addClass("disabled")
         }
 
-        setOffcanvasAnimeDetails(containerID,result.content[currentAnimeSelectedPosition])
+        setOffcanvasAnimeDetails(containerID,page.content[currentAnimeSelectedPosition])
         nextBtn.removeClass("disabled")
     })
 
-    setOffcanvasAnimeDetails(containerID,result.content[currentAnimeSelectedPosition])
+    setOffcanvasAnimeDetails(containerID,page.content[currentAnimeSelectedPosition])
 }
 
 function setOffcanvasAnimeDetails(containerID,content){
