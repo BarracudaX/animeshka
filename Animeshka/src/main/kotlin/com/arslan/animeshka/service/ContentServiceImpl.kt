@@ -81,6 +81,15 @@ class ContentServiceImpl(
         return json.decodeFromString<PersonContent>(content.content).copy(id = content.id)
     }
 
+    override suspend fun checkContentForUpdate(id: Long): Content {
+
+        val content = contentRepository.findById(id) ?: throw EmptyResultDataAccessException("Could not find verified content with id $id",1)
+
+        if(content.contentStatus != ContentStatus.VERIFIED) throw IllegalStateException("Cannot add change proposals for content with id $id because of it's current state : ${content.contentStatus}.")
+
+        return content
+    }
+
     private suspend fun verifyContent(contentID: Long) : Content{
         val content = contentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Content with id $contentID not found.",1)
         if(content.contentStatus != ContentStatus.UNDER_VERIFICATION) throw IllegalStateException("Unverified content is currently not under verification. Current status: ${content.contentStatus}")

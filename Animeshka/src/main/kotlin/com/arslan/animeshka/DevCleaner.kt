@@ -1,6 +1,7 @@
 package com.arslan.animeshka
 
 import com.arslan.animeshka.repository.elastic.AnimeDocumentRepository
+import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
 import io.r2dbc.spi.ConnectionFactory
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
@@ -13,7 +14,7 @@ import java.nio.file.Path
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.isRegularFile
 
-class DevCleaner(private val connectionFactory: ConnectionFactory,private val animeDocumentRepository: AnimeDocumentRepository) : DisposableBean{
+class DevCleaner(private val connectionFactory: ConnectionFactory,private val animeDocumentRepository: AnimeDocumentRepository,private val novelDocumentRepository: NovelDocumentRepository) : DisposableBean{
 
     @Value("\${image.path.location}")
     private lateinit var imageLocation: Path
@@ -53,6 +54,7 @@ class DevCleaner(private val connectionFactory: ConnectionFactory,private val an
             }
 
             animeDocumentRepository.deleteAll().awaitFirstOrNull()
+            novelDocumentRepository.deleteAll().awaitFirstOrNull()
         }
     }
 

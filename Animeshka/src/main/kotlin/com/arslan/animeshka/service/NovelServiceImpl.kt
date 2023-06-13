@@ -1,15 +1,18 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.*
+import com.arslan.animeshka.elastic.NovelDocument
 import com.arslan.animeshka.entity.Novel
 import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.repository.NovelRepository
+import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.MessageSource
 import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.data.domain.Pageable
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
@@ -22,20 +25,21 @@ import java.nio.file.Path
 class NovelServiceImpl(
     private val novelRepository: NovelRepository,
     private val databaseClient: DatabaseClient,
-    private val messageSource: MessageSource,
     private val contentService: ContentService,
-    private val imageService: ImageService
+    private val imageService: ImageService,
+    private val novelDocumentRepository: NovelDocumentRepository,
 ) : NovelService {
 
+    override suspend fun findNovel(searchInput: String, pageable: Pageable) : PagedBasicNovelDTO {
+        val result = novelDocumentRepository.findNovel(searchInput,pageable)
 
-    @Value("\${image.path.location}")
-    private lateinit var imageLocation: Path
+        return with(result){ PagedBasicNovelDTO(content.map { it.content.toBasicNovelDTO() },hasNext(),hasPrevious()) }
+    }
 
-    override suspend fun findByTitle(title: String) : BasicNovelDTO {
-        val novel = novelRepository.findByTitleOrJapaneseTitle(title,title) ?: throw EmptyResultDataAccessException(messageSource.getMessage("novel.not.found.by.title.message",arrayOf(title),LocaleContextHolder.getLocale()),1)
-
-        val posterURL = "/poster/${novel.posterPath.substring(novel.posterPath.lastIndexOf("/")+1)}"
-        return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background, posterURL, finished?.toKotlinLocalDate(),id) }
+    private suspend fun NovelDocument.toBasicNovelDTO() : BasicNovelDTO{
+        val novel = novelRepository.findById(id)!!
+        val posterPath = "/poster/${novel.posterPath.substring(novel.posterPath.lastIndexOf("/")+1)}"
+        return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background,posterPath,finished?.toKotlinLocalDate(),id) }
     }
 
     override suspend fun createNovel(novel: NovelContent, poster: FilePart): Content {
@@ -44,7 +48,7 @@ class NovelServiceImpl(
         return contentService.createNovelEntry(novel.copy(posterPath = posterPath.toString()))
     }
 
-    override suspend fun verifyNovel(novelID: Long) {
+    override suspend fun verifyNovel(novelID: Long) : Novel {
         val novelContent = contentService.verifyNovel(novelID)
         val novel = with(novelContent){
             novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,posterPath,explicitGenre,magazine,null,null,background,finished?.toJavaLocalDate(),chapters,volumes,id!!).apply { isNewEntity = true })
@@ -55,6 +59,8 @@ class NovelServiceImpl(
         createCharacterRelations(novel,novelContent.characters)
         createThemes(novel,novelContent.themes)
         createGenres(novel,novelContent.genres)
+
+        return novel
     }
 
 

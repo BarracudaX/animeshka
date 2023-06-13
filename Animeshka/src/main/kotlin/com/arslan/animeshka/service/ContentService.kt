@@ -16,5 +16,6 @@ interface ContentService {
     suspend fun verifyCharacter(contentID: Long) : CharacterContent
     suspend fun createPersonEntry(personContent: PersonContent): Content
     suspend fun verifyPerson(id: Long): PersonContent
+    suspend fun checkContentForUpdate(id: Long): Content
 
 }

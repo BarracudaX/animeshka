@@ -5,9 +5,6 @@ import com.arslan.animeshka.elastic.AnimeDocument
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
 import com.arslan.animeshka.repository.elastic.AnimeDocumentRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toJavaLocalTime
@@ -28,7 +25,6 @@ class AnimeServiceImpl(
     private val animeRepository: AnimeRepository,
     private val animeSeasonsRepository: AnimeSeasonsRepository,
     private val contentService: ContentService,
-    private val contentRepository: ContentRepository,
     private val databaseClient: DatabaseClient,
     private val contentChangeService: ContentChangeService,
     private val animeDocumentRepository: AnimeDocumentRepository,
@@ -59,9 +55,7 @@ class AnimeServiceImpl(
     }
 
     override suspend fun updateAnime(anime: AnimeDTO) {
-        val content = contentRepository.findById(anime.id) ?: throw EmptyResultDataAccessException("Could not find verified anime content with id ${anime.id}",1)
-
-        if(content.contentStatus != ContentStatus.VERIFIED) throw IllegalStateException("Cannot add change proposals for anime with id ${anime.id} because of it's current state : ${content.contentStatus}.")
+        contentService.checkContentForUpdate(anime.id)
 
         val animeBasicData = animeRepository.findById(anime.id) ?: throw EmptyResultDataAccessException("Anime with id ${anime.id} not found.",1)
         val characters = getAnimeCharacters(animeBasicData)
