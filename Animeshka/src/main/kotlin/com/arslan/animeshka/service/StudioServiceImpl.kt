@@ -14,16 +14,10 @@ import org.springframework.validation.annotation.Validated
 @Validated
 class StudioServiceImpl(
     private val studioRepository: StudioRepository,
-    private val contentService: ContentService
 ) : StudioService {
 
-    override suspend fun createStudio(studio: StudioContent) : Content{
-        return contentService.createStudioEntry(studio)
-    }
 
-    override suspend fun verifyStudio(contentID: Long) : Studio {
-        val studioContent = contentService.verifyStudio(contentID)
-
+    override suspend fun insertStudio(studioContent: StudioContent) : Studio {
         return with(studioContent){ studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),id!!,true)) }
     }
 

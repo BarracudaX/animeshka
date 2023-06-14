@@ -11,7 +11,5 @@ interface NovelService {
 
     suspend fun findNovel(searchInput: String, pageable: Pageable) : PagedBasicNovelDTO
 
-    suspend fun createNovel(novel: NovelContent) : Content
-
-    suspend fun verifyNovel(novelID: Long) : Novel
+    suspend fun insertNovel(novelContent: NovelContent) : Novel
 }

@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import java.time.LocalDate
 import kotlin.io.path.Path
-import kotlin.io.path.exists
 
 @Profile("dev")
 @Component
@@ -52,7 +51,7 @@ class ApplicationInitializer(
             val studio = studioService.createStudio(StudioContent("studio","studio_jp", LocalDate.now().toKotlinLocalDate()))
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,studio)
             moderationService.acceptModeration(studio.id!!)
-            studioService.verifyStudio(studio.id)
+            studioService.insertStudio(studio.id)
 
 
             val novel1 = novelService.createNovel(NovelContent("test novel 1","test novel 1 jp","test novel 1 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
@@ -83,10 +82,10 @@ class ApplicationInitializer(
             moderationService.acceptModeration(anime2.id!!)
             moderationService.acceptModeration(anime3.id!!)
             moderationService.acceptModeration(character.id!!)
-            characterService.verifyCharacter(character.id)
-            val savedNovel1 = novelService.verifyNovel(novel1.id)
-            val savedNovel2 = novelService.verifyNovel(novel2.id)
-            val savedNovel3 = novelService.verifyNovel(novel3.id)
+            characterService.insertCharacter(character.id)
+            val savedNovel1 = novelService.insertNovel(novel1.id)
+            val savedNovel2 = novelService.insertNovel(novel2.id)
+            val savedNovel3 = novelService.insertNovel(novel3.id)
             val savedAnime = animeService.insertAnime(contentService.verifyAnime(anime.id))
             val savedAnime2 = animeService.insertAnime(contentService.verifyAnime(anime2.id))
             val savedAnime3 = animeService.insertAnime(contentService.verifyAnime(anime3.id))
@@ -97,7 +96,7 @@ class ApplicationInitializer(
             novelDocumentRepository.save(NovelDocument(savedNovel1.title,savedNovel1.japaneseTitle,savedNovel1.synopsis,savedNovel1.id)).awaitSingleOrNull()
             novelDocumentRepository.save(NovelDocument(savedNovel2.title,savedNovel2.japaneseTitle,savedNovel2.synopsis,savedNovel2.id)).awaitSingleOrNull()
             novelDocumentRepository.save(NovelDocument(savedNovel3.title,savedNovel3.japaneseTitle,savedNovel3.synopsis,savedNovel3.id)).awaitSingleOrNull()
-            peopleService.verifyPerson(person.id)
+            peopleService.insertPerson(person.id)
         }.contextWrite(securityContext).awaitSingleOrNull()
 
     }

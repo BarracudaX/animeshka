@@ -3,29 +3,21 @@ package com.arslan.animeshka.service
 import com.arslan.animeshka.*
 import com.arslan.animeshka.elastic.NovelDocument
 import com.arslan.animeshka.entity.Novel
-import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.repository.NovelRepository
 import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toKotlinLocalDate
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.data.domain.Pageable
-import org.springframework.http.codec.multipart.FilePart
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.r2dbc.core.await
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.nio.file.Path
 
 @Transactional
 @Service
 class NovelServiceImpl(
     private val novelRepository: NovelRepository,
     private val databaseClient: DatabaseClient,
-    private val contentService: ContentService,
     private val novelDocumentRepository: NovelDocumentRepository,
 ) : NovelService {
 
@@ -41,12 +33,7 @@ class NovelServiceImpl(
         return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background,posterPath,finished?.toKotlinLocalDate(),id) }
     }
 
-    override suspend fun createNovel(novel: NovelContent): Content {
-        return contentService.createNovelEntry(novel)
-    }
-
-    override suspend fun verifyNovel(novelID: Long) : Novel {
-        val novelContent = contentService.verifyNovel(novelID)
+    override suspend fun insertNovel(novelContent: NovelContent) : Novel {
         val novel = with(novelContent){
             novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,posterPath,explicitGenre,magazine,null,null,background,finished?.toJavaLocalDate(),chapters,volumes,id!!).apply { isNewEntity = true })
         }

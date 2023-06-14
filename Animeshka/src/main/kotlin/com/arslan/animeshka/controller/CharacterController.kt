@@ -3,6 +3,7 @@ package com.arslan.animeshka.controller
 import com.arslan.animeshka.CharacterContent
 import com.arslan.animeshka.entity.Character
 import com.arslan.animeshka.service.CharacterService
+import com.arslan.animeshka.service.ContentService
 import com.arslan.animeshka.service.ImageService
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
@@ -17,11 +18,11 @@ import kotlin.io.path.deleteExisting
 
 @RequestMapping("/character")
 @RestController
-class CharacterController(private val characterService: CharacterService,private val imageService: ImageService) {
+class CharacterController(private val characterService: CharacterService,private val imageService: ImageService,private val contentService: ContentService) {
 
     @PostMapping
     suspend fun postCharacter(@RequestPart("data") character: CharacterContent, @RequestPart("images") images: Flux<FilePart>,@RequestPart("poster") poster: FilePart) : ResponseEntity<Unit>{
-        val content = characterService.createCharacterEntry(character)
+        val content = contentService.createCharacterEntry(character)
         imageService.saveImages(images,poster,content)
         return ResponseEntity.ok(Unit)
     }

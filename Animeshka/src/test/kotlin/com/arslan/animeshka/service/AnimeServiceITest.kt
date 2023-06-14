@@ -1,31 +1,17 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.*
-import com.arslan.animeshka.annotation.ClearImages
 import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.entity.Studio
 import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.repository.*
 import io.kotest.assertions.assertSoftly
-import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.booleans.shouldBeFalse
-import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldNotBeEmpty
 import kotlinx.datetime.toKotlinLocalDate
-import kotlinx.serialization.decodeFromString
-import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.http.HttpHeaders
 import java.time.LocalDate
-import kotlin.io.path.Path
-import kotlin.io.path.exists
 
 class  AnimeServiceITest @Autowired constructor (
         private val studioService: StudioService,
@@ -82,7 +68,7 @@ class  AnimeServiceITest @Autowired constructor (
     private suspend fun createStudio() : Studio {
         val content = studioService.createStudio(StudioContent("test_studio_name","jp_test_studio_name",LocalDate.now().toKotlinLocalDate()))
         moderationService.acceptModeration(content.id!!)
-        return studioService.verifyStudio(content.id!!)
+        return studioService.insertStudio(content.id!!)
     }
 
 }

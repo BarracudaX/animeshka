@@ -14,17 +14,11 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @Service
 class CharacterServiceImpl(
-    private val contentService: ContentService,
     private val characterRepository: CharacterRepository,
     private val messageSource: MessageSource
 ) : CharacterService {
 
-    override suspend fun createCharacterEntry(character: CharacterContent) : Content {
-        return contentService.createCharacterEntry(character)
-    }
-
-    override suspend fun verifyCharacter(contentID: Long) {
-        val characterContent= contentService.verifyCharacter(contentID)
+    override suspend fun insertCharacter(characterContent: CharacterContent) {
         with(characterContent){ characterRepository.save(Character(characterName,japaneseName,description, posterPath,id!!).apply { isNewEntity = true })}
     }
 
