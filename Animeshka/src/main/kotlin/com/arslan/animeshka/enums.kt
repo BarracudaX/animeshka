@@ -2,6 +2,10 @@ package com.arslan.animeshka
 
 import java.time.Month
 
+enum class ImageExtension{
+    JPEG,JPG,PNG
+}
+
 enum class UserRole{
     USER,STREAMER,NOVEL_ADMINISTRATOR,ANIME_ADMINISTRATOR
 }
@@ -49,3 +53,5 @@ enum class ContentStatus{ PENDING_VERIFICATION,UNDER_VERIFICATION,VERIFIED,REJEC
 enum class ContentChangeOperation{ REPLACE,ADD,REMOVE }
 
 enum class ContentChangeStatus{ ACCEPTED,REJECTED,PENDING }
+
+enum class ImageType{ POSTER,GALLERY }

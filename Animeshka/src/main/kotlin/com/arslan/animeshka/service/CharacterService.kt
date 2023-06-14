@@ -7,7 +7,7 @@ import org.springframework.http.codec.multipart.FilePart
 
 interface CharacterService {
 
-    suspend fun createCharacterEntry(character: CharacterContent, poster: FilePart) : Content
+    suspend fun createCharacterEntry(character: CharacterContent) : Content
 
     suspend fun verifyCharacter(contentID: Long)
     suspend fun findByName(name: String): Character

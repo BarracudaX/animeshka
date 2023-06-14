@@ -21,10 +21,10 @@ class StudioServiceImpl(
         return contentService.createStudioEntry(studio)
     }
 
-    override suspend fun verifyStudio(contentID: Long) {
+    override suspend fun verifyStudio(contentID: Long) : Studio {
         val studioContent = contentService.verifyStudio(contentID)
 
-        with(studioContent){ studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),id!!,true)) }
+        return with(studioContent){ studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),id!!,true)) }
     }
 
 

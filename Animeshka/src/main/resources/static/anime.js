@@ -87,7 +87,7 @@ async function searchAnime(containerID,pageNumber = 0,isPrevBtnSource = false){
 function setOffcanvasAnimeDetails(containerID,content){
     $(`#anime_relation_non_found_alert_${containerID}`).addClass("d-none").removeClass("d-block")
     $(`#anime_relation_choose_btn_${containerID}`).removeClass("d-none").addClass("d-block").text(`${content.title}/${content.japaneseTitle}`)
-    $(`#anime_relation_offcanvas_image_${containerID}`).attr("src",content.posterPath)
+    $(`#anime_relation_offcanvas_image_${containerID}`).attr("src",`/image/${content.posterID}`)
     $(`#anime_relation_offcanvas_title_${containerID}`).text(`${content.title}/${content.japaneseTitle}`)
     $(`#anime_relation_offcanvas_type_${containerID}`).val(content.animeType.split("_").map(value => value.toLowerCase()).join(" "))
     $(`#anime_relation_offcanvas_demographics_${containerID}`).val(content.demographic.toLowerCase())

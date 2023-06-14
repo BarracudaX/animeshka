@@ -16,14 +16,11 @@ import org.springframework.transaction.annotation.Transactional
 class CharacterServiceImpl(
     private val contentService: ContentService,
     private val characterRepository: CharacterRepository,
-    private val imageService: ImageService,
     private val messageSource: MessageSource
 ) : CharacterService {
 
-    override suspend fun createCharacterEntry(character: CharacterContent, poster: FilePart) : Content {
-        val posterPath = imageService.saveImage(poster).toString()
-
-        return contentService.createCharacterEntry(character.copy(posterPath = posterPath))
+    override suspend fun createCharacterEntry(character: CharacterContent) : Content {
+        return contentService.createCharacterEntry(character)
     }
 
     override suspend fun verifyCharacter(contentID: Long) {

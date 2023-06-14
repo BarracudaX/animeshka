@@ -8,13 +8,16 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.DisposableBean
 import org.springframework.beans.factory.annotation.Value
-import java.nio.file.DirectoryStream
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.isRegularFile
 
-class DevCleaner(private val connectionFactory: ConnectionFactory,private val animeDocumentRepository: AnimeDocumentRepository,private val novelDocumentRepository: NovelDocumentRepository) : DisposableBean{
+@Profile("dev")
+@Component
+class ApplicationCleaner(private val connectionFactory: ConnectionFactory, private val animeDocumentRepository: AnimeDocumentRepository, private val novelDocumentRepository: NovelDocumentRepository) : DisposableBean{
 
     @Value("\${image.path.location}")
     private lateinit var imageLocation: Path
@@ -22,7 +25,7 @@ class DevCleaner(private val connectionFactory: ConnectionFactory,private val an
     override fun destroy() {
         runBlocking{
             val connection = connectionFactory.create().awaitFirst()
-            connection.createStatement("DROP TABLE IF EXISTS IMAGE_ID_GENERATOR").execute().awaitFirst()
+            connection.createStatement("DROP TABLE IF EXISTS IMAGES").execute().awaitFirst()
             connection.createStatement("DROP TABLE IF EXISTS CONTENT_CHANGES").execute().awaitFirst()
             connection.createStatement("DROP TABLE IF EXISTS ANIME_EPISODE_CHARACTER_APPEARANCES").execute().awaitFirst()
             connection.createStatement("DROP TABLE IF EXISTS NOVEL_ANIME_RELATIONS").execute().awaitFirst()
@@ -50,9 +53,7 @@ class DevCleaner(private val connectionFactory: ConnectionFactory,private val an
                 for(path in stream){
                     path.deleteExisting()
                 }
-                animeDocumentRepository.deleteAll().awaitFirstOrNull()
             }
-
             animeDocumentRepository.deleteAll().awaitFirstOrNull()
             novelDocumentRepository.deleteAll().awaitFirstOrNull()
         }

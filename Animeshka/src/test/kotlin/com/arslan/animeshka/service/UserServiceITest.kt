@@ -2,6 +2,7 @@ package com.arslan.animeshka.service
 
 import com.arslan.animeshka.UserRegistration
 import com.arslan.animeshka.UserRole
+import com.arslan.animeshka.annotation.ClearImages
 import com.arslan.animeshka.repository.UserRepository
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
@@ -17,7 +18,7 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.security.crypto.password.PasswordEncoder
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class UserServiceITest @Autowired constructor(private val userService: UserService,private val userRepository: UserRepository,private val passwordEncoder: PasswordEncoder) : AbstractServiceITest(){
+class UserServiceITest @Autowired constructor(private val userService: UserService,private val passwordEncoder: PasswordEncoder) : AbstractServiceITest(){
 
     private val userRegistration = UserRegistration("test@email.com","Pass123!","Pass123!","test_username","test_fn","test_ln")
 

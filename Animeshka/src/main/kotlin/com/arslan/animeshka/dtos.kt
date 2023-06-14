@@ -92,8 +92,6 @@ data class AnimeContent(
 
     val characters: Set<AnimeCharacter> = emptySet(),
 
-    val posterPath: String = "",
-
     val explicitGenre: ExplicitGenre? = null,
 
     val airingTime: LocalTime? = null,
@@ -172,8 +170,6 @@ data class BasicAnimeDTO(
 
     val animeType: AnimeType,
 
-    val posterPath: String,
-
     val id: Long,
 
     val background: String = "",
@@ -181,6 +177,10 @@ data class BasicAnimeDTO(
     val airedAt: LocalDate? = null,
 
     val finishedAt: LocalDate? = null,
+
+    val images: Set<Long> = emptySet(),
+
+    val posterID: Long? = null,
 )
 
 @Serializable

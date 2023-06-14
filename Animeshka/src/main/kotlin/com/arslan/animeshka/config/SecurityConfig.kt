@@ -85,7 +85,7 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
             }.anonymous{ }
             .authorizeExchange { authorization ->
                 authorization
-                    .pathMatchers("/user/register","/","/user/login","/poster/**").permitAll()
+                    .pathMatchers("/user/register","/","/user/login","/image/**").permitAll()
                     .pathMatchers(HttpMethod.POST,"/anime","/studio").authenticated()
                     .pathMatchers(HttpMethod.GET,"/insert/anime","/novel/title/**","/anime/title/**","/character/name/**").authenticated()
                     .pathMatchers(HttpMethod.PUT,"/anime").authenticated()
@@ -93,10 +93,12 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
                     .pathMatchers(HttpMethod.GET,"/","/login","/logout","/access_denied").permitAll()
                     .pathMatchers(HttpMethod.GET,"/resource/**").permitAll()
                     .anyExchange().denyAll()
-            }.csrf { csrf ->
+            }
+            .csrf { csrf ->
                 val protectedWithCsrf = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST,"/login")
                 csrf.requireCsrfProtectionMatcher(protectedWithCsrf)
-            }.securityContextRepository(NoOpServerSecurityContextRepository.getInstance()).build()
+            }
+            .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()).build()
 
     }
 

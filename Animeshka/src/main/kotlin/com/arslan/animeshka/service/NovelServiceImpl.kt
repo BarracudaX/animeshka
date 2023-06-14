@@ -26,7 +26,6 @@ class NovelServiceImpl(
     private val novelRepository: NovelRepository,
     private val databaseClient: DatabaseClient,
     private val contentService: ContentService,
-    private val imageService: ImageService,
     private val novelDocumentRepository: NovelDocumentRepository,
 ) : NovelService {
 
@@ -42,10 +41,8 @@ class NovelServiceImpl(
         return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background,posterPath,finished?.toKotlinLocalDate(),id) }
     }
 
-    override suspend fun createNovel(novel: NovelContent, poster: FilePart): Content {
-        val posterPath = imageService.saveImage(poster)
-
-        return contentService.createNovelEntry(novel.copy(posterPath = posterPath.toString()))
+    override suspend fun createNovel(novel: NovelContent): Content {
+        return contentService.createNovelEntry(novel)
     }
 
     override suspend fun verifyNovel(novelID: Long) : Novel {

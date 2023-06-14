@@ -13,13 +13,11 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class PeopleServiceImpl(
     private val contentService: ContentService,
-    private val imageService: ImageService,
     private val peopleRepository: PeopleRepository
 ) : PeopleService {
     
-    override suspend fun createPersonEntry(personContent: PersonContent, image: FilePart) : Content{
-        val posterPath = imageService.saveImage(image)
-        return contentService.createPersonEntry(personContent.copy(posterPath = posterPath.toString()))
+    override suspend fun createPersonEntry(personContent: PersonContent) : Content{
+        return contentService.createPersonEntry(personContent)
     }
 
     override suspend fun verifyPerson(id: Long) {

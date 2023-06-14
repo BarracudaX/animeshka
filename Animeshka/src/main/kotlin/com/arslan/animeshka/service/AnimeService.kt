@@ -13,9 +13,7 @@ import org.springframework.http.codec.multipart.FilePart
 
 interface AnimeService {
 
-    suspend fun createUnverifiedAnime(animeContent: AnimeContent, poster: FilePart) : Content
-
-    suspend fun verifyAnimeEntry(contentID: Long) : Anime
+    suspend fun insertAnime(animeContent: AnimeContent) : Anime
 
     suspend fun updateAnime(anime: AnimeDTO)
     suspend fun findAnimeByTitle(searchTitle: String,pageable: Pageable): PagedBasicAnimeDTO

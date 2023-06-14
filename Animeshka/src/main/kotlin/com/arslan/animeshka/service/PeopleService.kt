@@ -6,7 +6,7 @@ import org.springframework.http.codec.multipart.FilePart
 
 interface PeopleService {
 
-    suspend fun createPersonEntry(personContent: PersonContent, image: FilePart) : Content
+    suspend fun createPersonEntry(personContent: PersonContent) : Content
     suspend fun verifyPerson(id: Long)
 
 }

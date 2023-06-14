@@ -19,4 +19,6 @@ interface ContentRepository : CoroutineCrudRepository<Content,Long>{
     @Lock(LockMode.PESSIMISTIC_WRITE)
     override suspend fun findById(id: Long) : Content?
 
+    suspend fun findByContentKey(contentKey: String) : Content?
+
 }
