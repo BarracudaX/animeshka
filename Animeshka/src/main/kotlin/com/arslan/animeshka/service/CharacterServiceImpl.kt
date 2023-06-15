@@ -1,34 +1,40 @@
 package com.arslan.animeshka.service
 
+import com.arslan.animeshka.BasicCharacterDTO
 import com.arslan.animeshka.entity.Character
 import com.arslan.animeshka.CharacterContent
-import com.arslan.animeshka.entity.Content
+import com.arslan.animeshka.PagedBasicAnimeDTO
+import com.arslan.animeshka.PagedBasicCharacterDTO
+import com.arslan.animeshka.elastic.CharacterDocument
 import com.arslan.animeshka.repository.CharacterRepository
+import com.arslan.animeshka.repository.elastic.CharacterDocumentRepository
 import org.springframework.context.MessageSource
-import org.springframework.context.i18n.LocaleContextHolder
-import org.springframework.dao.EmptyResultDataAccessException
-import org.springframework.http.codec.multipart.FilePart
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Transactional
 @Service
 class CharacterServiceImpl(
-    private val characterRepository: CharacterRepository,
-    private val messageSource: MessageSource
+        private val characterRepository: CharacterRepository,
+        private val characterDocumentRepository: CharacterDocumentRepository
 ) : CharacterService {
 
-    override suspend fun insertCharacter(characterContent: CharacterContent) {
-        with(characterContent){ characterRepository.save(Character(characterName,japaneseName,description, posterPath,id!!).apply { isNewEntity = true })}
+    override suspend fun insertCharacter(characterContent: CharacterContent): Character {
+        return with(characterContent) { characterRepository.save(Character(characterName, japaneseName, description, id!!).apply { isNewEntity = true }) }
     }
 
-    override suspend fun findByName(name: String): Character {
-        val character = characterRepository.findByCharacterNameOrJapaneseName(name,name) ?: throw EmptyResultDataAccessException(messageSource.getMessage("character.not.found.by.name.message",arrayOf(name),LocaleContextHolder.getLocale()),1)
-
-        val posterPath = "/poster/${character.posterPath.substring(character.posterPath.lastIndexOf("/")+1)}"
-
-        return character.copy(posterPath = posterPath)
+    override suspend fun searchCharacters(searchKey: String, pageable: Pageable): PagedBasicCharacterDTO {
+        val result = characterDocumentRepository.findCharacter(searchKey,pageable)
+        return with(result){
+            PagedBasicCharacterDTO(searchHits.searchHits.map{ it.content.toBasicCharacterDTO() },hasNext(),hasPrevious())
+        }
     }
 
+    private suspend fun CharacterDocument.toBasicCharacterDTO() : BasicCharacterDTO{
+        val character = characterRepository.findById(id)!!
+
+        return with(character){ BasicCharacterDTO(characterName,japaneseName,description,id) }
+    }
 
 }

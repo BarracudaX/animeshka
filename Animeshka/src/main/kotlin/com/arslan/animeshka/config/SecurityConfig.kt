@@ -87,7 +87,7 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
                 authorization
                     .pathMatchers("/user/register","/","/user/login","/image/**").permitAll()
                     .pathMatchers(HttpMethod.POST,"/anime","/studio").authenticated()
-                    .pathMatchers(HttpMethod.GET,"/insert/anime","/novel/title/**","/anime/title/**","/character/name/**").authenticated()
+                    .pathMatchers(HttpMethod.GET,"/insert/anime","/novel/search/**","/anime/search/**","/character/search/**").authenticated()
                     .pathMatchers(HttpMethod.PUT,"/anime").authenticated()
                     .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(UserRole.ANIME_ADMINISTRATOR.name)
                     .pathMatchers(HttpMethod.GET,"/","/login","/logout","/access_denied").permitAll()

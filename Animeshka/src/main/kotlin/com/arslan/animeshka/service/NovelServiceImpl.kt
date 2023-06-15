@@ -29,13 +29,12 @@ class NovelServiceImpl(
 
     private suspend fun NovelDocument.toBasicNovelDTO() : BasicNovelDTO{
         val novel = novelRepository.findById(id)!!
-        val posterPath = "/poster/${novel.posterPath.substring(novel.posterPath.lastIndexOf("/")+1)}"
-        return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background,posterPath,finished?.toKotlinLocalDate(),id) }
+        return with(novel){ BasicNovelDTO(title,japaneseTitle,synopsis,published.toKotlinLocalDate(),novelStatus,novelType,demographic,background,finished?.toKotlinLocalDate(),id) }
     }
 
     override suspend fun insertNovel(novelContent: NovelContent) : Novel {
         val novel = with(novelContent){
-            novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,posterPath,explicitGenre,magazine,null,null,background,finished?.toJavaLocalDate(),chapters,volumes,id!!).apply { isNewEntity = true })
+            novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,explicitGenre,magazine,null,null,background,finished?.toJavaLocalDate(),chapters,volumes,id!!).apply { isNewEntity = true })
         }
 
         createNovelRelations(novel,novelContent.novelRelations)

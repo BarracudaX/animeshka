@@ -27,7 +27,7 @@
     </div>
 </nav>
 <div id="insert_anime">
-    <form class="m-auto w-75 mt-2" th:action="@{/anime}" method="post">
+    <form class="m-auto w-75 mt-2 p-1" th:action="@{/anime}" method="post">
         <div>
             <label th:text="#{title.label}" class="form-label" for="title">Title:</label>
             <input type="text" id="title" name="title" placeholder="Anime's english title" class="form-control"
@@ -37,8 +37,7 @@
         <div>
             <label th:text="#{japanese.title.label}" class="form-label" for="japanese_title">Japanese
                 Title:</label>
-            <input type="text" id="japanese_title" name="japanese_title" placeholder="Anime's official japanese title"
-                   class="form-control" th:placeholder="#{japanese.title.placeholder}"/>
+            <input type="text" id="japanese_title" name="japanese_title" placeholder="Anime's official japanese title" class="form-control" th:placeholder="#{japanese.title.placeholder}"/>
         </div>
 
         <div>
@@ -106,8 +105,15 @@
         </div>
 
         <div>
-            <label for="formFile" class="form-label" th:text="#{poster.label}">Poster:</label>
-            <input class="form-control" type="file" id="formFile" accept="image/*">
+            <label for="poster" class="form-label" th:text="#{poster.label}">Poster:</label>
+            <input class="form-control" type="file" id="poster" accept="image/*" >
+            <div class="form-text" th:text="#{poster.hint}">Poster can be maximum 5MB.No avatar/no nudity.</div>
+        </div>
+
+        <div>
+            <label for="images" class="form-label" th:text="#{images.label}">Images:</label>
+            <input class="form-control" type="file" id="images" accept="image/*" multiple>
+            <div class="form-text" th:text="#{image.hint}">Each image can be maximum 5MB.No avatar/no nudity.</div>
         </div>
 
         <div>
@@ -478,7 +484,9 @@
                 novelRelationFinishedLabelText : finishedOnLabelText,
                 novelRelationSynopsisLabelText : synopsisLabelText,
                 novelRelationBackgroundLabelText : backgroundLabelText,
-                novelRelationMoreDetailsBtnText : moreDetailsLabel
+                novelRelationMoreDetailsBtnText : moreDetailsLabel,
+                previousBtnText : previousBtnText,
+                nextBtnText : nextBtnText
             }
 
             addNovelRelation(nextNovelRelation,messages)

@@ -4,29 +4,95 @@ function removeNovelRelation(id) {
 }
 
 
-async function searchNovel(containerID){
-    let searchTitle = $(`#novel_relation_search_${containerID}`).val()
-    let response = await fetch("/novel/title?"+ new URLSearchParams({ title : searchTitle }),{ method : "GET",credentials: "same-origin" })
+async function searchNovel(containerID,pageNumber = 0,isPrevBtnSource = false,pageSize = 2){
+    let searchKey = $(`#novel_relation_search_${containerID}`).val()
+    let response = await fetch("/novel/search?"+ new URLSearchParams({ searchKey : searchKey,page : `${pageNumber}`, size : `${pageSize}` }),{ method : "GET",credentials: "same-origin" })
 
     if(response.status !== 200){
         addAlert($(`#novel_relation_${containerID}`).children(".alerts"),await response.text())
-        $(`#show_result_novel_relation_${containerID}`).removeClass("d-block").addClass("d-none")
+        $(`#novel_relation_choose_btn_${containerID}`).removeClass("d-block").addClass("d-none")
         return
     }
 
-    let result = JSON.parse(await response.text())
+    let page = JSON.parse(await response.text())
 
-    $(`#show_result_novel_relation_${containerID}`).removeClass("d-none").addClass("d-block")
-    $(`#novel_relation_offcanvas_image_${containerID}`).attr("src",result.posterPath)
-    $(`#novel_relation_offcanvas_title_${containerID}`).text(`${result.title}/${result.japaneseTitle}`)
-    $(`#novel_relation_offcanvas_type_${containerID}`).val(result.novelType.split("_").map(value => value.toLowerCase()).join(" "))
-    $(`#novel_relation_offcanvas_demographics_${containerID}`).val(result.demographic.toLowerCase())
-    $(`#novel_relation_offcanvas_status_${containerID}`).val(result.novelStatus.split("_").map(value => value.toLowerCase()).join(" "))
-    $(`#novel_relation_offcanvas_published_${containerID}`).val(result.published)
-    $(`#novel_relation_offcanvas_finished_${containerID}`).val(result.finished)
-    $(`#novel_relation_offcanvas_synopsis_${containerID}`).text(result.synopsis)
-    $(`#novel_relation_offcanvas_background_${containerID}`).text(result.background)
-    $(`#novel_relation_offcanvas_details_${containerID}`).attr("href",`/novel/${result.id}`)
+
+    //0 search hits.
+    if(page.content.length === 0){
+        $(`#novel_relation_non_found_alert_${containerID}`).removeClass("d-none").addClass("d-block")
+        return
+    }
+
+    let currentNovelSelectedPosition = 0
+    let previousBtn = $(`#novel_relation_offcanvas_previous_btn_${containerID}`)
+    let nextBtn = $(`#novel_relation_offcanvas_next_btn_${containerID}`)
+    //remove any previously registered click events.
+    previousBtn.off("click")
+    nextBtn.off("click")
+
+    /**
+     * Go to the last novel of the search request since request was initiated by user clicking on previous btn.
+     */
+    if(isPrevBtnSource){
+        currentNovelSelectedPosition = page.content.length - 1
+    }
+
+    if(!page.hasNext && page.content.length === 1){
+        nextBtn.addClass("disabled")
+    }else{
+        nextBtn.removeClass("disabled")
+    }
+
+    if(currentNovelSelectedPosition === 0 && !page.hasPrevious){
+        previousBtn.addClass("disabled")
+    }else{
+        previousBtn.removeClass("disabled")
+    }
+
+    nextBtn.on("click",function (){
+        if(currentNovelSelectedPosition === page.content.length - 1 && page.hasNext){
+            searchNovel(containerID,pageNumber + 1)
+            return
+        }
+        currentNovelSelectedPosition = currentNovelSelectedPosition + 1
+        if(currentNovelSelectedPosition === page.content.length - 1 && !page.hasNext){
+            nextBtn.addClass("disabled")
+        }
+        setOffcanvasNovelDetails(containerID,page.content[currentNovelSelectedPosition])
+        previousBtn.removeClass("disabled")
+    })
+
+    previousBtn.on("click",function() {
+        if(currentNovelSelectedPosition === 0 && page.hasPrevious){
+            searchNovel(containerID,pageNumber - 1,true)
+            return
+        }
+        currentNovelSelectedPosition = currentNovelSelectedPosition - 1
+        if(currentNovelSelectedPosition === 0 && !page.hasPrevious){
+            previousBtn.addClass("disabled")
+        }
+
+        setOffcanvasNovelDetails(containerID,page.content[currentNovelSelectedPosition])
+        nextBtn.removeClass("disabled")
+    })
+
+
+    setOffcanvasNovelDetails(containerID,page.content[currentNovelSelectedPosition])
+}
+
+function setOffcanvasNovelDetails(containerID,content){
+    $(`#novel_relation_non_found_alert_${containerID}`).addClass("d-none").removeClass("d-block")
+    $(`#novel_relation_choose_btn_${containerID}`).removeClass("d-none").addClass("d-block").text(`${content.title}/${content.japaneseTitle}`)
+    $(`#novel_relation_offcanvas_image_${containerID}`).attr("src",`/image/${content.posterID}`)
+    $(`#novel_relation_offcanvas_title_${containerID}`).text(`${content.title}/${content.japaneseTitle}`)
+    $(`#novel_relation_offcanvas_type_${containerID}`).val(content.novelType.split("_").map(value => value.toLowerCase()).join(" "))
+    $(`#novel_relation_offcanvas_demographics_${containerID}`).val(content.demographic.toLowerCase())
+    $(`#novel_relation_offcanvas_status_${containerID}`).val(content.novelStatus.split("_").map(value => value.toLowerCase()).join(" "))
+    $(`#novel_relation_offcanvas_published_${containerID}`).val(content.published)
+    $(`#novel_relation_offcanvas_finished_${containerID}`).val(content.finished)
+    $(`#novel_relation_offcanvas_synopsis_${containerID}`).text(content.synopsis)
+    $(`#novel_relation_offcanvas_background_${containerID}`).text(content.background)
+    $(`#novel_relation_offcanvas_details_${containerID}`).attr("href",`/novel/${content.id}`).attr("target","_blank")
 }
 
 function addAlert(alertContainer,text){
@@ -40,7 +106,7 @@ function addNovelRelation(id,messages){
         .attr("for",``)
         .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(messages.removeBtnText).on("click",function(){ removeNovelRelation(`novel_relation_${id}`) }))
 
-    let alertsContainer = $("<div class='alerts'>")
+    let alertsContainer = $("<div class='alerts'>").append($("<div class='alert alert-warning d-none'>").text(messages.novelSearchNotFound).attr("id",`novel_relation_non_found_alert_${id}`))
 
     let relationSelectLabel = $("<label>")
         .attr("class","form-label")
@@ -66,16 +132,15 @@ function addNovelRelation(id,messages){
         .append($("<input>").attr("class","form-control me-2").attr("id",`novel_relation_search_${id}`).attr("type","search"))
         .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(messages.searchBtnText).on("click",function(){ searchNovel(id) }))
 
-    let showResultButton = $("<button>")
+    let chooseRelationBtn = $("<button>")
         .attr("class","btn btn-secondary mt-2 w-100 d-none")
         .attr("type","button")
         .attr("data-bs-toggle","offcanvas")
         .attr("data-bs-target",`#novel_relation_offcanvas_${id}`)
-        .attr("id",`show_result_novel_relation_${id}`)
-        .text(messages.showResultBtnText)
+        .attr("id",`novel_relation_choose_btn_${id}`)
 
     let offcanvasContainer = $("<div>")
-        .attr("class","offcanvas offcanvas-start")
+        .attr("class","offcanvas offcanvas-start w-50")
         .attr("id",`novel_relation_offcanvas_${id}`)
         .append(
             $("<div>").attr("class","offcanvas-header")
@@ -100,6 +165,11 @@ function addNovelRelation(id,messages){
                 .append($("<label>").attr("class","form-label").attr("for",`novel_relation_offcanvas_background_${id}`).text(messages.novelRelationBackgroundLabelText))
                 .append($("<textarea>").attr("class","form-control").attr("readonly","readonly").attr("id",`novel_relation_offcanvas_background_${id}`))
                 .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`novel_relation_offcanvas_details_${id}`).text(messages.novelRelationMoreDetailsBtnText))
+                .append(
+                    $("<div>").attr("class","d-flex mt-1")
+                        .append($("<button>").attr("class","btn btn-primary").attr("type","button").attr("id",`novel_relation_offcanvas_previous_btn_${id}`).text(messages.previousBtnText))
+                        .append($("<button>").attr("class","btn btn-primary ms-auto").attr("type","button").attr("id",`novel_relation_offcanvas_next_btn_${id}`).text(messages.nextBtnText))
+                )
         )
 
 
@@ -113,7 +183,7 @@ function addNovelRelation(id,messages){
         .append($("<div>").attr("class","form-text").text("Relation is from this item to the specified novel. For example, sequel means that this items is sequel of searched novel."))
         .append(searchLabel)
         .append(searchContainer)
-        .append(showResultButton)
+        .append(chooseRelationBtn)
         .append(offcanvasContainer)
         .insertBefore("#add_novel_relation_btn")
 }

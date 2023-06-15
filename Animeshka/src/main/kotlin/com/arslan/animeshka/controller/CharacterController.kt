@@ -1,10 +1,17 @@
 package com.arslan.animeshka.controller
 
+import com.arslan.animeshka.BasicCharacterDTO
 import com.arslan.animeshka.CharacterContent
+import com.arslan.animeshka.ImageType
+import com.arslan.animeshka.PagedBasicCharacterDTO
 import com.arslan.animeshka.entity.Character
+import com.arslan.animeshka.entity.Image
 import com.arslan.animeshka.service.CharacterService
 import com.arslan.animeshka.service.ContentService
 import com.arslan.animeshka.service.ImageService
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.fold
+import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.GetMapping
@@ -27,9 +34,31 @@ class CharacterController(private val characterService: CharacterService,private
         return ResponseEntity.ok(Unit)
     }
 
-    @GetMapping("/name")
-    suspend fun findCharacterByName(@RequestParam name: String) : ResponseEntity<Character>{
-        return ResponseEntity.ok(characterService.findByName(name))
+
+    @GetMapping("/search")
+    suspend fun searchCharacters(@RequestParam("searchKey") searchKey:String,pageable: Pageable) : ResponseEntity<PagedBasicCharacterDTO> {
+        val resultWithoutImages = characterService.searchCharacters(searchKey,pageable)
+
+        val resultWithImages = with(resultWithoutImages){
+            val enrichedContent = content.map { character -> character.enrichWith(imageService.findContentImages(character.id)) }
+            PagedBasicCharacterDTO(enrichedContent,hasNext,hasPrevious)
+        }
+
+        return ResponseEntity.ok(resultWithImages)
+    }
+
+    private suspend fun BasicCharacterDTO.enrichWith(images: Flow<Image>) : BasicCharacterDTO{
+        return images.fold(this){ character,nextImage ->
+            when(nextImage.imageType){
+                ImageType.POSTER ->
+                    if(character.posterID != null){
+                        throw IllegalStateException("Character with id ${character.id} must have one poster but instead has at least two with ids ${character.posterID} and ${nextImage.id}")
+                    }else{
+                        character.copy(posterID = nextImage.id)
+                    }
+                ImageType.GALLERY -> character.copy(images = character.images + nextImage.id!!)
+            }
+        }
     }
 
 

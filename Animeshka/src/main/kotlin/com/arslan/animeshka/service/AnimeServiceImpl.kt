@@ -61,7 +61,7 @@ class AnimeServiceImpl(
 
     override suspend fun findAnimeByTitle(searchTitle: String, pageable: Pageable): PagedBasicAnimeDTO {
         val result = animeDocumentRepository.findAnime(searchTitle, pageable)
-        return with(result) { PagedBasicAnimeDTO(result.searchHits.searchHits.map { it.content.toBasicAnimeDTO() }, hasNext(), hasPrevious()) }
+        return with(result) { PagedBasicAnimeDTO(searchHits.searchHits.map { it.content.toBasicAnimeDTO() }, hasNext(), hasPrevious()) }
     }
 
     private suspend fun AnimeDocument.toBasicAnimeDTO(): BasicAnimeDTO {

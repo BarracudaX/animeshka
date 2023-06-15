@@ -28,9 +28,6 @@ data class Novel(
 
     val demographic: Demographic,
 
-    @Column("poster_path")
-    val posterPath: String,
-
     val explicitGenre: ExplicitGenre? = null,
 
     val magazine: Long? = null,

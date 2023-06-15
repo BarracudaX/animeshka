@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
-import org.springframework.http.codec.json.KotlinSerializationJsonDecoder
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -54,8 +53,8 @@ class AnimeController(
         return ResponseEntity.ok(Unit)
     }
 
-    @GetMapping("/title")
-    suspend fun findByTitle(@RequestParam("title") title: String,pageable: Pageable) : ResponseEntity<PagedBasicAnimeDTO> {
+    @GetMapping("/search")
+    suspend fun search(@RequestParam("searchKey") title: String, pageable: Pageable) : ResponseEntity<PagedBasicAnimeDTO> {
         val resultWithoutImages = animeService.findAnimeByTitle(title,pageable)
         val resultWithImages = with(resultWithoutImages){
             val enrichedContent = content.map { anime -> anime.enrichWith(imageService.findContentImages(anime.id)) }

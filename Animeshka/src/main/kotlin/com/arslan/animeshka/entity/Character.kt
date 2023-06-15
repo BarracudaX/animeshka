@@ -16,8 +16,6 @@ data class Character(
 
     val description: String = "",
 
-    val posterPath: String,
-
     @Id
     val id: Long
 ) : Persistable<Long> {

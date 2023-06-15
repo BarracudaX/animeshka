@@ -13,9 +13,9 @@ data class Person(
 
     val lastName: String,
 
-    val familyName: String,
+    val familyName: String? = null,
 
-    val givenName: String,
+    val givenName: String? = null,
 
     val description: String = "",
 

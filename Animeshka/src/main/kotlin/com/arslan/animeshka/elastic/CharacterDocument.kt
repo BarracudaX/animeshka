@@ -5,16 +5,16 @@ import org.springframework.data.elasticsearch.annotations.Document
 import org.springframework.data.elasticsearch.annotations.Field
 import org.springframework.data.elasticsearch.annotations.FieldType
 
-@Document(indexName = "anime")
-data class AnimeDocument(
+@Document(indexName = "characters")
+data class CharacterDocument(
         @Field(type = FieldType.Text)
-        val title: String,
+        val characterName: String,
 
         @Field(type = FieldType.Text)
-        val japaneseTitle: String,
+        val description: String,
 
         @Field(type = FieldType.Text)
-        val synopsis: String,
+        val japaneseName: String? = null,
 
         @Id
         val id: Long

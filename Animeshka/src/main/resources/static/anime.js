@@ -1,4 +1,3 @@
-let pageSize = 2
 
 function removeAnimeRelation(id){
     document.getElementById("anime_relations").removeChild(document.getElementById(id))
@@ -10,13 +9,13 @@ function removeAnimeRelation(id){
  * @param pageNumber - the number of the page that will be requested. Default - 0.
  * @param isPrevBtnSource - whether the request was triggered by user clicking the previous btn. If true, instead of showing the first item of the page, user will be presented with the last item of the page.
  */
-async function searchAnime(containerID,pageNumber = 0,isPrevBtnSource = false){
-    let searchTitle = $(`#anime_relation_search_${containerID}`).val()
-    let response = await fetch("/anime/title?"+ new URLSearchParams({ title : searchTitle, page : `${pageNumber}` , size : `${pageSize}`}),{ method : "GET",credentials: "same-origin" })
+async function searchAnime(containerID,pageNumber = 0,isPrevBtnSource = false,pageSize = 2){
+    let searchKey = $(`#anime_relation_search_${containerID}`).val()
+    let response = await fetch("/anime/search?"+ new URLSearchParams({ searchKey : searchKey, page : `${pageNumber}` , size : `${pageSize}`}),{ method : "GET",credentials: "same-origin" })
 
     if(response.status !== 200){
         addAlert($(`#anime_relation_${containerID}`).children(".alerts"),await response.text())
-        $(`#show_result_anime_relation_${containerID}`).removeClass("d-block").addClass("d-none")
+        $(`#anime_relation_choose_btn_${containerID}`).removeClass("d-block").addClass("d-none")
         return
     }
 
@@ -96,7 +95,7 @@ function setOffcanvasAnimeDetails(containerID,content){
     $(`#anime_relation_offcanvas_finished_${containerID}`).val(content.finishedAt)
     $(`#anime_relation_offcanvas_synopsis_${containerID}`).text(content.synopsis)
     $(`#anime_relation_offcanvas_background_${containerID}`).text(content.background)
-    $(`#anime_relation_offcanvas_details_${containerID}`).attr("href",`/anime/${content.id}`)
+    $(`#anime_relation_offcanvas_details_${containerID}`).attr("href",`/anime/${content.id}`).attr("target","_blank")
 }
 
 function addAlert(alertContainer,text){
@@ -137,13 +136,12 @@ function addAnimeRelation(id,messages){
         .append($("<input>").attr("class","form-control me-2").attr("id",`anime_relation_search_${id}`).attr("type","search"))
         .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText).on("click",function(){ searchAnime(id) }))
 
-    let showResultButton = $("<button>")
+    let chooseRelationBtn = $("<button>")
         .attr("class","btn btn-secondary mt-2 w-100 d-none")
         .attr("type","button")
         .attr("data-bs-toggle","offcanvas")
         .attr("data-bs-target",`#anime_relation_offcanvas_${id}`)
         .attr("id",`anime_relation_choose_btn_${id}`)
-        .text(messages.showResultBtnText)
 
     let offcanvasContainer = $("<div>")
         .attr("class","offcanvas offcanvas-start w-50")
@@ -188,7 +186,7 @@ function addAnimeRelation(id,messages){
         .append($("<div>").attr("class","form-text").text("Relation is from this item to the specified anime. For example, sequel means that this items is sequel of searched anime."))
         .append(searchLabel)
         .append(searchContainer)
-        .append(showResultButton)
+        .append(chooseRelationBtn)
         .append(offcanvasContainer)
         .insertBefore("#add_anime_relation_btn")
 }
