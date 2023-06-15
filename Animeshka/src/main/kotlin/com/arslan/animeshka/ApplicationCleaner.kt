@@ -1,7 +1,9 @@
 package com.arslan.animeshka
 
 import com.arslan.animeshka.repository.elastic.AnimeDocumentRepository
+import com.arslan.animeshka.repository.elastic.CharacterDocumentRepository
 import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
+import com.arslan.animeshka.repository.elastic.PeopleDocumentRepository
 import io.r2dbc.spi.ConnectionFactory
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
@@ -17,7 +19,13 @@ import kotlin.io.path.isRegularFile
 
 @Profile("dev")
 @Component
-class ApplicationCleaner(private val connectionFactory: ConnectionFactory, private val animeDocumentRepository: AnimeDocumentRepository, private val novelDocumentRepository: NovelDocumentRepository) : DisposableBean{
+class ApplicationCleaner(
+        private val connectionFactory: ConnectionFactory,
+        private val animeDocumentRepository: AnimeDocumentRepository,
+        private val novelDocumentRepository: NovelDocumentRepository,
+        private val peopleDocumentRepository: PeopleDocumentRepository,
+        private val characterDocumentRepository: CharacterDocumentRepository
+) : DisposableBean{
 
     @Value("\${image.path.location}")
     private lateinit var imageLocation: Path
@@ -56,6 +64,8 @@ class ApplicationCleaner(private val connectionFactory: ConnectionFactory, priva
             }
             animeDocumentRepository.deleteAll().awaitFirstOrNull()
             novelDocumentRepository.deleteAll().awaitFirstOrNull()
+            characterDocumentRepository.deleteAll().awaitFirstOrNull()
+            peopleDocumentRepository.deleteAll().awaitFirstOrNull()
         }
     }
 

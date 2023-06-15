@@ -430,6 +430,11 @@
         let previousBtnText = /*[[#{previous.btn.text}]]*/ "Previous";
         let nextBtnText = /*[[#{next.btn.text}]]*/ "Next";
         let animeSearchNotFound = /*[[#{anime.not.found.messages}]]*/ "Not a single anime was found.";
+        let novelSearchNotFound = /*[[#{novels.not.found.message}]]*/ "Not a single novel was found.";
+        let characterNotFound = /*[[#{characters.not.found.message}]]*/ "Not a single character was found."
+        let voiceActorNotFound = /*[[#{people.not.found.message}]]*/ "Not a single person was found."
+        let descriptionLabel = /*[[#{description.label}]]*/ "Description:";
+        let birthDateLabel = /*[[#{birth.date.label}]]*/ "Birth Date:";
 
         function onAddCharacterRelation(){
             let messages = {
@@ -439,7 +444,14 @@
                 searchBtnText : searchBtnText,
                 showResultBtnText : showResultBtnText,
                 moreDetailsBtnText : moreDetailsLabel,
-                voiceActorLabel : voiceActorLabel
+                voiceActorLabel : voiceActorLabel,
+                nextBtnText : nextBtnText,
+                previousBtnText : previousBtnText,
+                characterNotFound : characterNotFound,
+                voiceActorNotFound : voiceActorNotFound,
+                descriptionLabel : descriptionLabel,
+                birthDateLabel : birthDateLabel,
+                removeBtnText : removeBtnText
             }
             addCharacterRelation(nextAnimeCharacter,messages)
 
@@ -486,7 +498,8 @@
                 novelRelationBackgroundLabelText : backgroundLabelText,
                 novelRelationMoreDetailsBtnText : moreDetailsLabel,
                 previousBtnText : previousBtnText,
-                nextBtnText : nextBtnText
+                nextBtnText : nextBtnText,
+                novelSearchNotFound : novelSearchNotFound
             }
 
             addNovelRelation(nextNovelRelation,messages)

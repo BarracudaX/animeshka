@@ -11,6 +11,7 @@ import com.arslan.animeshka.repository.elastic.CharacterDocumentRepository
 import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
 import com.arslan.animeshka.repository.elastic.PeopleDocumentRepository
 import com.arslan.animeshka.service.*
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runBlocking
@@ -77,7 +78,7 @@ class ApplicationInitializer(
 
             val character1 = contentService.createCharacterEntry(CharacterContent("test character","jp test character","test_desc"))
             val character2 = contentService.createCharacterEntry(CharacterContent("another character Dio","another character Dio jp","test_desc_2"))
-            val character3 = contentService.createCharacterEntry(CharacterContent("third character Rio","third character Rio jp","test_desc_3"))
+            val character3 = contentService.createCharacterEntry(CharacterContent("third another character Rio","third character Rio jp","test_desc_3"))
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,character1)
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,character2)
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,character3)
@@ -122,8 +123,8 @@ class ApplicationInitializer(
             novelDocumentRepository.save(NovelDocument(savedNovel2.title,savedNovel2.japaneseTitle,savedNovel2.synopsis,savedNovel2.id)).awaitSingleOrNull()
             novelDocumentRepository.save(NovelDocument(savedNovel3.title,savedNovel3.japaneseTitle,savedNovel3.synopsis,savedNovel3.id)).awaitSingleOrNull()
             characterDocumentRepository.save(CharacterDocument(savedCharacter1.characterName,savedCharacter1.description,savedCharacter1.japaneseName,savedCharacter1.id)).awaitSingleOrNull()
-            characterDocumentRepository.save(CharacterDocument(savedCharacter2.characterName,savedCharacter1.description,savedCharacter1.japaneseName,savedCharacter1.id)).awaitSingleOrNull()
-            characterDocumentRepository.save(CharacterDocument(savedCharacter3.characterName,savedCharacter1.description,savedCharacter1.japaneseName,savedCharacter1.id)).awaitSingleOrNull()
+            characterDocumentRepository.save(CharacterDocument(savedCharacter2.characterName,savedCharacter2.description,savedCharacter2.japaneseName,savedCharacter2.id)).awaitSingleOrNull()
+            characterDocumentRepository.save(CharacterDocument(savedCharacter3.characterName,savedCharacter3.description,savedCharacter3.japaneseName,savedCharacter3.id)).awaitSingleOrNull()
             peopleDocumentRepository.save(PersonDocument(savedPerson1.firstName,savedPerson1.lastName,savedPerson1.familyName,savedPerson1.givenName,savedPerson1.description,savedPerson1.id)).awaitSingleOrNull()
             peopleDocumentRepository.save(PersonDocument(savedPerson2.firstName,savedPerson2.lastName,savedPerson2.familyName,savedPerson2.givenName,savedPerson2.description,savedPerson2.id)).awaitSingleOrNull()
             peopleDocumentRepository.save(PersonDocument(savedPerson3.firstName,savedPerson3.lastName,savedPerson3.familyName,savedPerson3.givenName,savedPerson3.description,savedPerson3.id)).awaitSingleOrNull()

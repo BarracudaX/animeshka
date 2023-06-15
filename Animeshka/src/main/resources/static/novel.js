@@ -106,7 +106,7 @@ function addNovelRelation(id,messages){
         .attr("for",``)
         .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(messages.removeBtnText).on("click",function(){ removeNovelRelation(`novel_relation_${id}`) }))
 
-    let alertsContainer = $("<div class='alerts'>").append($("<div class='alert alert-warning d-none'>").text(messages.novelSearchNotFound).attr("id",`novel_relation_non_found_alert_${id}`))
+    let alertsContainer = $("<div class='alerts mt-1'>").append($("<div class='alert alert-warning d-none'>").text(messages.novelSearchNotFound).attr("id",`novel_relation_non_found_alert_${id}`))
 
     let relationSelectLabel = $("<label>")
         .attr("class","form-label")

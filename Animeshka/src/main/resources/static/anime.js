@@ -95,7 +95,7 @@ function setOffcanvasAnimeDetails(containerID,content){
     $(`#anime_relation_offcanvas_finished_${containerID}`).val(content.finishedAt)
     $(`#anime_relation_offcanvas_synopsis_${containerID}`).text(content.synopsis)
     $(`#anime_relation_offcanvas_background_${containerID}`).text(content.background)
-    $(`#anime_relation_offcanvas_details_${containerID}`).attr("href",`/anime/${content.id}`).attr("target","_blank")
+    $(`#anime_relation_offcanvas_details_${containerID}`).attr("href",`/anime/${content.id}`)
 }
 
 function addAlert(alertContainer,text){

@@ -24,7 +24,7 @@ interface CustomizedCharacterDocumentRepository{
 class CustomizedCharacterDocumentRepositoryImpl(private val reactiveElasticsearchTemplate: ReactiveElasticsearchTemplate) : CustomizedCharacterDocumentRepository{
     override suspend fun findCharacter(searchInput: String, pageable: Pageable) : SearchPage<CharacterDocument> {
 
-        val criteria = Criteria.where("characterName").matches(searchInput).or("japaneseField").matches(searchInput)
+        val criteria = Criteria.where("characterName").matches(searchInput).or("japaneseName").matches(searchInput)
 
         val query = CriteriaQuery(criteria,pageable)
 
