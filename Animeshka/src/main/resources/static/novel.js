@@ -93,6 +93,7 @@ function setOffcanvasNovelDetails(containerID,content){
     $(`#novel_relation_offcanvas_synopsis_${containerID}`).text(content.synopsis)
     $(`#novel_relation_offcanvas_background_${containerID}`).text(content.background)
     $(`#novel_relation_offcanvas_details_${containerID}`).attr("href",`/novel/${content.id}`).attr("target","_blank")
+    $(`#novel_relation_hidden_${containerID}`).val(content.id)
 }
 
 function addAlert(alertContainer,text){
@@ -131,6 +132,10 @@ function addNovelRelation(id,messages){
         .attr("role","search")
         .append($("<input>").attr("class","form-control me-2").attr("id",`novel_relation_search_${id}`).attr("type","search"))
         .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(messages.searchBtnText).on("click",function(){ searchNovel(id) }))
+
+    let hiddenNovelID = $("<input type='hidden'>")
+        .attr("id",`novel_relation_hidden_${id}`)
+        .attr("class","novel_relation_hidden_id")
 
     let chooseRelationBtn = $("<button>")
         .attr("class","btn btn-secondary mt-2 w-100 d-none")
@@ -183,6 +188,7 @@ function addNovelRelation(id,messages){
         .append($("<div>").attr("class","form-text").text("Relation is from this item to the specified novel. For example, sequel means that this items is sequel of searched novel."))
         .append(searchLabel)
         .append(searchContainer)
+        .append(hiddenNovelID)
         .append(chooseRelationBtn)
         .append(offcanvasContainer)
         .insertBefore("#add_novel_relation_btn")

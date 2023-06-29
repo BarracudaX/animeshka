@@ -399,7 +399,7 @@
             <input type="date" id="finished_at" class="form-control" />
         </div>
 
-        <button type="submit" class="btn btn-primary mt-2 w-100" th:value="#{submit.button}">Submit
+        <button type="submit" class="btn btn-primary mt-2 w-100" onclick="postAnime()" th:value="#{submit.button}">Submit
         </button>
     </form>
     <script th:inline="javascript" type="text/javascript">
@@ -435,6 +435,14 @@
         let voiceActorNotFound = /*[[#{people.not.found.message}]]*/ "Not a single person was found."
         let descriptionLabel = /*[[#{description.label}]]*/ "Description:";
         let birthDateLabel = /*[[#{birth.date.label}]]*/ "Birth Date:";
+
+        let animes = []
+        let novels = []
+        let characters = []
+
+        function postAnime(){
+
+        }
 
         function onAddCharacterRelation(){
             let messages = {

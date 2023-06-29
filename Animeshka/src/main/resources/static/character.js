@@ -86,6 +86,7 @@ function setOffcanvasVoiceActorDetails(containerID,content){
     $(`#voice_actor_relation_offcanvas_birthdate_${containerID}`).val(content.birthDate)
     $(`#voice_actor_relation_offcanvas_description_${containerID}`).text(content.description)
     $(`#voice_actor_relation_offcanvas_details_${containerID}`).attr("href",`/person/${content.id}`)
+    $(`#character_relation_va_hidden_${containerID}`).val(content.id)
 }
 
 
@@ -173,6 +174,7 @@ function setOffcanvasCharacterDetails(containerID,content){
     $(`#character_relation_offcanvas_title_${containerID}`).text(`${content.characterName}/${content.japaneseName}`)
     $(`#character_relation_offcanvas_description_${containerID}`).text(content.description)
     $(`#character_relation_offcanvas_details_${containerID}`).attr("href",`/character/${content.id}`)
+    $(`#character_relation_hidden_${containerID}`).val(content.id)
 }
 
 function addAlert(alertContainer,text){
@@ -211,6 +213,9 @@ function addCharacterRelation(id,messages){
         .attr("role","search")
         .append($("<input>").attr("class","form-control me-2").attr("id",`character_relation_voice_actor_search_${id}`).attr("type","search"))
         .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(messages.searchBtnText).on("click",function(){ searchVoiceActor(id) }))
+    let hiddenVoiceActorID = $("<input type='hidden'>")
+        .attr("id",`character_relation_va_hidden_${id}`)
+        .attr("class","character_relation_va_hidden_id")
 
     for (let i = 0; i < roleOptions.length; i++) {
         $("<option>").text(roleOptions[i].toLowerCase().split("_").join(" ")).appendTo(roleSelect)
@@ -226,6 +231,9 @@ function addCharacterRelation(id,messages){
         .attr("role","search")
         .append($("<input>").attr("class","form-control me-2").attr("id",`character_relation_character_search_${id}`).attr("type","search"))
         .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(messages.searchBtnText).on("click",function(){ searchCharacter(id) }))
+    let hiddenCharacterID = $("<input type='hidden'>")
+        .attr("id",`character_relation_hidden_${id}`)
+        .attr("class","character_relation_hidden_id")
 
     let chooseCharacterRelationBtn = $("<button>")
         .attr("class","btn btn-secondary mt-2 w-100 d-none")
@@ -294,9 +302,11 @@ function addCharacterRelation(id,messages){
         .append(roleSelect)
         .append(searchLabel)
         .append(searchCharacterContainer)
+        .append(hiddenCharacterID)
         .append(chooseCharacterRelationBtn)
         .append(voiceActorLabel)
         .append(searchVoiceActorContainer)
+        .append(hiddenVoiceActorID)
         .append(chooseVoiceActorRelationBt)
         .append(characterOffcanvasContainer)
         .append(voiceActorOffcanvasContainer)

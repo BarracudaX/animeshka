@@ -96,6 +96,7 @@ function setOffcanvasAnimeDetails(containerID,content){
     $(`#anime_relation_offcanvas_synopsis_${containerID}`).text(content.synopsis)
     $(`#anime_relation_offcanvas_background_${containerID}`).text(content.background)
     $(`#anime_relation_offcanvas_details_${containerID}`).attr("href",`/anime/${content.id}`)
+    $(`#anime_relation_hidden_${containerID}`).val(content.id)
 }
 
 function addAlert(alertContainer,text){
@@ -135,6 +136,11 @@ function addAnimeRelation(id,messages){
         .attr("role","search")
         .append($("<input>").attr("class","form-control me-2").attr("id",`anime_relation_search_${id}`).attr("type","search"))
         .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText).on("click",function(){ searchAnime(id) }))
+
+    let hiddenID = $("<input>")
+        .attr("type","hidden")
+        .attr("id",`anime_relation_hidden_${id}`)
+        .attr("class","anime_relation_hidden_id")
 
     let chooseRelationBtn = $("<button>")
         .attr("class","btn btn-secondary mt-2 w-100 d-none")
@@ -186,6 +192,7 @@ function addAnimeRelation(id,messages){
         .append($("<div>").attr("class","form-text").text("Relation is from this item to the specified anime. For example, sequel means that this items is sequel of searched anime."))
         .append(searchLabel)
         .append(searchContainer)
+        .append(hiddenID)
         .append(chooseRelationBtn)
         .append(offcanvasContainer)
         .insertBefore("#add_anime_relation_btn")
