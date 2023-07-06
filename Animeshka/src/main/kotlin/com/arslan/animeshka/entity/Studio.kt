@@ -10,16 +10,18 @@ import java.time.LocalDate
 data class Studio(
     val studioName: String,
 
-    val japaneseName: String,
+    val japaneseName: String? = null,
 
     val established: LocalDate,
 
     @Id
-    val id: Long,
+    val id: Long
+) : Persistable<Long> {
+
 
     @Transient
-    val isNewEntity: Boolean = false
-) : Persistable<Long> {
+    var isNewEntity: Boolean = false
+
     override fun getId(): Long = id
 
     override fun isNew(): Boolean  = isNewEntity

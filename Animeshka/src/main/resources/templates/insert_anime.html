@@ -27,7 +27,7 @@
     </div>
 </nav>
 <div id="insert_anime">
-    <form class="m-auto w-75 mt-2 p-1" th:action="@{/anime}" method="post">
+    <form class="m-auto w-75 mt-2 p-1" th:action="@{/anime}" method="post" id="insert_anime_form">
         <div>
             <label th:text="#{title.label}" class="form-label" for="title">Title:</label>
             <input type="text" id="title" name="title" placeholder="Anime's english title" class="form-control"
@@ -90,17 +90,62 @@
 
         <div>
             <label th:text="#{studio.label}" class="form-label" for="rating">Studio:</label>
+            <div class="alerts mt-1" id="studio_search_alerts"><div class="alert alert-warning d-none" id="studio_not_found_alert">Not a single studio was found.</div></div>
             <div class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="studio_search_input" >
+                <input type="hidden" id="studio_id" />
+                <button class="btn btn-outline-success" type="button" onclick="searchStudio('studio_search_input')">Search</button>
+            </div>
+            <button class="btn btn-secondary mt-2 w-100 d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#studio_offcanvas" id="studio_choose_btn"></button>
+            <div class="offcanvas offcanvas-start w-50" id="studio_offcanvas">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title w-100 text-center" id="studio_offcanvas_title"></h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <img class="image-fluid m-auto d-block" id="studio_offcanvas_image" alt="poster">
+
+                    <label class="form-label" for="studio_offcanvas_name" th:text="#{studio.name.label}">Studio Name:</label>
+                    <input  class="form-control" readonly="readonly" id="studio_offcanvas_name" />
+
+                    <label class="form-label" for="studio_offcanvas_japanese_name" th:text="#{studio.japanese.name.label}">Japanese Name:</label>
+                    <input class="form-control" readonly="readonly" id="studio_offcanvas_japanese_name" />
+                    <div class="d-flex mt-1">
+                        <button type="button" class="btn btn-primary" id="studio_offcanvas_prev_btn">Previous</button>
+                        <button type="button" class="btn btn-primary ms-auto" id="studio_offcanvas_next_btn">Next</button>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div>
             <label th:text="#{licensor.label}" class="form-label" for="rating">Licensor:</label>
+            <div class="alerts mt-1" id="licensor_search_alerts"><div class="alert alert-warning d-none" id="licensor_not_found_alert">Not a single studio was found.</div></div>
+
             <div class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" >
-                <button class="btn btn-outline-success" type="submit">Search</button>
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="licensor_search_input">
+                <input type="hidden" id="licensor_id" />
+                <button class="btn btn-outline-success" type="button" onclick="searchStudio('licensor_search_input',true)">Search</button>
+            </div>
+            <button class="btn btn-secondary mt-2 w-100 d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#licensor_offcanvas" id="licensor_choose_btn"></button>
+            <div class="offcanvas offcanvas-start w-50" id="licensor_offcanvas">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title w-100 text-center" id="licensor_offcanvas_title"></h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <img class="image-fluid m-auto d-block" id="licensor_offcanvas_image" alt="poster">
+
+                    <label class="form-label" for="licensor_offcanvas_name" th:text="#{studio.name.label}">Studio Name:</label>
+                    <input  class="form-control" readonly="readonly" id="licensor_offcanvas_name" />
+
+                    <label class="form-label" for="licensor_offcanvas_japanese_name" th:text="#{studio.japanese.name.label}">Japanese Name:</label>
+                    <input class="form-control" readonly="readonly" id="licensor_offcanvas_japanese_name" />
+                    <div class="d-flex mt-1">
+                        <button type="button" class="btn btn-primary" id="licensor_offcanvas_prev_btn">Previous</button>
+                        <button type="button" class="btn btn-primary ms-auto" id="licensor_offcanvas_next_btn">Next</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -137,7 +182,7 @@
             <div><label th:text="#{themes.label}">Themes:</label></div>
             <div class="row">
                 <div th:each="theme : ${T(com.arslan.animeshka.Theme).values()}" class="form-check form-check-inline col-lg-2 col-md-4">
-                    <input type="checkbox" th:value="${theme.name()}" id="ADULT_CAST" th:id="${theme.name()}"/>
+                    <input type="checkbox" class="anime_theme" th:value="${theme.name()}" id="ADULT_CAST" th:id="${theme.name()}"/>
                     <label th:for="${theme.name()}" for="ADULT_CAST" th:text="${#strings.arrayJoin(theme.name().split('_'),' ')}">Adult Cast</label>
                 </div>
 
@@ -183,7 +228,7 @@
             <div><label th:text="#{genres.label}">Genres:</label></div>
             <div class="row">
                 <div th:each="genre : ${T(com.arslan.animeshka.Genre).values()}"  class="form-check form-check-inline col-lg-2 col-md-4">
-                    <input type="checkbox" th:value="${genre.name()}" id="ACTION" th:id="${genre.name()}"/>
+                    <input class="anime_genre" type="checkbox" th:value="${genre.name()}" id="ACTION" th:id="${genre.name()}"/>
                     <label th:for="${genre.name()}" for="ACTION"
                            th:text="${#strings.arrayJoin(genre.name().split('_'),' ')}">Action</label>
                 </div>
@@ -357,8 +402,8 @@
             <button type="button" class="btn btn-success w-100 mt-2" onclick="onAddCharacterRelation()" id="add_character_relation_btn">+</button>
         </div>
         <div>
-            <label th:text="#{explicit.genre.label}" class="form-label" for="excplicit_genre">Explicit Genre:</label>
-            <select id="excplicit_genre" name="series_type" class="form-control">
+            <label th:text="#{explicit.genre.label}" class="form-label" for="explicit_genre">Explicit Genre:</label>
+            <select id="explicit_genre" name="series_type" class="form-control">
                 <option value="-">-</option>
                 <option th:each="explicitGenre : ${T(com.arslan.animeshka.ExplicitGenre).values()}" th:value="${explicitGenre.name()}" th:text="${#strings.capitalize(explicitGenre.name().toLowerCase())}">Ecchi</option>
                 <option th:remove="all">Erotica</option>
@@ -373,7 +418,7 @@
         <div>
             <label class="form-label" for="airing_day" th:text="#{airing.day.label}">Airing Day:</label>
             <select id="airing_day" class="form-control">
-                <option th:value="NONE">-</option>
+                <option value="-">-</option>
                 <option th:each="day : ${T(java.time.DayOfWeek).values()}" th:text="${#messages.msg('day.'+day.name())}" th:value="${day.name()}">Monday</option>
                 <option th:remove="all">Tuesday</option>
                 <option th:remove="all">Wednesday</option>
@@ -399,10 +444,17 @@
             <input type="date" id="finished_at" class="form-control" />
         </div>
 
-        <button type="submit" class="btn btn-primary mt-2 w-100" onclick="postAnime()" th:value="#{submit.button}">Submit
+        <button type="button" class="btn btn-primary mt-2 w-100" onclick="postAnime()" th:value="#{submit.button}">Submit
         </button>
     </form>
     <script th:inline="javascript" type="text/javascript">
+        $("#insert_anime_form").validate(
+            {
+                submitHandler : function(){ postAnime() },
+                debug: true,
+                
+            }
+        )
         let nextNovelRelation = 1
         let nextAnimeRelation = 1
         let nextAnimeCharacter = 1
@@ -436,12 +488,110 @@
         let descriptionLabel = /*[[#{description.label}]]*/ "Description:";
         let birthDateLabel = /*[[#{birth.date.label}]]*/ "Birth Date:";
 
-        let animes = []
-        let novels = []
-        let characters = []
+        async function postAnime(){
+            let title = $("#title").val()
+            let japaneseTitle = $("#japanese_title").val()
+            let status = $("#anime_status").find(":selected").val()
+            let rating = $("#rating").find(":selected").val()
+            let demographic = $("#demographic").find(":selected").val()
+            let type = $("#series_type").find(":selected").val()
+            let synopsis = $("#synopsis").val()
+            let background = $("#background").val()
+            let additionalInfo = $("#additional_information").val()
+            let themes = $(".anime_theme:checkbox:checked").map( (_,checkbox) => checkbox.value).toArray()
+            let genres = $(".anime_genre:checkbox:checked").map( (_,checkbox) => checkbox.value).toArray()
+            let studio = $("#studio_id").val()
+            let licensor = $("#licensor_id").val()
+            let explicitGenre = $("#explicit_genre").val()
+            if(explicitGenre === "-"){ explicitGenre = null }
+            let airingTime = $("#airing_time").val()
+            if(airingTime === ""){ airingTime = null }
+            let airingDay = $("#airing_day").val()
+            if(airingDay === "-"){ airingDay = null }
+            let episodeDuration = $("#episode_duration").val()
+            if(episodeDuration === ""){ episodeDuration = null }
+            let airedAt = $("#aired_at").val()
+            if(airedAt === ""){ airedAt = null }
+            let finishedAt = $("#finished_at").val()
+            if(finishedAt === ""){ finishedAt = null }
+            let novelRelations = $(".novel_relation_hidden_id")
+                .map( (_,novel) => {
+                    let htmlID = $(novel).attr("id")
+                    let sequenceID = htmlID.substring(htmlID.lastIndexOf("_")+1)
+                    let novelID = $(novel).val()
+                    let novelRelation = $(`#novel_relation_select_${sequenceID}`).val()
 
-        function postAnime(){
+                    return {
+                        relatedWorkID : novelID,
+                        relation : novelRelation
+                    }
+                }).toArray()
+            let animeRelations = $(".anime_relation_hidden_id").map((_,anime) => {
+                let htmlID = $(anime).attr("id")
+                let sequenceID = htmlID.substring(htmlID.lastIndexOf("_")+1)
+                let animeID = $(anime).val()
+                let animeRelation = $(`#anime_relation_select_${sequenceID}`).val()
 
+                return {
+                    relatedWorkID : animeID,
+                    relation : animeRelation
+                }
+            }).toArray()
+            let characterRelations = $(".character_relation_hidden_id").map((_,character) => {
+                let htmlID = $(character).attr("id")
+                let sequenceID = htmlID.substring(htmlID.lastIndexOf("_")+1)
+                let characterID = $(character).val()
+                let voiceActorID = $(`#character_relation_va_hidden_${sequenceID}`).val()
+                let role = $(`#character_relation_select_${sequenceID}`).val()
+
+                return {
+                    characterID : characterID,
+                    voiceActorID : voiceActorID,
+                    role : role
+                }
+            }).toArray()
+            const animeContent = {
+                title : title,
+                japaneseTitle : japaneseTitle,
+                status : status,
+                rating : rating,
+                studio : studio,
+                licensor : licensor,
+                demographic : demographic,
+                synopsis : synopsis,
+                animeType : type,
+                background : background,
+                additionalInfo : additionalInfo,
+                themes : themes,
+                genres : genres,
+                novelRelations : novelRelations,
+                animeRelations : animeRelations,
+                characters : characterRelations,
+                explicitGenre : explicitGenre,
+                airingTime : airingTime,
+                airingDay: airingDay,
+                duration : episodeDuration,
+                airedAt : airedAt,
+                finishedAt : finishedAt
+            }
+            const form = new FormData()
+            let animeContentJson = JSON.stringify(animeContent)
+            console.log(animeContentJson)
+            form.append("data",new Blob([animeContentJson],{type : "application/json"}))
+            let images = $("#images")[0].files
+            for (let i = 0; i <images.length; i++) {
+                form.append("images",images[i])
+            }
+            form.append("poster",$("#poster")[0].files[0])
+            let response = await fetch(
+                "/anime",
+                {
+                    method : "POST",
+                    credentials: "same-origin",
+                    body : form
+                }
+            )
+            console.log(await response.text())
         }
 
         function onAddCharacterRelation(){
@@ -515,9 +665,14 @@
             nextNovelRelation = nextNovelRelation + 1
         }
 
+        function addAlert(alertContainer,text){
+            alertContainer.append($("<div>").attr("class","alert alert-danger alert-dismissible fade show mt-2").attr("role","alert").text(text).append($("<button>").attr("class","btn-close").attr("type","button").attr("data-bs-dismiss","alert").attr("aria-label","Close")))
+        }
+
     </script>
     <script th:src="@{/resource/anime.js}" type="text/javascript" src="../static/anime.js"></script>
     <script th:src="@{/resource/novel.js}" type="text/javascript" src="../static/novel.js"></script>
+    <script th:src="@{/resource/studio.js}" type="text/javascript" src="../static/studio.js"></script>
     <script th:src="@{/resource/character.js}" type="text/javascript" src="../static/character.js"></script>
 </div>
 <footer>

@@ -184,6 +184,19 @@ data class BasicAnimeDTO(
 )
 
 @Serializable
+data class BasicStudioDTO(
+        val studioName: String,
+
+        val japaneseName: String?,
+
+        val id: Long,
+
+        val posterID: Long? = null,
+
+        val images: Set<Long> = emptySet(),
+)
+
+@Serializable
 data class PersonContent(
         val firstName: String,
 
@@ -331,6 +344,9 @@ data class CharacterContent(
 
 @Serializable
 data class PagedBasicAnimeDTO(val content: List<BasicAnimeDTO>, val hasNext: Boolean, val hasPrevious: Boolean)
+
+@Serializable
+data class PagedBasicStudioDTO(val content: List<BasicStudioDTO>,val hasNext: Boolean,val hasPrevious: Boolean)
 
 @Serializable
 data class PagedBasicNovelDTO(val content: List<BasicNovelDTO>, val hasNext: Boolean, val hasPrevious: Boolean)

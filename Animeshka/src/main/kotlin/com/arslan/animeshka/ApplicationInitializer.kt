@@ -1,17 +1,10 @@
 package com.arslan.animeshka
 
-import com.arslan.animeshka.elastic.AnimeDocument
-import com.arslan.animeshka.elastic.CharacterDocument
-import com.arslan.animeshka.elastic.NovelDocument
-import com.arslan.animeshka.elastic.PersonDocument
+import com.arslan.animeshka.elastic.*
 import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.repository.UserRepository
-import com.arslan.animeshka.repository.elastic.AnimeDocumentRepository
-import com.arslan.animeshka.repository.elastic.CharacterDocumentRepository
-import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
-import com.arslan.animeshka.repository.elastic.PeopleDocumentRepository
+import com.arslan.animeshka.repository.elastic.*
 import com.arslan.animeshka.service.*
-import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.runBlocking
@@ -45,7 +38,8 @@ class ApplicationInitializer(
         private val animeDocumentRepository: AnimeDocumentRepository,
         private val novelDocumentRepository: NovelDocumentRepository,
         private val characterDocumentRepository: CharacterDocumentRepository,
-        private val peopleDocumentRepository: PeopleDocumentRepository
+        private val peopleDocumentRepository: PeopleDocumentRepository,
+        private val studioDocumentRepository: StudioDocumentRepository
 ) : ApplicationRunner{
 
     override fun run(args: ApplicationArguments) : Unit = runBlocking {
@@ -55,11 +49,19 @@ class ApplicationInitializer(
 
         val securityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(user.id,""))
         mono{
-            val studio = contentService.createStudioEntry(StudioContent("studio","studio_jp", LocalDate.now().toKotlinLocalDate()))
-            imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,studio)
-            moderationService.acceptModeration(studio.id!!)
-            studioService.insertStudio(contentService.verifyStudio(studio.id))
+            val studio1 = contentService.createStudioEntry(StudioContent("studio","studio_jp", LocalDate.now().toKotlinLocalDate()))
+            val studio2 = contentService.createStudioEntry(StudioContent("another studio from japan","makisama studio", LocalDate.now().toKotlinLocalDate()))
+            val studio3 = contentService.createStudioEntry(StudioContent("third studio japan","origami paralax", LocalDate.now().toKotlinLocalDate()))
+            imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,studio1)
+            imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,studio2)
+            imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,studio3)
+            moderationService.acceptModeration(studio1.id!!)
+            moderationService.acceptModeration(studio2.id!!)
+            moderationService.acceptModeration(studio3.id!!)
 
+            val savedStudio1 = studioService.insertStudio(contentService.verifyStudio(studio1.id))
+            val savedStudio2 = studioService.insertStudio(contentService.verifyStudio(studio2.id))
+            val savedStudio3 = studioService.insertStudio(contentService.verifyStudio(studio3.id))
 
             val novel1 = contentService.createNovelEntry(NovelContent("test novel 1","test novel 1 jp","test novel 1 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
             val novel2 = contentService.createNovelEntry(NovelContent("another novel world 2","jp another novel world 2","another novel world 2 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
@@ -83,9 +85,9 @@ class ApplicationInitializer(
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,character2)
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,character3)
 
-            val anime = contentService.createAnimeEntry(AnimeContent("anime title test here in other world","japanese anime title here in other world",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio.id!!,Demographic.JOSEI,studio.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()))
-            val anime2 = contentService.createAnimeEntry(AnimeContent("another anime different title here in parallel world","japanese anime different title here in parallel world",AnimeStatus.AIRING,SeriesRating.R_15,studio.id!!,Demographic.SHOUJO,studio.id,"test_synopsis_2",AnimeType.TV,"test_bg_2","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()))
-            val anime3 = contentService.createAnimeEntry(AnimeContent("anime sword art online","japanese anime sword art online",AnimeStatus.AIRING,SeriesRating.PG_12,studio.id!!,Demographic.SEINEN,studio.id,"test_synopsis_3",AnimeType.SPECIAL,"test_bg_3","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()))
+            val anime = contentService.createAnimeEntry(AnimeContent("anime title test here in other world","japanese anime title here in other world",AnimeStatus.NOT_YET_AIRED,SeriesRating.G,studio1.id!!,Demographic.JOSEI,studio1.id,"test_synopsis",AnimeType.OVA,"test_bg","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()))
+            val anime2 = contentService.createAnimeEntry(AnimeContent("another anime different title here in parallel world","japanese anime different title here in parallel world",AnimeStatus.AIRING,SeriesRating.R_15,studio1.id!!,Demographic.SHOUJO,studio1.id,"test_synopsis_2",AnimeType.TV,"test_bg_2","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()))
+            val anime3 = contentService.createAnimeEntry(AnimeContent("anime sword art online","japanese anime sword art online",AnimeStatus.AIRING,SeriesRating.PG_12,studio1.id!!,Demographic.SEINEN,studio1.id,"test_synopsis_3",AnimeType.SPECIAL,"test_bg_3","test_add_info",setOf(Theme.BLOOD,Theme.DETECTIVE),setOf(Genre.ACTION,Genre.ADVENTURE), airedAt = LocalDate.now().minusDays(5).toKotlinLocalDate()))
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,anime)
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,anime2)
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,anime3)
@@ -128,6 +130,9 @@ class ApplicationInitializer(
             peopleDocumentRepository.save(PersonDocument(savedPerson1.firstName,savedPerson1.lastName,savedPerson1.familyName,savedPerson1.givenName,savedPerson1.description,savedPerson1.id)).awaitSingleOrNull()
             peopleDocumentRepository.save(PersonDocument(savedPerson2.firstName,savedPerson2.lastName,savedPerson2.familyName,savedPerson2.givenName,savedPerson2.description,savedPerson2.id)).awaitSingleOrNull()
             peopleDocumentRepository.save(PersonDocument(savedPerson3.firstName,savedPerson3.lastName,savedPerson3.familyName,savedPerson3.givenName,savedPerson3.description,savedPerson3.id)).awaitSingleOrNull()
+            studioDocumentRepository.save(StudioDocument(savedStudio1.studioName,savedStudio1.japaneseName,savedStudio1.id)).awaitSingleOrNull()
+            studioDocumentRepository.save(StudioDocument(savedStudio2.studioName,savedStudio2.japaneseName,savedStudio2.id)).awaitSingleOrNull()
+            studioDocumentRepository.save(StudioDocument(savedStudio3.studioName,savedStudio3.japaneseName,savedStudio3.id)).awaitSingleOrNull()
         }.contextWrite(securityContext).awaitSingleOrNull()
 
     }

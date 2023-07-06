@@ -119,7 +119,7 @@ function addNovelRelation(id,messages){
         .attr("id",`novel_relation_select_${id}`)
 
     for (let i = 0; i < messages.relationOptions.length; i++) {
-        $("<option>").text(messages.relationOptions[i].toLowerCase().split("_").join(" ")).appendTo(relationSelect)
+        $("<option>").text(messages.relationOptions[i].toLowerCase().split("_").join(" ")).val(messages.relationOptions[i].toUpperCase()).appendTo(relationSelect)
     }
 
     let searchLabel = $("<label>")

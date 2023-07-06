@@ -99,9 +99,6 @@ function setOffcanvasAnimeDetails(containerID,content){
     $(`#anime_relation_hidden_${containerID}`).val(content.id)
 }
 
-function addAlert(alertContainer,text){
-    alertContainer.append($("<div>").attr("class","alert alert-danger alert-dismissible fade show mt-2").attr("role","alert").text(text).append($("<button>").attr("class","btn-close").attr("type","button").attr("data-bs-dismiss","alert").attr("aria-label","Close")))
-}
 
 function addAnimeRelation(id,messages){
     let animeRelationID = `anime_relation_${id}`
@@ -123,7 +120,7 @@ function addAnimeRelation(id,messages){
         .attr("id",`anime_relation_select_${id}`)
 
     for (let i = 0; i < messages.relationOptions.length; i++) {
-        $("<option>").text(messages.relationOptions[i].toLowerCase().split("_").join(" ")).appendTo(relationSelect)
+        $("<option>").text(messages.relationOptions[i].toLowerCase().split("_").join(" ")).val(messages.relationOptions[i].toUpperCase()).appendTo(relationSelect)
     }
 
     let searchLabel = $("<label>")

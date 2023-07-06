@@ -218,7 +218,7 @@ function addCharacterRelation(id,messages){
         .attr("class","character_relation_va_hidden_id")
 
     for (let i = 0; i < roleOptions.length; i++) {
-        $("<option>").text(roleOptions[i].toLowerCase().split("_").join(" ")).appendTo(roleSelect)
+        $("<option>").text(roleOptions[i].toLowerCase().split("_").join(" ")).val(messages.roleOptions[i].toUpperCase()).appendTo(roleSelect)
     }
 
     let searchLabel = $("<label>")
