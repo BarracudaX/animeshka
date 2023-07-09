@@ -182,55 +182,55 @@ function addAlert(alertContainer,text){
 }
 
 
-function addCharacterRelation(id,messages){
+function addCharacterRelation(id){
     let characterRelationID = `character_relation_${id}`
 
     let removeBtnContainer = $("<div>")
         .attr("class","d-flex justify-content-end")
         .attr("for",``)
-        .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(messages.removeBtnText).on("click",function(){ removeAnimeCharacter(characterRelationID) }))
+        .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeAnimeCharacter(characterRelationID) }))
 
     let alertsContainer = $("<div class='alerts mt-1'>")
-        .append($("<div class='alert alert-warning d-none'>").text(messages.characterNotFound).attr("id",`character_relation_non_found_alert_${id}`))
-        .append($("<div class='alert alert-warning d-none'>").text(messages.voiceActorNotFound).attr("id",`voice_actor_relation_non_found_alert_${id}`))
+        .append($("<div class='alert alert-warning d-none'>").text(characterNotFound).attr("id",`character_relation_non_found_alert_${id}`))
+        .append($("<div class='alert alert-warning d-none'>").text(voiceActorNotFound).attr("id",`voice_actor_relation_non_found_alert_${id}`))
 
     let roleSelectLabel = $("<label>")
         .attr("class","form-label")
         .attr("for",`character_relation_select_${id}`)
-        .text(messages.roleLabelText)
+        .text(roleSelectLabelText)
 
     let roleSelect = $("<select>")
         .attr("class","form-control")
         .attr("id",`character_relation_select_${id}`)
 
-    let voiceActorLabel = $("<label>")
+    let voiceActorLabelEle = $("<label>")
         .attr("class","form-label")
         .attr("for",`character_relation_voice_actor_search_${id}`)
-        .text(messages.voiceActorLabel)
+        .text(voiceActorLabel)
 
     let searchVoiceActorContainer = $("<div>")
         .attr("class","d-flex")
         .attr("role","search")
         .append($("<input>").attr("class","form-control me-2").attr("id",`character_relation_voice_actor_search_${id}`).attr("type","search"))
-        .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(messages.searchBtnText).on("click",function(){ searchVoiceActor(id) }))
+        .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText).on("click",function(){ searchVoiceActor(id) }))
     let hiddenVoiceActorID = $("<input type='hidden'>")
         .attr("id",`character_relation_va_hidden_${id}`)
         .attr("class","character_relation_va_hidden_id")
 
     for (let i = 0; i < roleOptions.length; i++) {
-        $("<option>").text(roleOptions[i].toLowerCase().split("_").join(" ")).val(messages.roleOptions[i].toUpperCase()).appendTo(roleSelect)
+        $("<option>").text(roleOptions[i].toLowerCase().split("_").join(" ")).val(roleOptions[i].toUpperCase()).appendTo(roleSelect)
     }
 
     let searchLabel = $("<label>")
         .attr("class","form-label")
         .attr("for",`character_relation_character_search_${id}`)
-        .text(messages.characterSearchLabelText)
+        .text(characterSearchLabelText)
 
     let searchCharacterContainer = $("<div>")
         .attr("class","d-flex")
         .attr("role","search")
         .append($("<input>").attr("class","form-control me-2").attr("id",`character_relation_character_search_${id}`).attr("type","search"))
-        .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(messages.searchBtnText).on("click",function(){ searchCharacter(id) }))
+        .append($("<button>").attr("class","btn btn-outline-success").attr("type","button").text(searchBtnText).on("click",function(){ searchCharacter(id) }))
     let hiddenCharacterID = $("<input type='hidden'>")
         .attr("id",`character_relation_hidden_${id}`)
         .attr("class","character_relation_hidden_id")
@@ -260,13 +260,13 @@ function addCharacterRelation(id,messages){
             $("<div>")
                 .attr("class","offcanvas-body")
                 .append($("<img>").attr("class","img-fluid m-auto d-block").attr("id",`character_relation_offcanvas_image_${id}`))
-                .append($("<label>").attr("class","form-label").attr("for",`character_relation_offcanvas_description_${id}`).text(messages.descriptionLabel))
+                .append($("<label>").attr("class","form-label").attr("for",`character_relation_offcanvas_description_${id}`).text(descriptionLabel))
                 .append($("<textarea>").attr("class","form-control").attr("readonly","readonly").attr("id",`character_relation_offcanvas_description_${id}`))
-                .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`character_relation_offcanvas_details_${id}`).text(messages.moreDetailsBtnText))
+                .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`character_relation_offcanvas_details_${id}`).text(moreDetailsLabel))
                 .append(
                     $("<div>").attr("class","d-flex mt-1")
-                        .append($("<button>").attr("class","btn btn-primary").attr("type","button").attr("id",`character_relation_offcanvas_previous_btn_${id}`).text(messages.previousBtnText))
-                        .append($("<button>").attr("class","btn btn-primary ms-auto").attr("type","button").attr("id",`character_relation_offcanvas_next_btn_${id}`).text(messages.nextBtnText))
+                        .append($("<button>").attr("class","btn btn-primary").attr("type","button").attr("id",`character_relation_offcanvas_previous_btn_${id}`).text(previousBtnText))
+                        .append($("<button>").attr("class","btn btn-primary ms-auto").attr("type","button").attr("id",`character_relation_offcanvas_next_btn_${id}`).text(nextBtnText))
                 )
         )
 
@@ -282,15 +282,15 @@ function addCharacterRelation(id,messages){
             $("<div>")
                 .attr("class","offcanvas-body")
                 .append($("<img>").attr("class","img-fluid m-auto d-block").attr("id",`voice_actor_relation_offcanvas_image_${id}`))
-                .append($("<label>").attr("class","form-label").attr("for",`voice_actor_relation_offcanvas_birthdate_${id}`).text(messages.birthDateLabel))
+                .append($("<label>").attr("class","form-label").attr("for",`voice_actor_relation_offcanvas_birthdate_${id}`).text(birthDateLabel))
                 .append($("<input>").attr("class","form-control").attr("readonly","readonly").attr("type","date").attr("id",`voice_actor_relation_offcanvas_birthdate_${id}`))
-                .append($("<label>").attr("class","form-label").attr("for",`voice_actor_relation_offcanvas_description_${id}`).text(messages.descriptionLabel))
+                .append($("<label>").attr("class","form-label").attr("for",`voice_actor_relation_offcanvas_description_${id}`).text(descriptionLabel))
                 .append($("<textarea>").attr("class","form-control").attr("readonly","readonly").attr("id",`voice_actor_relation_offcanvas_description_${id}`))
-                .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`voice_actor_relation_offcanvas_details_${id}`).text(messages.moreDetailsBtnText))
+                .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`voice_actor_relation_offcanvas_details_${id}`).text(moreDetailsLabel))
                 .append(
                     $("<div>").attr("class","d-flex mt-1")
-                        .append($("<button>").attr("class","btn btn-primary").attr("type","button").attr("id",`voice_actor_relation_offcanvas_previous_btn_${id}`).text(messages.previousBtnText))
-                        .append($("<button>").attr("class","btn btn-primary ms-auto").attr("type","button").attr("id",`voice_actor_relation_offcanvas_next_btn_${id}`).text(messages.nextBtnText))
+                        .append($("<button>").attr("class","btn btn-primary").attr("type","button").attr("id",`voice_actor_relation_offcanvas_previous_btn_${id}`).text(previousBtnText))
+                        .append($("<button>").attr("class","btn btn-primary ms-auto").attr("type","button").attr("id",`voice_actor_relation_offcanvas_next_btn_${id}`).text(nextBtnText))
                 )
         )
     $("<div>")
@@ -304,7 +304,7 @@ function addCharacterRelation(id,messages){
         .append(searchCharacterContainer)
         .append(hiddenCharacterID)
         .append(chooseCharacterRelationBtn)
-        .append(voiceActorLabel)
+        .append(voiceActorLabelEle)
         .append(searchVoiceActorContainer)
         .append(hiddenVoiceActorID)
         .append(chooseVoiceActorRelationBt)

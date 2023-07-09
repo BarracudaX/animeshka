@@ -100,7 +100,7 @@ function setOffcanvasAnimeDetails(containerID,content){
 }
 
 
-function addAnimeRelation(id,messages){
+function addAnimeRelation(id){
     let animeRelationID = `anime_relation_${id}`
 
     let removeBtnContainer = $("<div>")
@@ -108,25 +108,25 @@ function addAnimeRelation(id,messages){
         .attr("for",``)
         .append($("<button>").attr("class","btn btn-danger").attr("type","button").text(removeBtnText).on("click",function(){ removeAnimeRelation(animeRelationID) }))
 
-    let alertsContainer = $("<div class='alerts mt-1'>").append($("<div class='alert alert-warning d-none'>").text(messages.animeSearchNotFound).attr("id",`anime_relation_non_found_alert_${id}`))
+    let alertsContainer = $("<div class='alerts mt-1'>").append($("<div class='alert alert-warning d-none'>").text(animeSearchNotFound).attr("id",`anime_relation_non_found_alert_${id}`))
 
     let relationSelectLabel = $("<label>")
         .attr("class","form-label")
         .attr("for",`anime_relation_select_${id}`)
-        .text(messages.relationSelectLabelText)
+        .text(relationSelectLabelText)
 
     let relationSelect = $("<select>")
         .attr("class","form-control")
         .attr("id",`anime_relation_select_${id}`)
 
-    for (let i = 0; i < messages.relationOptions.length; i++) {
-        $("<option>").text(messages.relationOptions[i].toLowerCase().split("_").join(" ")).val(messages.relationOptions[i].toUpperCase()).appendTo(relationSelect)
+    for (let i = 0; i < relationOptions.length; i++) {
+        $("<option>").text(relationOptions[i].toLowerCase().split("_").join(" ")).val(relationOptions[i].toUpperCase()).appendTo(relationSelect)
     }
 
     let searchLabel = $("<label>")
         .attr("class","form-label")
         .attr("for",`anime_relation_search_${id}`)
-        .text(messages.animeSearchLabelText)
+        .text(animeSearchLabelText)
 
     let searchContainer = $("<div>")
         .attr("class","d-flex")
@@ -157,25 +157,25 @@ function addAnimeRelation(id,messages){
             $("<div>")
                 .attr("class","offcanvas-body")
                 .append($("<img>").attr("class","img-fluid m-auto d-block").attr("id",`anime_relation_offcanvas_image_${id}`))
-                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_type_${id}`).text(messages.animeRelationTypeLabelText))
+                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_type_${id}`).text(relationSelectLabelText))
                 .append($("<input>").attr("class","form-control").attr("readonly","readonly").attr("id",`anime_relation_offcanvas_type_${id}`))
-                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_demographics_${id}`).text(messages.animeRelationDemographicsLabelText))
+                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_demographics_${id}`).text(demographicsLabelText))
                 .append($("<input>").attr("class","form-control").attr("readonly","readonly").attr("id",`anime_relation_offcanvas_demographics_${id}`))
-                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_status_${id}`).text(messages.animeRelationStatusLabelText))
+                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_status_${id}`).text(animeRelationStatusLabelText))
                 .append($("<input>").attr("class","form-control").attr("readonly","readonly").attr("id",`anime_relation_offcanvas_status_${id}`))
-                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_published_${id}`).text(messages.animeRelationPublishedLabelText))
+                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_published_${id}`).text(animeRelationPublishedLabelText))
                 .append($("<input>").attr("class","form-control").attr("readonly","readonly").attr("id",`anime_relation_offcanvas_published_${id}`).attr("type","date"))
-                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_finished_${id}`).text(messages.animeRelationFinishedLabelText))
+                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_finished_${id}`).text(finishedOnLabelText))
                 .append($("<input>").attr("class","form-control").attr("readonly","readonly").attr("id",`anime_relation_offcanvas_finished_${id}`).attr("type","date"))
-                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_synopsis_${id}`).text(messages.animeRelationSynopsisLabelText))
+                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_synopsis_${id}`).text(synopsisLabelText))
                 .append($("<textarea>").attr("class","form-control").attr("readonly","readonly").attr("id",`anime_relation_offcanvas_synopsis_${id}`))
-                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_background_${id}`).text(messages.animeRelationBackgroundLabelText))
+                .append($("<label>").attr("class","form-label").attr("for",`anime_relation_offcanvas_background_${id}`).text(backgroundLabelText))
                 .append($("<textarea>").attr("class","form-control").attr("readonly","readonly").attr("id",`anime_relation_offcanvas_background_${id}`))
-                .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`anime_relation_offcanvas_details_${id}`).text(messages.animeRelationMoreDetailsBtnText))
+                .append($("<a>").attr("class","btn btn-primary mt-2 w-100").attr("target","_blank").attr("id",`anime_relation_offcanvas_details_${id}`).text(moreDetailsLabel))
                 .append(
                     $("<div>").attr("class","d-flex mt-1")
-                        .append($("<button>").attr("class","btn btn-primary").attr("type","button").attr("id",`anime_relation_offcanvas_previous_btn_${id}`).text(messages.previousBtnText))
-                        .append($("<button>").attr("class","btn btn-primary ms-auto").attr("type","button").attr("id",`anime_relation_offcanvas_next_btn_${id}`).text(messages.nextBtnText))
+                        .append($("<button>").attr("class","btn btn-primary").attr("type","button").attr("id",`anime_relation_offcanvas_previous_btn_${id}`).text(previousBtnText))
+                        .append($("<button>").attr("class","btn btn-primary ms-auto").attr("type","button").attr("id",`anime_relation_offcanvas_next_btn_${id}`).text(nextBtnText))
                 )
         )
 

@@ -595,72 +595,19 @@
         }
 
         function onAddCharacterRelation(){
-            let messages = {
-                roleLabelText : roleSelectLabelText,
-                roleOptions : roleOptions,
-                characterSearchLabelText : characterSearchLabelText,
-                searchBtnText : searchBtnText,
-                showResultBtnText : showResultBtnText,
-                moreDetailsBtnText : moreDetailsLabel,
-                voiceActorLabel : voiceActorLabel,
-                nextBtnText : nextBtnText,
-                previousBtnText : previousBtnText,
-                characterNotFound : characterNotFound,
-                voiceActorNotFound : voiceActorNotFound,
-                descriptionLabel : descriptionLabel,
-                birthDateLabel : birthDateLabel,
-                removeBtnText : removeBtnText
-            }
-            addCharacterRelation(nextAnimeCharacter,messages)
+            addCharacterRelation(nextAnimeCharacter)
 
             nextAnimeCharacter = nextAnimeCharacter + 1
         }
 
         function onAddAnimeRelation(){
-            let messages = {
-                relationSelectLabelText : relationSelectLabelText,
-                relationOptions : relationOptions,
-                animeSearchLabelText : animeSearchLabelText,
-                showResultBtnText : showResultBtnText,
-                animeRelationTypeLabelText : seriesTypeLabel,
-                animeRelationDemographicsLabelText : demographicsLabelText,
-                animeRelationStatusLabelText : animeRelationStatusLabelText,
-                animeRelationPublishedLabelText : animeRelationPublishedLabelText,
-                animeRelationFinishedLabelText : finishedOnLabelText,
-                animeRelationSynopsisLabelText : synopsisLabelText,
-                animeRelationBackgroundLabelText : backgroundLabelText,
-                animeRelationMoreDetailsBtnText : moreDetailsLabel,
-                previousBtnText : previousBtnText,
-                nextBtnText : nextBtnText,
-                animeSearchNotFound : animeSearchNotFound
-            }
-            addAnimeRelation(nextAnimeRelation,messages)
+            addAnimeRelation(nextAnimeRelation)
 
             nextAnimeRelation = nextAnimeRelation + 1
         }
 
         function onAddNovelRelation() {
-            let messages = {
-                removeBtnText : removeBtnText,
-                relationSelectLabelText : relationSelectLabelText,
-                relationOptions : relationOptions,
-                novelSearchLabelText : novelSearchLabelText,
-                searchBtnText : searchBtnText,
-                showResultBtnText : showResultBtnText,
-                novelRelationTypeLabelText : seriesTypeLabel,
-                novelRelationDemographicsLabelText : demographicsLabelText,
-                novelRelationStatusLabelText : novelRelationStatusLabelText,
-                novelRelationPublishedLabelText : novelRelationPublishedLabelText,
-                novelRelationFinishedLabelText : finishedOnLabelText,
-                novelRelationSynopsisLabelText : synopsisLabelText,
-                novelRelationBackgroundLabelText : backgroundLabelText,
-                novelRelationMoreDetailsBtnText : moreDetailsLabel,
-                previousBtnText : previousBtnText,
-                nextBtnText : nextBtnText,
-                novelSearchNotFound : novelSearchNotFound
-            }
-
-            addNovelRelation(nextNovelRelation,messages)
+            addNovelRelation(nextNovelRelation)
 
             nextNovelRelation = nextNovelRelation + 1
         }
