@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://unpkg.com/v8n/dist/v8n.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Title</title>
 </head>
@@ -30,8 +31,7 @@
     <form class="m-auto w-75 mt-2 p-1" th:action="@{/anime}" method="post" id="insert_anime_form">
         <div>
             <label th:text="#{title.label}" class="form-label" for="title">Title:</label>
-            <input type="text" id="title" name="title" placeholder="Anime's english title" class="form-control"
-                   th:placeholder="#{title.placeholder}"/>
+            <input type="text" id="title" name="title" placeholder="Anime's english title" class="form-control" th:placeholder="#{title.placeholder}"/>
         </div>
 
         <div>
@@ -78,8 +78,7 @@
         </div>
 
         <div>
-            <label th:text="#{series.type.label}" class="form-label" for="series_type">Series
-                Type:</label>
+            <label th:text="#{series.type.label}" class="form-label" for="series_type">Series Type:</label>
             <select th:remove="all-but-first" id="series_type" name="series_type" class="form-control">
                 <option th:each="animeType : ${T(com.arslan.animeshka.AnimeType).values()}" th:value="${animeType.name()}" th:text="${#strings.capitalize(animeType.name().toLowerCase())}">TV
                 </option>
@@ -91,10 +90,12 @@
         <div>
             <label th:text="#{studio.label}" class="form-label" for="rating">Studio:</label>
             <div class="alerts mt-1" id="studio_search_alerts"><div class="alert alert-warning d-none" id="studio_not_found_alert">Not a single studio was found.</div></div>
-            <div class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="studio_search_input" >
-                <input type="hidden" id="studio_id" />
-                <button class="btn btn-outline-success" type="button" onclick="searchStudio('studio_search_input')">Search</button>
+            <div role="search">
+                <div class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="studio_search_input" >
+                    <button class="btn btn-outline-success" type="button" onclick="searchStudio('studio_search_input')">Search</button>
+                </div>
+                <input type="hidden" id="studio_id" name="studio_id" />
             </div>
             <button class="btn btn-secondary mt-2 w-100 d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#studio_offcanvas" id="studio_choose_btn"></button>
             <div class="offcanvas offcanvas-start w-50" id="studio_offcanvas">
@@ -122,10 +123,12 @@
             <label th:text="#{licensor.label}" class="form-label" for="rating">Licensor:</label>
             <div class="alerts mt-1" id="licensor_search_alerts"><div class="alert alert-warning d-none" id="licensor_not_found_alert">Not a single studio was found.</div></div>
 
-            <div class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="licensor_search_input">
-                <input type="hidden" id="licensor_id" />
-                <button class="btn btn-outline-success" type="button" onclick="searchStudio('licensor_search_input',true)">Search</button>
+            <div role="search">
+                <div class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="licensor_search_input">
+                    <button class="btn btn-outline-success" type="button" onclick="searchStudio('licensor_search_input',true)">Search</button>
+                </div>
+                <input type="hidden" id="licensor_id" name="licensor_id" />
             </div>
             <button class="btn btn-secondary mt-2 w-100 d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#licensor_offcanvas" id="licensor_choose_btn"></button>
             <div class="offcanvas offcanvas-start w-50" id="licensor_offcanvas">
@@ -151,7 +154,7 @@
 
         <div>
             <label for="poster" class="form-label" th:text="#{poster.label}">Poster:</label>
-            <input class="form-control" type="file" id="poster" accept="image/*" >
+            <input class="form-control" type="file" id="poster" accept="image/*" name="poster">
             <div class="form-text" th:text="#{poster.hint}">Poster can be maximum 5MB.No avatar/no nudity.</div>
         </div>
 
@@ -172,8 +175,7 @@
         </div>
 
         <div>
-            <label th:text="#{additional.info.label}" class="form-label" for="additional_information">Additional
-                Information:</label>
+            <label th:text="#{additional.info.label}" class="form-label" for="additional_information">Additional Information:</label>
             <textarea id="additional_information" class="form-control" rows="7" style="resize: none"
                       name="additional_information"></textarea>
         </div>
@@ -444,17 +446,20 @@
             <input type="date" id="finished_at" class="form-control" />
         </div>
 
-        <button type="button" class="btn btn-primary mt-2 w-100" onclick="postAnime()" th:value="#{submit.button}">Submit
-        </button>
+        <button type="button" class="btn btn-primary mt-2 w-100" th:value="#{submit.button}" onclick="postAnime()">Submit</button>
     </form>
     <script th:inline="javascript" type="text/javascript">
-        $("#insert_anime_form").validate(
-            {
-                submitHandler : function(){ postAnime() },
-                debug: true,
-                
-            }
-        )
+        const titleRequiredMessage = /*[[#{anime.english.title.required.message}]]*/ "Please fill the official english title!";
+        const japaneseTitleRequiredMessage = /*[[#{anime.japanese.title.required.message}]]*/ "Please fill the japanese title!";
+        const studioRequiredMessage = /*[[#{anime.studio.required.message}]]*/"";
+        const licensorRequiredMessage = /*[[#{anime.licensor.required.message}]]*/ "";
+        const posterRequiredMessage = /*[[#{anime.poster.required.message}]]*/ "";
+        const synopsisRequiredMessage = /*[[#{anime.synopsis.required.message}]]*/ "";
+        const novelRequiredMessage = /*[[#{anime.novel.relation.required.message}]]*/ "Novel Required!";
+        const animeRequiredMessage = /*[[#{anime.anime.relation.required.message}]]*/ "";
+        const characterRequiredMessage = /*[[#{anime.character.relation.required.message}]]*/ "";
+        const voiceActorRequired = /*[[#{anime.voice.actor.relation.required.message}]]*/ "";
+
         let nextNovelRelation = 1
         let nextAnimeRelation = 1
         let nextAnimeCharacter = 1
@@ -467,7 +472,6 @@
         let animeSearchLabelText = /*[[#{anime.label}]]*/ "Anime:";
         let characterSearchLabelText = /*[[#{character.label}]]*/ "Character:";
         let searchBtnText = /*[[#{search.button}]]*/ "Search" ;
-        let showResultBtnText = /*[[#{show.result.button}]]*/ "Show Result";
         let demographicsLabelText = /*[[#{demographic.label}]]*/ "Demographics:"
         let novelRelationStatusLabelText = /*[[#{novel.status.label}]]*/ "Novel Status:"
         let novelRelationPublishedLabelText = /*[[#{novel.publication.label}]]*/ "Publication Date:";
@@ -489,6 +493,11 @@
         let birthDateLabel = /*[[#{birth.date.label}]]*/ "Birth Date:";
 
         async function postAnime(){
+
+            if(!animeValidation()){
+                return
+            }
+
             let title = $("#title").val()
             let japaneseTitle = $("#japanese_title").val()
             let status = $("#anime_status").find(":selected").val()
@@ -619,6 +628,7 @@
     </script>
     <script th:src="@{/resource/anime.js}" type="text/javascript" src="../static/anime.js"></script>
     <script th:src="@{/resource/novel.js}" type="text/javascript" src="../static/novel.js"></script>
+    <script th:src="@{/resource/validation.js}" type="text/javascript" src="../static/validation.js"></script>
     <script th:src="@{/resource/studio.js}" type="text/javascript" src="../static/studio.js"></script>
     <script th:src="@{/resource/character.js}" type="text/javascript" src="../static/character.js"></script>
 </div>

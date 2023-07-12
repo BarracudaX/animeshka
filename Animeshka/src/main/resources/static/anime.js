@@ -180,7 +180,7 @@ function addAnimeRelation(id){
         )
 
     $("<div>")
-        .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
+        .attr("class","border border-secondary-subtle container-fluid p-2 mt-2 anime_relation")
         .attr("id",`anime_relation_${id}`)
         .append(removeBtnContainer)
         .append(alertsContainer)

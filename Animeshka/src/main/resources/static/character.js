@@ -294,7 +294,7 @@ function addCharacterRelation(id){
                 )
         )
     $("<div>")
-        .attr("class","border border-secondary-subtle container-fluid p-2 mt-2")
+        .attr("class","border border-secondary-subtle container-fluid p-2 mt-2 character_relation")
         .attr("id",`character_relation_${id}`)
         .append(removeBtnContainer)
         .append(alertsContainer)
