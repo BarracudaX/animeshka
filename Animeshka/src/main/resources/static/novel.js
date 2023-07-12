@@ -94,6 +94,7 @@ function setOffcanvasNovelDetails(containerID,content){
     $(`#novel_relation_offcanvas_background_${containerID}`).text(content.background)
     $(`#novel_relation_offcanvas_details_${containerID}`).attr("href",`/novel/${content.id}`).attr("target","_blank")
     $(`#novel_relation_hidden_${containerID}`).val(content.id)
+    $(`#novel_relation_hidden_${containerID}`).trigger("input") // trigger for validation to kick off
 }
 
 function addAlert(alertContainer,text){
@@ -136,6 +137,7 @@ function addNovelRelation(id){
     let hiddenNovelID = $("<input type='hidden'>")
         .attr("id",`novel_relation_hidden_${id}`)
         .attr("class","novel_relation_hidden_id")
+    $(hiddenNovelID).on("input",function(){ isNovelRelationValid(hiddenNovelID) })
 
     let chooseRelationBtn = $("<button>")
         .attr("class","btn btn-secondary mt-2 w-100 d-none")

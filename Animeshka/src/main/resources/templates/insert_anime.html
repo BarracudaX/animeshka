@@ -31,13 +31,13 @@
     <form class="m-auto w-75 mt-2 p-1" th:action="@{/anime}" method="post" id="insert_anime_form">
         <div>
             <label th:text="#{title.label}" class="form-label" for="title">Title:</label>
-            <input type="text" id="title" name="title" placeholder="Anime's english title" class="form-control" th:placeholder="#{title.placeholder}"/>
+            <input type="text" id="title" name="title" placeholder="Anime's english title" class="form-control" th:placeholder="#{title.placeholder}" onkeyup="isAnimeTitleValid()"/>
         </div>
 
         <div>
             <label th:text="#{japanese.title.label}" class="form-label" for="japanese_title">Japanese
                 Title:</label>
-            <input type="text" id="japanese_title" name="japanese_title" placeholder="Anime's official japanese title" class="form-control" th:placeholder="#{japanese.title.placeholder}"/>
+            <input type="text" id="japanese_title" name="japanese_title" placeholder="Anime's official japanese title" class="form-control" th:placeholder="#{japanese.title.placeholder}" onkeyup="isAnimeJapaneseTitleValid()"/>
         </div>
 
         <div>
@@ -95,7 +95,7 @@
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="studio_search_input" >
                     <button class="btn btn-outline-success" type="button" onclick="searchStudio('studio_search_input')">Search</button>
                 </div>
-                <input type="hidden" id="studio_id" name="studio_id" />
+                <input type="hidden" id="studio_id" name="studio_id" oninput="isAnimeStudioValid()" />
             </div>
             <button class="btn btn-secondary mt-2 w-100 d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#studio_offcanvas" id="studio_choose_btn"></button>
             <div class="offcanvas offcanvas-start w-50" id="studio_offcanvas">
@@ -128,7 +128,7 @@
                     <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="licensor_search_input">
                     <button class="btn btn-outline-success" type="button" onclick="searchStudio('licensor_search_input',true)">Search</button>
                 </div>
-                <input type="hidden" id="licensor_id" name="licensor_id" />
+                <input type="hidden" id="licensor_id" name="licensor_id" oninput="isAnimeLicensorValid()"/>
             </div>
             <button class="btn btn-secondary mt-2 w-100 d-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#licensor_offcanvas" id="licensor_choose_btn"></button>
             <div class="offcanvas offcanvas-start w-50" id="licensor_offcanvas">
@@ -154,7 +154,7 @@
 
         <div>
             <label for="poster" class="form-label" th:text="#{poster.label}">Poster:</label>
-            <input class="form-control" type="file" id="poster" accept="image/*" name="poster">
+            <input class="form-control" type="file" id="poster" accept="image/*" name="poster" oninput="isAnimePosterValid()">
             <div class="form-text" th:text="#{poster.hint}">Poster can be maximum 5MB.No avatar/no nudity.</div>
         </div>
 
@@ -166,7 +166,7 @@
 
         <div>
             <label th:text="#{synopsis.label}" class="form-label" for="synopsis">Synopsis:</label>
-            <textarea id="synopsis" class="form-control" rows="7" style="resize: none" name="synopsis"></textarea>
+            <textarea id="synopsis" class="form-control" rows="7" style="resize: none" name="synopsis" oninput="isAnimeSynopsisValid()"></textarea>
         </div>
 
         <div>

@@ -106,6 +106,7 @@ function setStudioOffcanvasDetails(content){
     $("#studio_offcanvas_name").val(content.studioName)
     $("#studio_offcanvas_japanese_name").val(content.japaneseName)
     $("#studio_id").val(content.id)
+    $("#studio_id").trigger("input") // trigger for validation to kick off
 }
 
 function setLicensorOffcanvasDetails(content){
@@ -116,4 +117,5 @@ function setLicensorOffcanvasDetails(content){
     $("#licensor_offcanvas_name").val(content.studioName)
     $("#licensor_offcanvas_japanese_name").val(content.japaneseName)
     $("#licensor_id").val(content.id)
+    $("#licensor_id").trigger("input") // trigger for validation to kick off
 }

@@ -97,6 +97,7 @@ function setOffcanvasAnimeDetails(containerID,content){
     $(`#anime_relation_offcanvas_background_${containerID}`).text(content.background)
     $(`#anime_relation_offcanvas_details_${containerID}`).attr("href",`/anime/${content.id}`)
     $(`#anime_relation_hidden_${containerID}`).val(content.id)
+    $(`#anime_relation_hidden_${containerID}`).trigger("input") //trigger for validation to kick off.
 }
 
 
@@ -138,6 +139,7 @@ function addAnimeRelation(id){
         .attr("type","hidden")
         .attr("id",`anime_relation_hidden_${id}`)
         .attr("class","anime_relation_hidden_id")
+    $(hiddenID).on("input",function(){ isAnimeRelationValid(hiddenID) })
 
     let chooseRelationBtn = $("<button>")
         .attr("class","btn btn-secondary mt-2 w-100 d-none")

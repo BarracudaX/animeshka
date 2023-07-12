@@ -87,6 +87,7 @@ function setOffcanvasVoiceActorDetails(containerID,content){
     $(`#voice_actor_relation_offcanvas_description_${containerID}`).text(content.description)
     $(`#voice_actor_relation_offcanvas_details_${containerID}`).attr("href",`/person/${content.id}`)
     $(`#character_relation_va_hidden_${containerID}`).val(content.id)
+    $(`#character_relation_va_hidden_${containerID}`).trigger("input") //trigger for validation to kick off
 }
 
 
@@ -175,6 +176,7 @@ function setOffcanvasCharacterDetails(containerID,content){
     $(`#character_relation_offcanvas_description_${containerID}`).text(content.description)
     $(`#character_relation_offcanvas_details_${containerID}`).attr("href",`/character/${content.id}`)
     $(`#character_relation_hidden_${containerID}`).val(content.id)
+    $(`#character_relation_hidden_${containerID}`).trigger("input") //trigger for validation to kick off
 }
 
 function addAlert(alertContainer,text){
@@ -216,6 +218,7 @@ function addCharacterRelation(id){
     let hiddenVoiceActorID = $("<input type='hidden'>")
         .attr("id",`character_relation_va_hidden_${id}`)
         .attr("class","character_relation_va_hidden_id")
+    hiddenVoiceActorID.on("input",function(){ isVoiceActorRelationValid(hiddenVoiceActorID) })
 
     for (let i = 0; i < roleOptions.length; i++) {
         $("<option>").text(roleOptions[i].toLowerCase().split("_").join(" ")).val(roleOptions[i].toUpperCase()).appendTo(roleSelect)
@@ -234,6 +237,7 @@ function addCharacterRelation(id){
     let hiddenCharacterID = $("<input type='hidden'>")
         .attr("id",`character_relation_hidden_${id}`)
         .attr("class","character_relation_hidden_id")
+    hiddenCharacterID.on("input",function(){ isCharacterRelationValid(hiddenCharacterID) })
 
     let chooseCharacterRelationBtn = $("<button>")
         .attr("class","btn btn-secondary mt-2 w-100 d-none")
