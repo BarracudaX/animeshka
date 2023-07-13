@@ -2,7 +2,9 @@ package com.arslan.animeshka
 
 import com.arslan.animeshka.elastic.*
 import com.arslan.animeshka.entity.User
+import com.arslan.animeshka.entity.UserRole
 import com.arslan.animeshka.repository.UserRepository
+import com.arslan.animeshka.repository.UserRoleRepository
 import com.arslan.animeshka.repository.elastic.*
 import com.arslan.animeshka.service.*
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -39,15 +41,17 @@ class ApplicationInitializer(
         private val novelDocumentRepository: NovelDocumentRepository,
         private val characterDocumentRepository: CharacterDocumentRepository,
         private val peopleDocumentRepository: PeopleDocumentRepository,
-        private val studioDocumentRepository: StudioDocumentRepository
+        private val studioDocumentRepository: StudioDocumentRepository,
+        private val userRoleRepository: UserRoleRepository
 ) : ApplicationRunner{
 
     override fun run(args: ApplicationArguments) : Unit = runBlocking {
-        val user = userRepository.save(User("Test_Anime_Admin","Test_Anime_Admin","AnimeAdmin","anime@admin.com",passwordEncoder.encode("Pass123!")))
+        val animeAdmin = userRepository.save(User("Test_Anime_Admin","Test_Anime_Admin","AnimeAdmin","anime@admin.com",passwordEncoder.encode("Pass123!")))
+        userRoleRepository.save(UserRole(animeAdmin.id!!,Role.ANIME_ADMINISTRATOR))
         userService.register(UserRegistration("test@email.com","Pass123!","Pass123!","TestUser","test","test"))
         val filePart = AppFilePart(HttpHeaders().apply { add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=test.jpg") }, Path("./images/test.jpg"))
 
-        val securityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(user.id,""))
+        val securityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(animeAdmin.id,""))
         mono{
             val studio1 = contentService.createStudioEntry(StudioContent("studio","studio_jp", LocalDate.now().toKotlinLocalDate()))
             val studio2 = contentService.createStudioEntry(StudioContent("another studio from japan","makisama studio", LocalDate.now().toKotlinLocalDate()))

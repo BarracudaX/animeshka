@@ -9,6 +9,7 @@ import com.nimbusds.jose.crypto.MACSigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import kotlinx.coroutines.flow.fold
+import kotlinx.coroutines.flow.reduce
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Duration
@@ -27,7 +28,13 @@ class JwtServiceImpl(private val jwsAlgorithm: JWSAlgorithm,private val jwsSigne
             .subject(user.id!!.toString())
             .issueTime(Date.from(Instant.now()))
             .expirationTime(Date.from(Instant.now().plus(tokenDuration)))
-            .claim("scope",userRoleRepository.findAllByUserID(user.id).fold(""){ acc, value -> acc.plus(" ").plus(value.userRole.name)})
+            .claim("scope",userRoleRepository.findAllByUserID(user.id).fold(""){current,role ->
+                if(current === ""){
+                    role.userRole.name
+                }else{
+                    current.plus(" ").plus(role.userRole.name)
+                }
+            })
             .audience("Animeshka")
             .build()
 

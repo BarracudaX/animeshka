@@ -30,6 +30,10 @@
             <li><a class="dropdown-item" href="#">Insert Studio</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#">Insert Person</a></li>
+            <!--/*@thymesVar id="roles" type="java.util.List<java.lang.String>"*/-->
+            <li th:if="${roles.contains('ROLE_ANIME_ADMINISTRATOR') or roles.contains('ROLE_NOVEL_ADMINISTRATOR')}"><hr class="dropdown-divider"></li>
+            <li th:if="${roles.contains('ROLE_ANIME_ADMINISTRATOR')}"><a class="dropdown-item" href="#">Unverified Anime</a></li>
+            <li th:if="${roles.contains('ROLE_NOVEL_ADMINISTRATOR')}"><a class="dropdown-item" href="#">Unverified Novels</a></li>
           </ul>
         </li>
         <li class="nav-item" sec:authorize="isAnonymous()"><a  th:href="@{/user/login}" href="#" class="nav-link">Login</a></li>

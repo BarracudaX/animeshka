@@ -18,6 +18,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseCookie
 import org.springframework.security.authentication.AnonymousAuthenticationToken
+import org.springframework.security.authorization.AuthorityReactiveAuthorizationManager
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -44,7 +45,7 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
     private val redirectServerAuthenticationSuccessHandler = RedirectServerAuthenticationSuccessHandler()
 
     @Bean
-    fun cookieAwareBearerTokenAuthenticationConverter() : ServerAuthenticationConverter = ServerAuthenticationConverter{ exchange ->
+    fun cookieAwareBearerTokenAuthenticationConverter(): ServerAuthenticationConverter = ServerAuthenticationConverter { exchange ->
         Mono.fromCallable {
             val cookie = exchange.request.cookies["Authorization"] ?: return@fromCallable null
             BearerTokenAuthenticationToken(cookie[0].value)
@@ -52,75 +53,75 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
     }
 
     @Bean
-    fun securityWebFilterChain(http: ServerHttpSecurity,decoder: ReactiveJwtDecoder,bearerTokenConverter: ServerAuthenticationConverter,userService: UserService) : SecurityWebFilterChain {
+    fun securityWebFilterChain(http: ServerHttpSecurity, decoder: ReactiveJwtDecoder, bearerTokenConverter: ServerAuthenticationConverter, userService: UserService): SecurityWebFilterChain {
         return http
-            .formLogin { login ->
-                login.loginPage("/user/login").authenticationManager(userService)
-                    .authenticationSuccessHandler { webFilterExchange, authentication ->
-                        val token = (authentication as BearerTokenAuthenticationToken).token
-                        webFilterExchange.exchange.response.addCookie(ResponseCookie.from("Authorization", token).httpOnly(true).path("/").maxAge(tokenDuration).build())
-                        redirectServerAuthenticationSuccessHandler.onAuthenticationSuccess(webFilterExchange, authentication)
-                    }.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
-            }
-            .exceptionHandling { exceptionHandling ->
-                exceptionHandling.authenticationEntryPoint(RedirectServerAuthenticationEntryPoint("/user/login"))
-                exceptionHandling.accessDeniedHandler { exchange, ex ->
-                    mono {
-                        exchange.response.statusCode = HttpStatus.PERMANENT_REDIRECT
-                        exchange.response.headers.location = URI.create("/access_denied")
-                        null
+                .formLogin { login ->
+                    login.loginPage("/user/login").authenticationManager(userService)
+                            .authenticationSuccessHandler { webFilterExchange, authentication ->
+                                val token = (authentication as BearerTokenAuthenticationToken).token
+                                webFilterExchange.exchange.response.addCookie(ResponseCookie.from("Authorization", token).httpOnly(true).path("/").maxAge(tokenDuration).build())
+                                redirectServerAuthenticationSuccessHandler.onAuthenticationSuccess(webFilterExchange, authentication)
+                            }.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+                }
+                .exceptionHandling { exceptionHandling ->
+                    exceptionHandling.authenticationEntryPoint(RedirectServerAuthenticationEntryPoint("/user/login"))
+                    exceptionHandling.accessDeniedHandler { exchange, ex ->
+                        mono {
+                            exchange.response.statusCode = HttpStatus.PERMANENT_REDIRECT
+                            exchange.response.headers.location = URI.create("/access_denied")
+                            null
+                        }
                     }
+                }.oauth2ResourceServer { oauth ->
+                    oauth.bearerTokenConverter(bearerTokenConverter)
+                    oauth.jwt { jwt ->
+                        val grantedAuthorityConverter = ReactiveJwtGrantedAuthoritiesConverterAdapter(JwtGrantedAuthoritiesConverter().apply { setAuthorityPrefix("ROLE_") })
+                        val jwtConverter = ReactiveJwtAuthenticationConverter().apply { setJwtGrantedAuthoritiesConverter(grantedAuthorityConverter) }
+                        jwt.jwtDecoder(decoder).jwtAuthenticationConverter(jwtConverter)
+                    }
+                }.anonymous { }
+                .authorizeExchange { authorization ->
+                    authorization
+                            .pathMatchers("/user/register", "/", "/user/login", "/image/**").permitAll()
+                            .pathMatchers(HttpMethod.POST, "/anime", "/studio").authenticated()
+                            .pathMatchers(HttpMethod.GET, "/insert/anime", "/novel/search/**", "/anime/search/**", "/character/search/**", "/person/search/**", "/studio/search/**").authenticated()
+                            .pathMatchers(HttpMethod.PUT, "/anime").authenticated()
+                            .pathMatchers(HttpMethod.PUT, "/content/*/accept", "/content/*/reject", "/anime/verify/*", "/studio/verify/*").hasRole(Role.ANIME_ADMINISTRATOR.name)
+                            .pathMatchers(HttpMethod.GET, "/", "/login", "/logout", "/access_denied").permitAll()
+                            .pathMatchers(HttpMethod.GET, "/resource/**").permitAll()
+                            .anyExchange().denyAll()
                 }
-            }.oauth2ResourceServer { oauth ->
-                oauth.bearerTokenConverter(bearerTokenConverter)
-                oauth.jwt { jwt ->
-                    val grantedAuthorityConverter  = ReactiveJwtGrantedAuthoritiesConverterAdapter(JwtGrantedAuthoritiesConverter().apply { setAuthorityPrefix("ROLE_") })
-                    val jwtConverter = ReactiveJwtAuthenticationConverter().apply { setJwtGrantedAuthoritiesConverter(grantedAuthorityConverter) }
-                    jwt.jwtDecoder(decoder).jwtAuthenticationConverter(jwtConverter)
+                .csrf { csrf ->
+                    val protectedWithCsrf = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login")
+                    csrf.requireCsrfProtectionMatcher(protectedWithCsrf)
                 }
-            }.anonymous{ }
-            .authorizeExchange { authorization ->
-                authorization
-                    .pathMatchers("/user/register","/","/user/login","/image/**").permitAll()
-                    .pathMatchers(HttpMethod.POST,"/anime","/studio").authenticated()
-                    .pathMatchers(HttpMethod.GET,"/insert/anime","/novel/search/**","/anime/search/**","/character/search/**","/person/search/**","/studio/search/**").authenticated()
-                    .pathMatchers(HttpMethod.PUT,"/anime").authenticated()
-                    .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(Role.ANIME_ADMINISTRATOR.name)
-                    .pathMatchers(HttpMethod.GET,"/","/login","/logout","/access_denied").permitAll()
-                    .pathMatchers(HttpMethod.GET,"/resource/**").permitAll()
-                    .anyExchange().denyAll()
-            }
-            .csrf { csrf ->
-                val protectedWithCsrf = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST,"/login")
-                csrf.requireCsrfProtectionMatcher(protectedWithCsrf)
-            }
-            .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()).build()
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()).build()
 
     }
 
     @Bean
-    fun jwtDecoder(@Value("\${secret.key}") key: ByteArray,jwsAlgorithm: JWSAlgorithm) : ReactiveJwtDecoder{
-        val secretKey = SecretKeySpec(key,jwsAlgorithm.name)
+    fun jwtDecoder(@Value("\${secret.key}") key: ByteArray, jwsAlgorithm: JWSAlgorithm): ReactiveJwtDecoder {
+        val secretKey = SecretKeySpec(key, jwsAlgorithm.name)
         return NimbusReactiveJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build()
     }
 
     @Bean
-    fun jwtSigner(@Value("\${secret.key}") key: ByteArray,jwsAlgorithm: JWSAlgorithm) : JWSSigner = MACSigner(SecretKeySpec(key,jwsAlgorithm.name))
+    fun jwtSigner(@Value("\${secret.key}") key: ByteArray, jwsAlgorithm: JWSAlgorithm): JWSSigner = MACSigner(SecretKeySpec(key, jwsAlgorithm.name))
 
     @Bean
-    fun jwtAlgorithm() : JWSAlgorithm = JWSAlgorithm.HS256
+    fun jwtAlgorithm(): JWSAlgorithm = JWSAlgorithm.HS256
 
     @Bean
-    fun passwordEncoder() : PasswordEncoder = BCryptPasswordEncoder()
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
-    fun loginCheckWebFilter() : WebFilter = WebFilter { exchange, chain ->
+    fun loginCheckWebFilter(): WebFilter = WebFilter { exchange, chain ->
         mono {
-            if(exchange.request.path.value() == "/user/login" && ReactiveSecurityContextHolder.getContext().awaitSingle().authentication !is AnonymousAuthenticationToken){
+            if (exchange.request.path.value() == "/user/login" && ReactiveSecurityContextHolder.getContext().awaitSingle().authentication !is AnonymousAuthenticationToken) {
                 exchange.response.statusCode = HttpStatus.PERMANENT_REDIRECT
                 exchange.response.headers.location = URI.create("/")
                 null
-            }else{
+            } else {
                 chain.filter(exchange).awaitSingleOrNull()
             }
         }
