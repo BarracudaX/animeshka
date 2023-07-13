@@ -1,9 +1,11 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.AbstractTest
-import com.arslan.animeshka.UserRole
+import com.arslan.animeshka.Role
 import com.arslan.animeshka.entity.User
+import com.arslan.animeshka.entity.UserRole
 import com.arslan.animeshka.repository.UserRepository
+import com.arslan.animeshka.repository.UserRoleRepository
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.test.runTest
@@ -43,6 +45,9 @@ abstract class AbstractServiceITest : AbstractTest(){
     @Autowired
     protected lateinit var userRepository: UserRepository
 
+    @Autowired
+    protected lateinit var userRoleRepository: UserRoleRepository
+
     protected fun runTransactionalTest(block: suspend () -> Unit) = runTest{
         transactionalOperator.executeAndAwait {
             block()
@@ -61,7 +66,11 @@ abstract class AbstractServiceITest : AbstractTest(){
         }
     }
 
-    private suspend fun createAdminUser(): User = userRepository.save(User("admin_fn","admin_ln","admin_usn","admin@admin.com","Admin123!",UserRole.ANIME_ADMINISTRATOR))
+    private suspend fun createAdminUser(): User {
+        val user = userRepository.save(User("admin_fn","admin_ln","admin_usn","admin@admin.com","Admin123!"))
+        userRoleRepository.save(UserRole(user.id!!,Role.ANIME_ADMINISTRATOR))
+        return user
+    }
 
 
     companion object{

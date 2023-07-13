@@ -61,14 +61,4 @@ class  AnimeServiceITest @Autowired constructor (
         }
     }
 
-    /**
-     * Creates new studio.
-     * Must be called inside transaction to be rolledback.
-     */
-    private suspend fun createStudio() : Studio {
-        val content = studioService.createStudio(StudioContent("test_studio_name","jp_test_studio_name",LocalDate.now().toKotlinLocalDate()))
-        moderationService.acceptModeration(content.id!!)
-        return studioService.insertStudio(content.id!!)
-    }
-
 }

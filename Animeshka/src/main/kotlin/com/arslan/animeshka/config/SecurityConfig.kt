@@ -1,6 +1,6 @@
 package com.arslan.animeshka.config
 
-import com.arslan.animeshka.UserRole
+import com.arslan.animeshka.Role
 import com.arslan.animeshka.repository.UserRepository
 import com.arslan.animeshka.service.JwtService
 import com.arslan.animeshka.service.UserService
@@ -25,7 +25,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
-import org.springframework.security.oauth2.server.resource.BearerTokenAuthenticationToken
 import org.springframework.security.oauth2.server.resource.authentication.*
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint
@@ -43,9 +42,6 @@ import javax.crypto.spec.SecretKeySpec
 class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration: Duration) {
 
     private val redirectServerAuthenticationSuccessHandler = RedirectServerAuthenticationSuccessHandler()
-
-    @Bean
-    fun userService(userRepository: UserRepository,passwordEncoder: PasswordEncoder,jwtService: JwtService) : UserService = UserServiceImpl(userRepository,passwordEncoder,jwtService)
 
     @Bean
     fun cookieAwareBearerTokenAuthenticationConverter() : ServerAuthenticationConverter = ServerAuthenticationConverter{ exchange ->
@@ -89,7 +85,7 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
                     .pathMatchers(HttpMethod.POST,"/anime","/studio").authenticated()
                     .pathMatchers(HttpMethod.GET,"/insert/anime","/novel/search/**","/anime/search/**","/character/search/**","/person/search/**","/studio/search/**").authenticated()
                     .pathMatchers(HttpMethod.PUT,"/anime").authenticated()
-                    .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(UserRole.ANIME_ADMINISTRATOR.name)
+                    .pathMatchers(HttpMethod.PUT,"/content/*/accept","/content/*/reject","/anime/verify/*","/studio/verify/*").hasRole(Role.ANIME_ADMINISTRATOR.name)
                     .pathMatchers(HttpMethod.GET,"/","/login","/logout","/access_denied").permitAll()
                     .pathMatchers(HttpMethod.GET,"/resource/**").permitAll()
                     .anyExchange().denyAll()

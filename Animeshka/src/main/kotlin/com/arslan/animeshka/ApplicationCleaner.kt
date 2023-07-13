@@ -55,6 +55,7 @@ class ApplicationCleaner(
             connection.createStatement("DROP TABLE IF EXISTS CHARACTERS").execute().awaitFirst()
             connection.createStatement("DROP TABLE IF EXISTS PEOPLE").execute().awaitFirst()
             connection.createStatement("DROP TABLE IF EXISTS CONTENT").execute().awaitFirst()
+            connection.createStatement("DROP TABLE IF EXISTS USER_ROLES").execute().awaitFirst()
             connection.createStatement("DROP TABLE IF EXISTS USERS").execute().awaitFirst()
 
             Files.newDirectoryStream(imageLocation){ path -> path.isRegularFile() }.use { stream ->

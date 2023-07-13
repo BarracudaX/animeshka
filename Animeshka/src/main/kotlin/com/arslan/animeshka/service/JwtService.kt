@@ -5,6 +5,6 @@ import com.arslan.animeshka.entity.User
 
 interface JwtService {
 
-    fun createToken(user: User) : String
+    suspend fun createToken(user: User) : String
 
 }

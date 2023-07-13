@@ -43,7 +43,7 @@ class ApplicationInitializer(
 ) : ApplicationRunner{
 
     override fun run(args: ApplicationArguments) : Unit = runBlocking {
-        val user = userRepository.save(User("Test_Anime_Admin","Test_Anime_Admin","AnimeAdmin","anime@admin.com",passwordEncoder.encode("Pass123!"),UserRole.ANIME_ADMINISTRATOR))
+        val user = userRepository.save(User("Test_Anime_Admin","Test_Anime_Admin","AnimeAdmin","anime@admin.com",passwordEncoder.encode("Pass123!")))
         userService.register(UserRegistration("test@email.com","Pass123!","Pass123!","TestUser","test","test"))
         val filePart = AppFilePart(HttpHeaders().apply { add(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=test.jpg") }, Path("./images/test.jpg"))
 

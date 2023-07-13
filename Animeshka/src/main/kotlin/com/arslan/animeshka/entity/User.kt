@@ -1,6 +1,5 @@
 package com.arslan.animeshka.entity
 
-import com.arslan.animeshka.UserRole
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
@@ -19,8 +18,6 @@ data class User(
     var email: String,
 
     var password: String,
-
-    var role: UserRole,
 
     @Id
     val id: Long? = null

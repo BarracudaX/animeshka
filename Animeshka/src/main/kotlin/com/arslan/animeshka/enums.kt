@@ -6,7 +6,7 @@ enum class ImageExtension{
     JPEG,JPG,PNG
 }
 
-enum class UserRole{
+enum class Role{
     USER,STREAMER,NOVEL_ADMINISTRATOR,ANIME_ADMINISTRATOR
 }
 
