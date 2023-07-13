@@ -28,6 +28,10 @@
     </div>
 </nav>
 <div id="insert_anime">
+    <div class="alert alert-success mt-1 alert-dismissible fade show" th:if="${!param.success.isEmpty()}">
+        <strong th:text="#{anime.inserted.successfully.message}">Anime is inserted for verification!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     <form class="m-auto w-75 mt-2 p-1" th:action="@{/anime}" method="post" id="insert_anime_form">
         <div>
             <label th:text="#{title.label}" class="form-label" for="title">Title:</label>
@@ -449,10 +453,21 @@
         <button type="button" class="btn btn-primary mt-2 w-100" th:value="#{submit.button}" onclick="postAnime()">Submit</button>
     </form>
     <script th:inline="javascript" type="text/javascript">
-        window.onbeforeunload = function(e){
-            e.preventDefault()
-            e.returnValue = ""
-        }
+        let formModified = false
+
+        $(document).ready(function(){
+            formModified = false
+            $("form :input").on("change input", function(){
+                formModified = true
+            })
+            window.onbeforeunload = function(e){
+                if(formModified){
+                    e.preventDefault()
+                    e.returnValue = ""
+                }
+            }
+        })
+
 
         const titleRequiredMessage = /*[[#{anime.english.title.required.message}]]*/ "Please fill the official english title!";
         const japaneseTitleRequiredMessage = /*[[#{anime.japanese.title.required.message}]]*/ "Please fill the japanese title!";
@@ -605,7 +620,12 @@
                     body : form
                 }
             )
-            console.log(await response.text())
+
+            if(response.status === 200){
+                formModified = false // set formModified to false in order avoid confirmation on redirect
+                window.location.replace(window.location.href+"?success")
+            }
+
         }
 
         function onAddCharacterRelation(){

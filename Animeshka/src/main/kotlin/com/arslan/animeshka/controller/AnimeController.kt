@@ -34,7 +34,7 @@ class AnimeController(
 ) {
 
     @PostMapping
-    suspend fun newAnime(@RequestPart("data") anime: AnimeContent,@RequestPart("images") images: Flux<FilePart>,@RequestPart("poster") poster: FilePart) : ResponseEntity<Unit>{
+    suspend fun newAnime(@RequestPart("data") anime: AnimeContent,@RequestPart("images", required = false) images: Flux<FilePart>,@RequestPart("poster") poster: FilePart) : ResponseEntity<Unit>{
         val content = contentService.createAnimeEntry(anime)
         imageService.saveImages(images,poster,content)
         return ResponseEntity.ok(Unit)
