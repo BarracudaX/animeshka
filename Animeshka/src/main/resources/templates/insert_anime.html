@@ -449,6 +449,11 @@
         <button type="button" class="btn btn-primary mt-2 w-100" th:value="#{submit.button}" onclick="postAnime()">Submit</button>
     </form>
     <script th:inline="javascript" type="text/javascript">
+        window.onbeforeunload = function(e){
+            e.preventDefault()
+            e.returnValue = ""
+        }
+
         const titleRequiredMessage = /*[[#{anime.english.title.required.message}]]*/ "Please fill the official english title!";
         const japaneseTitleRequiredMessage = /*[[#{anime.japanese.title.required.message}]]*/ "Please fill the japanese title!";
         const studioRequiredMessage = /*[[#{anime.studio.required.message}]]*/"";
