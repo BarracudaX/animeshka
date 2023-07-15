@@ -210,8 +210,6 @@ data class PersonContent(
 
         val birthDate: LocalDate? = null,
 
-        val posterPath: String = "",
-
         val id: Long? = null
 )
 

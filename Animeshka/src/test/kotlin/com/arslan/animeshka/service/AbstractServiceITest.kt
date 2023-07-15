@@ -4,10 +4,8 @@ import com.arslan.animeshka.AbstractTest
 import com.arslan.animeshka.Role
 import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.entity.UserRole
-import com.arslan.animeshka.repository.ContentRepository
-import com.arslan.animeshka.repository.StudioRepository
-import com.arslan.animeshka.repository.UserRepository
-import com.arslan.animeshka.repository.UserRoleRepository
+import com.arslan.animeshka.repository.*
+import com.arslan.animeshka.repository.elastic.PeopleDocumentRepository
 import com.arslan.animeshka.repository.elastic.StudioDocumentRepository
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
@@ -66,6 +64,12 @@ abstract class AbstractServiceITest : AbstractTest(){
 
     @Autowired
     protected lateinit var elasticsearchTemplate: ReactiveElasticsearchTemplate
+
+    @Autowired
+    protected lateinit var peopleRepository: PeopleRepository
+
+    @Autowired
+    protected lateinit var peopleDocumentRepository: PeopleDocumentRepository
 
     @BeforeEach
     fun prepare(){
