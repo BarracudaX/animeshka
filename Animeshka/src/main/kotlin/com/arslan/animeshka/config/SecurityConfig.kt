@@ -12,6 +12,7 @@ import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.web.server.Cookie
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -63,7 +64,7 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
                             .authenticationManager(userService)
                             .authenticationSuccessHandler { webFilterExchange, authentication ->
                                 val token = (authentication as BearerTokenAuthenticationToken).token
-                                webFilterExchange.exchange.response.addCookie(ResponseCookie.from("Authorization", token).httpOnly(true).path("/").maxAge(tokenDuration).build())
+                                webFilterExchange.exchange.response.addCookie(ResponseCookie.from("Authorization", token).httpOnly(true).path("/").maxAge(tokenDuration).sameSite(Cookie.SameSite.STRICT.attributeValue()).build())
                                 redirectServerAuthenticationSuccessHandler.onAuthenticationSuccess(webFilterExchange, authentication)
                             }.securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 }

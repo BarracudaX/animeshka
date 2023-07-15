@@ -605,14 +605,12 @@
             }
             const form = new FormData()
             let animeContentJson = JSON.stringify(animeContent)
-            console.log(animeContentJson)
             form.append("data",new Blob([animeContentJson],{type : "application/json"}))
             let images = $("#images")[0].files
             for (let i = 0; i <images.length; i++) {
                 form.append("images",images[i])
             }
             form.append("poster",$("#poster")[0].files[0])
-            console.log($("input[name=_csrf]").val()
             form.append("_csrf",$("input[name=_csrf]").val())
             let response = await fetch(
                 "/anime",
