@@ -1,2 +1,2 @@
 # animeshka
-Animeshka - project written in ktor that resembles myanimelist.
+Animeshka - project written using spring framework that resembles myanimelist.

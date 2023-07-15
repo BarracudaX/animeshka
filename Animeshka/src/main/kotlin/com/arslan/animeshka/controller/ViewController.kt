@@ -16,34 +16,29 @@ class ViewController {
 
     @GetMapping("/")
     suspend fun homePage(model: Model) : String {
-        roleAttributeInitializer(model)
         return "index"
     }
 
     @GetMapping("/user/login")
     suspend fun loginPage(model: Model) : String {
-        roleAttributeInitializer(model)
         return "login"
     }
 
     @GetMapping("/insert/anime")
     suspend fun insertAnimePage(model: Model) : String {
-        roleAttributeInitializer(model)
         return "insert_anime"
     }
 
     @GetMapping("/access_denied")
     suspend fun accessDenied(model: Model) : String {
-        roleAttributeInitializer(model)
         return "access_denied"
     }
 
     @GetMapping("/novel/{id}")
     suspend fun novelView(@PathVariable id: Long) : String = TODO()
 
-    suspend fun roleAttributeInitializer(model: Model){
-        val auth = ReactiveSecurityContextHolder.getContext().awaitSingleOrNull()?.authentication
-        val roles = auth?.authorities?.map { it.authority } ?: emptyList<String>()
-        model.addAttribute("roles",roles)
+    @ModelAttribute
+    fun roleAttributeInitializer(model: Model){
+        model.addAttribute("roles",ReactiveSecurityContextHolder.getContext().map { sec -> sec.authentication?.authorities?.map { it.authority } ?: emptyList() })
     }
 }
