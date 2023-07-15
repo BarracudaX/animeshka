@@ -27,11 +27,14 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.*
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationEntryPoint
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository
+import org.springframework.security.web.server.csrf.XorServerCsrfTokenRequestAttributeHandler
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers
 import org.springframework.web.server.WebFilter
 import reactor.core.publisher.Mono
@@ -56,7 +59,8 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
     fun securityWebFilterChain(http: ServerHttpSecurity, decoder: ReactiveJwtDecoder, bearerTokenConverter: ServerAuthenticationConverter, userService: UserService): SecurityWebFilterChain {
         return http
                 .formLogin { login ->
-                    login.loginPage("/user/login").authenticationManager(userService)
+                    login.loginPage("/user/login")
+                            .authenticationManager(userService)
                             .authenticationSuccessHandler { webFilterExchange, authentication ->
                                 val token = (authentication as BearerTokenAuthenticationToken).token
                                 webFilterExchange.exchange.response.addCookie(ResponseCookie.from("Authorization", token).httpOnly(true).path("/").maxAge(tokenDuration).build())
@@ -92,8 +96,9 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
                             .anyExchange().denyAll()
                 }
                 .csrf { csrf ->
-                    val protectedWithCsrf = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login")
+                    val protectedWithCsrf = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login","/anime")
                     csrf.requireCsrfProtectionMatcher(protectedWithCsrf)
+                    csrf.csrfTokenRequestHandler(XorServerCsrfTokenRequestAttributeHandler().apply { setTokenFromMultipartDataEnabled(true) })
                 }
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()).build()
 

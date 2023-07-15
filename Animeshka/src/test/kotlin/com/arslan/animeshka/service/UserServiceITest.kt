@@ -2,7 +2,8 @@ package com.arslan.animeshka.service
 
 import com.arslan.animeshka.UserRegistration
 import com.arslan.animeshka.Role
-import com.arslan.animeshka.repository.UserRoleRepository
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jwt.SignedJWT
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -10,20 +11,29 @@ import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactor.awaitSingle
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthentication
+import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UserServiceITest @Autowired constructor(private val userService: UserService,private val passwordEncoder: PasswordEncoder) : AbstractServiceITest(){
 
     private val userRegistration = UserRegistration("test@email.com","Pass123!","Pass123!","test_username","test_fn","test_ln")
 
+    @Autowired
+    private lateinit var expectedJwtAlgorithm:JWSAlgorithm
+
     @Test
-    fun `should register new user`() = runTransactionalTest{
+    fun `should register new user with USER role`() = runTransactionalTest{
         userRepository.findByUsername(userRegistration.username).shouldBeNull()
         userRepository.findByEmail(userRegistration.email).shouldBeNull()
 
@@ -54,5 +64,34 @@ class UserServiceITest @Autowired constructor(private val userService: UserServi
         userService.register(userRegistration)
 
         shouldThrow<DuplicateKeyException> { userService.register(userRegistration.copy(email = "diff_email@email.com")) }
+    }
+
+    @Test
+    fun `should throw BadCredentialsException when providing invalid email`() = runTransactionalTest {
+        userService.register(userRegistration)
+
+        shouldThrow<BadCredentialsException> { userService.authenticate(TestingAuthenticationToken(userRegistration.email.plus("1"),userRegistration.password)).awaitSingle() }
+    }
+
+    @Test
+    fun `should throw BadCredentialsException when providing invalid username`() = runTransactionalTest{
+        userService.register(userRegistration)
+
+        shouldThrow<BadCredentialsException> { userService.authenticate(TestingAuthenticationToken(userRegistration.username.plus("1"),userRegistration.password)).awaitSingle() }
+    }
+
+    @Test
+    fun `should return BearerTokenAuthenticationToken on successful authentication with email`() = runTransactionalTest{
+        userService.register(userRegistration)
+
+        val authentication = userService.authenticate(TestingAuthenticationToken(userRegistration.email.plus("1"),userRegistration.password)).awaitSingle()
+
+        val bearerTokenAuthentication = authentication.shouldBeInstanceOf<BearerTokenAuthenticationToken>()
+
+
+        assertSoftly(SignedJWT.parse(bearerTokenAuthentication.token)) {
+            header.algorithm shouldBe expectedJwtAlgorithm
+            jwtClaimsSet
+        }
     }
 }

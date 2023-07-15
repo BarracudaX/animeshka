@@ -612,6 +612,8 @@
                 form.append("images",images[i])
             }
             form.append("poster",$("#poster")[0].files[0])
+            console.log($("input[name=_csrf]").val()
+            form.append("_csrf",$("input[name=_csrf]").val())
             let response = await fetch(
                 "/anime",
                 {
