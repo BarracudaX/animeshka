@@ -2,12 +2,14 @@ package com.arslan.animeshka.service
 
 import com.arslan.animeshka.UserRegistration
 import com.arslan.animeshka.Role
+import com.arslan.animeshka.entity.User
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jwt.SignedJWT
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
@@ -81,17 +83,42 @@ class UserServiceITest @Autowired constructor(private val userService: UserServi
     }
 
     @Test
-    fun `should return BearerTokenAuthenticationToken on successful authentication with email`() = runTransactionalTest{
+    fun `should throw BadCredentialsException when providing invalid password`() = runTransactionalTest{
         userService.register(userRegistration)
 
-        val authentication = userService.authenticate(TestingAuthenticationToken(userRegistration.email.plus("1"),userRegistration.password)).awaitSingle()
+        shouldThrow<BadCredentialsException> { userService.authenticate(TestingAuthenticationToken(userRegistration.username,userRegistration.password.plus("1"))).awaitSingle() }
+    }
+
+    @Test
+    fun `should return BearerTokenAuthenticationToken on successful authentication with email`() = runTransactionalTest{
+        val user = userService.register(userRegistration)
+
+        val authentication = userService.authenticate(TestingAuthenticationToken(userRegistration.email,userRegistration.password)).awaitSingle()
 
         val bearerTokenAuthentication = authentication.shouldBeInstanceOf<BearerTokenAuthenticationToken>()
 
+        bearerTokenAuthentication.token.validateToken(user)
+    }
 
-        assertSoftly(SignedJWT.parse(bearerTokenAuthentication.token)) {
+
+    @Test
+    fun `should return BearerTokenAuthenticationToken on successful authentication with username`() = runTransactionalTest{
+        val user = userService.register(userRegistration)
+
+        val authentication = userService.authenticate(TestingAuthenticationToken(userRegistration.username,userRegistration.password)).awaitSingle()
+
+        val bearerTokenAuthentication = authentication.shouldBeInstanceOf<BearerTokenAuthenticationToken>()
+
+        bearerTokenAuthentication.token.validateToken(user)
+    }
+
+    private fun String.validateToken(user: User){
+        assertSoftly(SignedJWT.parse(this)) {
             header.algorithm shouldBe expectedJwtAlgorithm
-            jwtClaimsSet
+            jwtClaimsSet.issuer shouldBe "Animeshka"
+            jwtClaimsSet.subject shouldBe user.id.toString()
+            jwtClaimsSet.claims["scope"] shouldBe "${Role.USER}"
+            jwtClaimsSet.audience shouldContainExactlyInAnyOrder listOf("Animeshka")
         }
     }
 }

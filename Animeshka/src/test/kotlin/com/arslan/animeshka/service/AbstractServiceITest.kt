@@ -4,16 +4,23 @@ import com.arslan.animeshka.AbstractTest
 import com.arslan.animeshka.Role
 import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.entity.UserRole
+import com.arslan.animeshka.repository.ContentRepository
+import com.arslan.animeshka.repository.StudioRepository
 import com.arslan.animeshka.repository.UserRepository
 import com.arslan.animeshka.repository.UserRoleRepository
+import com.arslan.animeshka.repository.elastic.StudioDocumentRepository
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.MessageSource
+import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate
+import org.springframework.data.elasticsearch.core.RefreshPolicy
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -48,6 +55,23 @@ abstract class AbstractServiceITest : AbstractTest(){
     @Autowired
     protected lateinit var userRoleRepository: UserRoleRepository
 
+    @Autowired
+    protected lateinit var studioRepository: StudioRepository
+
+    @Autowired
+    protected lateinit var contentRepository: ContentRepository
+
+    @Autowired
+    protected lateinit var studioDocumentRepository: StudioDocumentRepository
+
+    @Autowired
+    protected lateinit var elasticsearchTemplate: ReactiveElasticsearchTemplate
+
+    @BeforeEach
+    fun prepare(){
+        elasticsearchTemplate.refreshPolicy = RefreshPolicy.IMMEDIATE
+    }
+
     protected fun runTransactionalTest(block: suspend () -> Unit) = runTest{
         transactionalOperator.executeAndAwait {
             block()
@@ -66,16 +90,21 @@ abstract class AbstractServiceITest : AbstractTest(){
         }
     }
 
-    private suspend fun createAdminUser(): User {
+    protected suspend fun createAdminUser(): User {
         val user = userRepository.save(User("admin_fn","admin_ln","admin_usn","admin@admin.com","Admin123!"))
         userRoleRepository.save(UserRole(user.id!!,Role.ANIME_ADMINISTRATOR))
+        return user
+    }
+
+    protected suspend fun createPlainUser() : User{
+        val user = userRepository.save(User("user_fn","user_ln","user_usn","user@user.com","User123!"))
+        userRoleRepository.save(UserRole(user.id!!,Role.USER))
         return user
     }
 
 
     companion object{
 
-        private val logger = LoggerFactory.getLogger(this::class.java)
         private val mysqlContainer = MySQLContainer("mysql:latest")
             .withReuse(true)
             .withDatabaseName("animeshka")
@@ -90,7 +119,6 @@ abstract class AbstractServiceITest : AbstractTest(){
         fun registerPropertySource(registry: DynamicPropertyRegistry){
             r2dbcContainer.start()
             elasticSearchContainer.apply {
-//                withLogConsumer(Slf4jLogConsumer(logger))
                 addEnv("xpack.security.enabled","false")
             }.start()
             registry.add("spring.r2dbc.url"){ "r2dbc:mysql://${mysqlContainer.host}:${mysqlContainer.firstMappedPort}/animeshka" }
