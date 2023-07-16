@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class ModerationServiceImpl(private val contentRepository: ContentRepository) : ModerationService {
     override suspend fun acceptModeration(contentID: Long) {
-        val content = contentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Anime content with id $contentID not found.",1)
+        val content = contentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Content with id $contentID not found.",1)
 
         if(content.verifier != null) throw ContentAlreadyUnderModerationException()
 
@@ -23,7 +23,7 @@ class ModerationServiceImpl(private val contentRepository: ContentRepository) : 
     }
 
     override suspend fun rejectContent(contentID: Long, rejectionReason: String) {
-        val content = contentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Anime content with id $contentID not found.",1)
+        val content = contentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Content with id $contentID not found.",1)
         val verifier = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
 
         if(content.contentStatus != ContentStatus.UNDER_VERIFICATION) throw IllegalStateException("Content cannot be rejected because it is not under moderation. Current content status : ${content.contentStatus}.")
