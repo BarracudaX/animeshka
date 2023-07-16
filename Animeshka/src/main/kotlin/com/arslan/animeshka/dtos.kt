@@ -56,6 +56,9 @@ data class StudioContent(
 data class AnimeCharacter(val characterID: Long, val voiceActorID: Long, val role: CharacterRole)
 
 @Serializable
+data class NovelCharacter(val characterID: Long,val role: CharacterRole)
+
+@Serializable
 data class WorkRelation(val relatedWorkID: Long, val relation: Relation)
 
 @Serializable
@@ -302,11 +305,9 @@ data class NovelContent(
 
         val demographic: Demographic,
 
-        val background: String,
+        val background: String = "",
 
-        val posterPath: String = "",
-
-        val characters: Set<Long> = emptySet(),
+        val characters: Set<NovelCharacter> = emptySet(),
 
         val animeRelations: Set<WorkRelation> = emptySet(),
 

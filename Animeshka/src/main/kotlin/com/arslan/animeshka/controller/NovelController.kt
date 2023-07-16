@@ -21,7 +21,7 @@ class NovelController(private val novelService: NovelService,private val imageSe
 
     @GetMapping("/search")
     suspend fun findNovel(@RequestParam("searchKey") searchInput: String, pageable: Pageable) : ResponseEntity<PagedBasicNovelDTO>{
-        val resultWithoutImages = novelService.findNovel(searchInput,pageable)
+        val resultWithoutImages = novelService.searchNovels(searchInput,pageable)
         val resultWithImages = with(resultWithoutImages){
             val enrichedContent = content.map { novel -> novel.enrichWithImages(imageService.findContentImages(novel.id)) }
             PagedBasicNovelDTO(enrichedContent,hasNext,hasPrevious)

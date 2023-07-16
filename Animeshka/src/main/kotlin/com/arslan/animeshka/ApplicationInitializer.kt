@@ -67,9 +67,9 @@ class ApplicationInitializer(
             val savedStudio2 = studioService.insertStudio(contentService.verifyStudio(studio2.id))
             val savedStudio3 = studioService.insertStudio(contentService.verifyStudio(studio3.id))
 
-            val novel1 = contentService.createNovelEntry(NovelContent("test novel 1","test novel 1 jp","test novel 1 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
-            val novel2 = contentService.createNovelEntry(NovelContent("another novel world 2","jp another novel world 2","another novel world 2 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
-            val novel3 = contentService.createNovelEntry(NovelContent("third novel parallel world 3","jp third novel parallel world 3","third novel parallel world 3 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", themes = setOf(Theme.ADULT_CAST,Theme.BLOOD), genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
+            val novel1 = contentService.createNovelEntry(NovelContent("test novel 1","test novel 1 jp","test novel 1 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
+            val novel2 = contentService.createNovelEntry(NovelContent("another novel world 2","jp another novel world 2","another novel world 2 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
+            val novel3 = contentService.createNovelEntry(NovelContent("third novel parallel world 3","jp third novel parallel world 3","third novel parallel world 3 synopsis",LocalDate.now().toKotlinLocalDate(),NovelStatus.NOT_YET_PUBLISHED,NovelType.LIGHT_NOVEL,Demographic.JOSEI,"test_bg", genres = setOf(Genre.BOYS_LOVE,Genre.HORROR)))
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,novel1)
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,novel2)
             imageService.saveImages(Flux.just(filePart,filePart,filePart),filePart,novel3)

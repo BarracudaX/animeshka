@@ -1,12 +1,13 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.AbstractTest
-import com.arslan.animeshka.Role
-import com.arslan.animeshka.entity.User
-import com.arslan.animeshka.entity.UserRole
+import com.arslan.animeshka.*
+import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
+import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
 import com.arslan.animeshka.repository.elastic.PeopleDocumentRepository
 import com.arslan.animeshka.repository.elastic.StudioDocumentRepository
+import kotlinx.coroutines.flow.toSet
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.test.runTest
@@ -19,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.MessageSource
 import org.springframework.data.elasticsearch.client.elc.ReactiveElasticsearchTemplate
 import org.springframework.data.elasticsearch.core.RefreshPolicy
+import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.test.context.DynamicPropertyRegistry
@@ -30,6 +32,8 @@ import org.testcontainers.containers.MySQLR2DBCDatabaseContainer
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
+import java.time.LocalDate
+import java.util.*
 
 @SpringBootTest
 @Testcontainers
@@ -71,9 +75,81 @@ abstract class AbstractServiceITest : AbstractTest(){
     @Autowired
     protected lateinit var peopleDocumentRepository: PeopleDocumentRepository
 
+    @Autowired
+    protected lateinit var characterRepository: CharacterRepository
+
+    @Autowired
+    protected lateinit var animeRepository: AnimeRepository
+
+    @Autowired
+    protected lateinit var novelRepository: NovelRepository
+
+    @Autowired
+    protected lateinit var databaseClient: DatabaseClient
+
+    @Autowired
+    protected lateinit var novelDocumentRepository: NovelDocumentRepository
+
     @BeforeEach
     fun prepare(){
         elasticsearchTemplate.refreshPolicy = RefreshPolicy.IMMEDIATE
+    }
+
+    protected suspend fun Novel.novelRelations() : Set<WorkRelation> = databaseClient
+            .sql("SELECT * FROM NOVEL_NOVEL_RELATIONS WHERE novel_id = :id")
+            .bind("id",id)
+            .map { row,_ -> WorkRelation(row.get("related_novel_id",Long::class.java)!!,Relation.valueOf(row.get("relation",String::class.java)!!))}
+            .all().asFlow().toSet()
+
+    protected suspend fun Novel.animeRelations() : Set<WorkRelation> = databaseClient
+            .sql("SELECT * FROM NOVEL_ANIME_RELATIONS WHERE novel_id = :id")
+            .bind("id",id)
+            .map { row,_ -> WorkRelation(row.get("anime_id",Long::class.java)!!,Relation.valueOf(row.get("relation",String::class.java)!!)) }
+            .all().asFlow().toSet()
+
+    protected suspend fun Novel.characters() : Set<NovelCharacter> = databaseClient
+            .sql("SELECT * FROM NOVEL_CHARACTERS WHERE novel_id = :id")
+            .bind("id",id)
+            .map { row,_ -> NovelCharacter(row.get("character_id",Long::class.java)!!,CharacterRole.valueOf(row.get("character_role",String::class.java)!!)) }
+            .all().asFlow().toSet()
+
+    protected suspend fun Novel.themes() : Set<Theme> = databaseClient
+            .sql("SELECT * FROM NOVEL_THEMES WHERE novel_id = :id")
+            .bind("id",id)
+            .map { row, _ -> Theme.valueOf(row.get("theme",String::class.java)!!) }
+            .all().asFlow().toSet()
+
+    protected suspend fun Novel.genres() : Set<Genre> = databaseClient
+            .sql("SELECT * FROM NOVEL_GENRES WHERE novel_id = :id")
+            .bind("id", id)
+            .map { row, _ -> Genre.valueOf(row.get("genre",String::class.java)!!) }
+            .all().asFlow().toSet()
+    protected fun randomRelation() : Relation = Relation.values().random()
+
+    protected fun randomCharacterRole() : CharacterRole = CharacterRole.values().random()
+
+    protected suspend fun createNovel() : Novel{
+        val creatorID = createPlainUser().id!!
+        val contentID = contentRepository.save(Content(creatorID,NewContentType.NOVEL,"{}",UUID.randomUUID().toString())).id!!
+        return novelRepository.save(Novel(UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),LocalDate.now(),NovelStatus.FINISHED,NovelType.NOVEL,Demographic.SEINEN,id = contentID).apply { isNewEntity = true })
+    }
+
+    protected suspend fun createAnime() : Anime{
+        val creatorID = createPlainUser().id!!
+        val contentID = contentRepository.save(Content(creatorID,NewContentType.ANIME,"{}",UUID.randomUUID().toString())).id!!
+        return animeRepository.save(Anime(UUID.randomUUID().toString(),AnimeStatus.AIRING,SeriesRating.PG_12,createStudio().id,Demographic.SEINEN,createStudio().id,UUID.randomUUID().toString(),UUID.randomUUID().toString(),id = contentID).apply { isNewEntity = true })
+    }
+
+    protected suspend fun createStudio() : Studio{
+        val creatorID = createPlainUser().id!!
+        val contentID = contentRepository.save(Content(creatorID,NewContentType.STUDIO,"{}",UUID.randomUUID().toString())).id!!
+        return studioRepository.save(Studio(UUID.randomUUID().toString(),UUID.randomUUID().toString(), LocalDate.now(),contentID).apply { isNewEntity = true })
+    }
+
+    protected suspend fun createCharacter() : Character{
+        val creatorID = createPlainUser().id!!
+        val contentID = contentRepository.save(Content(creatorID,NewContentType.CHARACTER,"{}",UUID.randomUUID().toString())).id!!
+        return characterRepository.save(Character(UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),contentID).apply { isNewEntity = true })
     }
 
     protected fun runTransactionalTest(block: suspend () -> Unit) = runTest{
@@ -95,13 +171,13 @@ abstract class AbstractServiceITest : AbstractTest(){
     }
 
     protected suspend fun createAdminUser(): User {
-        val user = userRepository.save(User("admin_fn","admin_ln","admin_usn","admin@admin.com","Admin123!"))
+        val user = userRepository.save(User("admin_fn","admin_ln", UUID.randomUUID().toString(),UUID.randomUUID().toString(),"Admin123!"))
         userRoleRepository.save(UserRole(user.id!!,Role.ANIME_ADMINISTRATOR))
         return user
     }
 
     protected suspend fun createPlainUser() : User{
-        val user = userRepository.save(User("user_fn","user_ln","user_usn","user@user.com","User123!"))
+        val user = userRepository.save(User("user_fn","user_ln",UUID.randomUUID().toString(),UUID.randomUUID().toString(),"User123!"))
         userRoleRepository.save(UserRole(user.id!!,Role.USER))
         return user
     }

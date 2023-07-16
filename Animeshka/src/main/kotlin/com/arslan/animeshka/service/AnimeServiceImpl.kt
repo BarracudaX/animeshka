@@ -59,8 +59,8 @@ class AnimeServiceImpl(
         contentChangeService.insertAnimeChanges(currentAnimeState, anime)
     }
 
-    override suspend fun findAnimeByTitle(searchTitle: String, pageable: Pageable): PagedBasicAnimeDTO {
-        val result = animeDocumentRepository.findAnime(searchTitle, pageable)
+    override suspend fun search(searchKey: String, pageable: Pageable): PagedBasicAnimeDTO {
+        val result = animeDocumentRepository.findAnime(searchKey, pageable)
         return with(result) { PagedBasicAnimeDTO(searchHits.searchHits.map { it.content.toBasicAnimeDTO() }, hasNext(), hasPrevious()) }
     }
 

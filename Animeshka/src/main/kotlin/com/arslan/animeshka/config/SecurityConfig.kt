@@ -101,7 +101,8 @@ class SecurityConfig(@Value("\${jwt.token.duration}") private val tokenDuration:
                     csrf.requireCsrfProtectionMatcher(protectedWithCsrf)
                     csrf.csrfTokenRequestHandler(XorServerCsrfTokenRequestAttributeHandler().apply { setTokenFromMultipartDataEnabled(true) })
                 }
-                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance()).build()
+                .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
+                .build()
 
     }
 

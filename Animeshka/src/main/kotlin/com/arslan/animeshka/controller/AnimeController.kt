@@ -55,7 +55,7 @@ class AnimeController(
 
     @GetMapping("/search")
     suspend fun search(@RequestParam("searchKey") title: String, pageable: Pageable) : ResponseEntity<PagedBasicAnimeDTO> {
-        val resultWithoutImages = animeService.findAnimeByTitle(title,pageable)
+        val resultWithoutImages = animeService.search(title,pageable)
         val resultWithImages = with(resultWithoutImages){
             val enrichedContent = content.map { anime -> anime.enrichWith(imageService.findContentImages(anime.id)) }
             PagedBasicAnimeDTO(enrichedContent,hasNext,hasPrevious)
