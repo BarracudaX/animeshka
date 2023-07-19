@@ -90,6 +90,9 @@ abstract class AbstractServiceITest : AbstractTest(){
     @Autowired
     protected lateinit var novelDocumentRepository: NovelDocumentRepository
 
+    @Autowired
+    protected lateinit var magazineRepository: MagazineRepository
+
     @BeforeEach
     fun prepare(){
         elasticsearchTemplate.refreshPolicy = RefreshPolicy.IMMEDIATE

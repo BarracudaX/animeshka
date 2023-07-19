@@ -3,6 +3,7 @@ package com.arslan.animeshka.entity
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import org.springframework.data.annotation.Id
+import org.springframework.data.domain.Persistable
 import org.springframework.data.relational.core.mapping.Table
 
 @Table("NOVEL_MAGAZINES")
@@ -10,7 +11,16 @@ import org.springframework.data.relational.core.mapping.Table
 data class Magazine(
     val magazineName: String,
 
-    @Transient
     @Id
-    val id: Long? = null
-)
+    val id: Long
+) : Persistable<Long> {
+
+    @org.springframework.data.annotation.Transient
+    @Transient
+    var isNewEntity = false
+
+    override fun getId(): Long = id
+
+    override fun isNew(): Boolean = isNewEntity
+
+}
