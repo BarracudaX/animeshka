@@ -1,7 +1,7 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.BasicStudioDTO
-import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.ContentType
 import com.arslan.animeshka.StudioContent
 import com.arslan.animeshka.elastic.StudioDocument
 import com.arslan.animeshka.entity.Content
@@ -20,7 +20,6 @@ import kotlinx.datetime.toKotlinLocalDate
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
-import org.springframework.data.elasticsearch.core.RefreshPolicy
 import java.time.LocalDate
 
 class StudioServiceITest @Autowired constructor(private val studioService: StudioService) : AbstractServiceITest() {
@@ -30,7 +29,7 @@ class StudioServiceITest @Autowired constructor(private val studioService: Studi
 
     @Test
     fun `should insert new studio into database`() = runTransactionalTest{
-        val studioContent = studioContent.copy(id = contentRepository.save(Content(createPlainUser().id!!, NewContentType.STUDIO,"{}","")).id!!)
+        val studioContent = studioContent.copy(id = contentRepository.save(Content(createPlainUser().id!!, ContentType.STUDIO,"{}","")).id!!)
         studioRepository.findAll().toList().shouldBeEmpty()
 
         studioService.insertStudio(studioContent)
@@ -47,10 +46,10 @@ class StudioServiceITest @Autowired constructor(private val studioService: Studi
     @Test
     fun `should find studios by search key and return the result as a page`() = runTransactionalTest {
         val userID = createPlainUser().id!!
-        val studio = with(studioContent.copy(id = contentRepository.save(Content(userID, NewContentType.STUDIO,"{}","1")).id!!)){
+        val studio = with(studioContent.copy(id = contentRepository.save(Content(userID, ContentType.STUDIO,"{}","1")).id!!)){
             studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),id!!).apply { isNewEntity = true })
         }
-        val studio2 = with(studioContent2.copy(id = contentRepository.save(Content(userID, NewContentType.STUDIO,"{}","")).id!!)){
+        val studio2 = with(studioContent2.copy(id = contentRepository.save(Content(userID, ContentType.STUDIO,"{}","")).id!!)){
             studioRepository.save(Studio(studioName,japaneseName,established.toJavaLocalDate(),id!!).apply { isNewEntity = true })
         }
         studioDocumentRepository.save(StudioDocument(studio.studioName,studio.japaneseName,studio.id)).awaitSingle()

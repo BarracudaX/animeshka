@@ -12,9 +12,7 @@ import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.MessageSource
@@ -133,25 +131,30 @@ abstract class AbstractServiceITest : AbstractTest(){
 
     protected suspend fun createNovel() : Novel{
         val creatorID = createPlainUser().id!!
-        val contentID = contentRepository.save(Content(creatorID,NewContentType.NOVEL,"{}",UUID.randomUUID().toString())).id!!
+        val contentID = contentRepository.save(Content(creatorID,ContentType.NOVEL,"{}",UUID.randomUUID().toString(),ContentStatus.VERIFIED)).id!!
         return novelRepository.save(Novel(UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),LocalDate.now(),NovelStatus.FINISHED,NovelType.NOVEL,Demographic.SEINEN,id = contentID).apply { isNewEntity = true })
     }
 
     protected suspend fun createAnime() : Anime{
         val creatorID = createPlainUser().id!!
-        val contentID = contentRepository.save(Content(creatorID,NewContentType.ANIME,"{}",UUID.randomUUID().toString())).id!!
+        val contentID = contentRepository.save(Content(creatorID,ContentType.ANIME,"{}",UUID.randomUUID().toString(),ContentStatus.VERIFIED)).id!!
         return animeRepository.save(Anime(UUID.randomUUID().toString(),AnimeStatus.AIRING,SeriesRating.PG_12,createStudio().id,Demographic.SEINEN,createStudio().id,UUID.randomUUID().toString(),UUID.randomUUID().toString(),id = contentID).apply { isNewEntity = true })
     }
 
+    protected suspend fun createPerson() : Person{
+        val creatorID = createPlainUser().id!!
+        val contentID = contentRepository.save(Content(creatorID,ContentType.PERSON,"{}",UUID.randomUUID().toString(),ContentStatus.VERIFIED)).id!!
+        return peopleRepository.save(Person(UUID.randomUUID().toString(),UUID.randomUUID().toString(),id = contentID).apply { isNewEntity = true })
+    }
     protected suspend fun createStudio() : Studio{
         val creatorID = createPlainUser().id!!
-        val contentID = contentRepository.save(Content(creatorID,NewContentType.STUDIO,"{}",UUID.randomUUID().toString())).id!!
+        val contentID = contentRepository.save(Content(creatorID,ContentType.STUDIO,"{}",UUID.randomUUID().toString(),ContentStatus.VERIFIED)).id!!
         return studioRepository.save(Studio(UUID.randomUUID().toString(),UUID.randomUUID().toString(), LocalDate.now(),contentID).apply { isNewEntity = true })
     }
 
     protected suspend fun createCharacter() : Character{
         val creatorID = createPlainUser().id!!
-        val contentID = contentRepository.save(Content(creatorID,NewContentType.CHARACTER,"{}",UUID.randomUUID().toString())).id!!
+        val contentID = contentRepository.save(Content(creatorID,ContentType.CHARACTER,"{}",UUID.randomUUID().toString(),ContentStatus.VERIFIED)).id!!
         return characterRepository.save(Character(UUID.randomUUID().toString(),UUID.randomUUID().toString(),UUID.randomUUID().toString(),contentID).apply { isNewEntity = true })
     }
 

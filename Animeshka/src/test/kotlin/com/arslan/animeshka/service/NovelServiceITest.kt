@@ -27,7 +27,7 @@ class NovelServiceITest @Autowired constructor(private val novelService: NovelSe
     @Test
     fun `should insert new novel`() = runTransactionalTest{
         val creatorID = createPlainUser().id!!
-        val contentID = contentRepository.save(Content(creatorID,NewContentType.NOVEL,"{}", UUID.randomUUID().toString())).id!!
+        val contentID = contentRepository.save(Content(creatorID,ContentType.NOVEL,"{}", UUID.randomUUID().toString())).id!!
         val characters = listOf(createCharacter(),createCharacter())
         val animeRelations = listOf(createAnime(),createAnime())
         val novelRelations = listOf(createNovel(),createNovel())
@@ -81,13 +81,13 @@ class NovelServiceITest @Autowired constructor(private val novelService: NovelSe
     @Test
     fun `should search for novels and return the result as a page`() = runTransactionalTest{
         val creatorID = createPlainUser().id!!
-        val novel = with(novelContent.copy(id = contentRepository.save(Content(creatorID,NewContentType.NOVEL,"{}",UUID.randomUUID().toString())).id!!)){
+        val novel = with(novelContent.copy(id = contentRepository.save(Content(creatorID,ContentType.NOVEL,"{}",UUID.randomUUID().toString())).id!!)){
             novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,explicitGenre,magazine,background = background, chapters = chapters, volumes = volumes, finished = finished?.toJavaLocalDate(), id = id!!).apply { isNewEntity = true })
         }
-        val novel2 = with(novelContent2.copy(id = contentRepository.save(Content(creatorID,NewContentType.NOVEL,"{}",UUID.randomUUID().toString())).id!!)){
+        val novel2 = with(novelContent2.copy(id = contentRepository.save(Content(creatorID,ContentType.NOVEL,"{}",UUID.randomUUID().toString())).id!!)){
             novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,explicitGenre,magazine,background = background, chapters = chapters, volumes = volumes, finished = finished?.toJavaLocalDate(), id = id!!).apply { isNewEntity = true })
         }
-        val novel3 = with(novelContent3.copy(id = contentRepository.save(Content(creatorID,NewContentType.NOVEL,"{}",UUID.randomUUID().toString())).id!!)){
+        val novel3 = with(novelContent3.copy(id = contentRepository.save(Content(creatorID,ContentType.NOVEL,"{}",UUID.randomUUID().toString())).id!!)){
             novelRepository.save(Novel(title,japaneseTitle,synopsis,published.toJavaLocalDate(),novelStatus,novelType,demographic,explicitGenre,magazine,background = background, chapters = chapters, volumes = volumes, finished = finished?.toJavaLocalDate(), id = id!!).apply { isNewEntity = true })
         }
         novelDocumentRepository.save(NovelDocument(novel.title,novel.japaneseTitle,novel.synopsis,novel.id)).awaitSingle()

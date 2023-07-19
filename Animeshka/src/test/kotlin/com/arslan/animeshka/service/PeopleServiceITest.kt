@@ -1,7 +1,7 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.BasicPersonDTO
-import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.ContentType
 import com.arslan.animeshka.PersonContent
 import com.arslan.animeshka.elastic.PersonDocument
 import com.arslan.animeshka.entity.Content
@@ -30,16 +30,16 @@ class PeopleServiceITest @Autowired constructor(private val peopleService: Peopl
     @Test
     fun `should allow searching people and return result as a page`() = runTransactionalTest{
         val userID = createPlainUser().id!!
-        val person = with(personContent.copy(id = contentRepository.save(Content(userID,NewContentType.PERSON,"{}","1")).id!!)){
+        val person = with(personContent.copy(id = contentRepository.save(Content(userID,ContentType.PERSON,"{}","1")).id!!)){
             peopleRepository.save(Person(firstName,lastName,familyName,givenName,description,birthDate?.toJavaLocalDate(),id!!).apply { isNewEntity = true })
         }
-        val person2 = with(personContent2.copy(id = contentRepository.save(Content(userID,NewContentType.PERSON,"{}","2")).id!!)){
+        val person2 = with(personContent2.copy(id = contentRepository.save(Content(userID,ContentType.PERSON,"{}","2")).id!!)){
             peopleRepository.save(Person(firstName,lastName,familyName,givenName,description,birthDate?.toJavaLocalDate(),id!!).apply { isNewEntity = true })
         }
-        val person3 = with(personContent3.copy(id = contentRepository.save(Content(userID,NewContentType.PERSON,"{}","3")).id!!)){
+        val person3 = with(personContent3.copy(id = contentRepository.save(Content(userID,ContentType.PERSON,"{}","3")).id!!)){
             peopleRepository.save(Person(firstName,lastName,familyName,givenName,description,birthDate?.toJavaLocalDate(),id!!).apply { isNewEntity = true })
         }
-        val person4 = with(personContent4.copy(id = contentRepository.save(Content(userID,NewContentType.PERSON,"{}","4")).id!!)){
+        val person4 = with(personContent4.copy(id = contentRepository.save(Content(userID,ContentType.PERSON,"{}","4")).id!!)){
             peopleRepository.save(Person(firstName,lastName,familyName,givenName,description,birthDate?.toJavaLocalDate(),id!!).apply { isNewEntity = true })
         }
         with(person){ peopleDocumentRepository.save(PersonDocument(firstName,lastName,familyName,givenName,description,id)).awaitFirst() }
@@ -75,7 +75,7 @@ class PeopleServiceITest @Autowired constructor(private val peopleService: Peopl
     @Test
     fun `should insert new person into database`() = runTransactionalTest{
         val userID = createPlainUser().id!!
-        val personContent = personContent.copy(id = contentRepository.save(Content(userID,NewContentType.PERSON,"{}","1")).id!!)
+        val personContent = personContent.copy(id = contentRepository.save(Content(userID,ContentType.PERSON,"{}","1")).id!!)
         peopleRepository.findAll().toList().shouldBeEmpty()
 
         peopleService.insertPerson(personContent)

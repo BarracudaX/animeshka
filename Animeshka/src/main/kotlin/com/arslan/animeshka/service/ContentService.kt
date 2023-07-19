@@ -4,7 +4,6 @@ import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.Content
 
 interface ContentService {
-
     suspend fun createAnimeEntry(animeContent: AnimeContent) : Content
     suspend fun verifyAnime(contentID: Long) : AnimeContent
     suspend fun createStudioEntry(studio: StudioContent) : Content

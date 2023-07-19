@@ -1,6 +1,6 @@
 package com.arslan.animeshka.service
 
-import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.ContentType
 import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.entity.Magazine
 import io.kotest.assertions.assertSoftly
@@ -14,7 +14,7 @@ class MagazineServiceITest @Autowired constructor(private val magazineService: M
     @Test
     fun `should create magazine entry`() = runTransactionalTest{
         val creatorID = createPlainUser().id!!
-        val magazine = Magazine("test",contentRepository.save(Content(creatorID,NewContentType.MAGAZINE,"{}","")).id!!)
+        val magazine = Magazine("test",contentRepository.save(Content(creatorID,ContentType.MAGAZINE,"{}","")).id!!)
         magazineRepository.findByMagazineName(magazine.magazineName).shouldBeNull()
 
         magazineService.insertMagazineEntry(magazine)

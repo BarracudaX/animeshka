@@ -52,6 +52,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.6.1")
     implementation("com.ninja-squad:springmockk:3.1.2")
     testImplementation("org.testcontainers:elasticsearch")
+    implementation("io.kotest:kotest-assertions-json-jvm:5.6.1")
 
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")

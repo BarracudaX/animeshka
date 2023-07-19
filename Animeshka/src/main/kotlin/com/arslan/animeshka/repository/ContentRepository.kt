@@ -1,5 +1,7 @@
 package com.arslan.animeshka.repository
 
+import com.arslan.animeshka.ContentStatus
+import com.arslan.animeshka.ContentType
 import com.arslan.animeshka.entity.Content
 import org.springframework.data.relational.core.sql.LockMode
 import org.springframework.data.relational.repository.Lock
@@ -21,4 +23,5 @@ interface ContentRepository : CoroutineCrudRepository<Content,Long>{
 
     suspend fun findByContentKey(contentKey: String) : Content?
 
+    suspend fun existsByContentTypeAndIdAndContentStatus(contentType: ContentType, id: Long, contentStatus: ContentStatus) : Boolean
 }

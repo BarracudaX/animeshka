@@ -2,7 +2,7 @@ package com.arslan.animeshka.service
 
 import com.arslan.animeshka.ContentAlreadyUnderModerationException
 import com.arslan.animeshka.ContentStatus
-import com.arslan.animeshka.NewContentType
+import com.arslan.animeshka.ContentType
 import com.arslan.animeshka.entity.Content
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrow
@@ -26,7 +26,7 @@ class ModerationServiceITest : AbstractServiceITest() {
     @Test
     fun `should throw ContentAlreadyUnderModerationException when trying to accept content for moderation that is already under moderation`() = runTransactionalTest{
         val creatorID = createPlainUser().id!!
-        val content = contentRepository.save(Content(creatorID,NewContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
+        val content = contentRepository.save(Content(creatorID,ContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
         val securityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(creatorID,""))
         mono{
             moderationService.acceptModeration(content.id!!)
@@ -39,7 +39,7 @@ class ModerationServiceITest : AbstractServiceITest() {
     @Test
     fun `should update the status and verifier information of the content on successful verification acceptance`() = runTransactionalTest{
         val userID = createPlainUser().id!!
-        val content = contentRepository.save(Content(userID,NewContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
+        val content = contentRepository.save(Content(userID,ContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
         val securityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(userID,""))
 
         mono{
@@ -60,7 +60,7 @@ class ModerationServiceITest : AbstractServiceITest() {
     @Test
     fun `should throw IllegalStateException when trying to reject content that is not under verification`() = runTransactionalTest {
         val userID = createPlainUser().id!!
-        val content = contentRepository.save(Content(userID,NewContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
+        val content = contentRepository.save(Content(userID,ContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
         val securityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(userID,""))
 
         mono{
@@ -73,7 +73,7 @@ class ModerationServiceITest : AbstractServiceITest() {
         val creatorID = createPlainUser().id!!
         val verifierID = createPlainUser().id!!
         val otherUserID = createPlainUser().id!!
-        val content = contentRepository.save(Content(creatorID,NewContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
+        val content = contentRepository.save(Content(creatorID,ContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
         val verifierSecurityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(verifierID,""))
         val otherUserSecurityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(otherUserID,""))
         mono{ moderationService.acceptModeration(content.id!!) }.contextWrite(verifierSecurityContext).awaitSingleOrNull()
@@ -87,7 +87,7 @@ class ModerationServiceITest : AbstractServiceITest() {
     fun `should update the content accordingly after successful rejection`() = runTransactionalTest {
         val creatorID = createPlainUser().id!!
         val verifierID = createPlainUser().id!!
-        val content = contentRepository.save(Content(creatorID,NewContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
+        val content = contentRepository.save(Content(creatorID,ContentType.CHARACTER,"{}", UUID.randomUUID().toString()))
         val verifierSecurityContext = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(verifierID,""))
         mono{ moderationService.acceptModeration(content.id!!) }.contextWrite(verifierSecurityContext).awaitSingleOrNull()
 

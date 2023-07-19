@@ -21,9 +21,40 @@ class ContentServiceImpl(
 ) : ContentService {
 
     override suspend fun createAnimeEntry(animeContent: AnimeContent) : Content{
+        if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.STUDIO,animeContent.studio,ContentStatus.VERIFIED)){
+            throw EmptyResultDataAccessException("Studio with id ${animeContent.studio} was not found.",1)
+        }
+
+        if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.STUDIO,animeContent.licensor,ContentStatus.VERIFIED)){
+            throw EmptyResultDataAccessException("Licensor with id ${animeContent.studio} was not found.",1)
+        }
+
+        for((novelID,_) in animeContent.novelRelations){
+            if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.NOVEL,novelID,ContentStatus.VERIFIED)){
+                throw EmptyResultDataAccessException("Novel with id $novelID was not found.",1)
+            }
+        }
+
+        for((animeID,_) in animeContent.animeRelations){
+            if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.ANIME,animeID,ContentStatus.VERIFIED)){
+               throw EmptyResultDataAccessException("Anime with id $animeID was not found.",1)
+            }
+        }
+
+        for((characterID,personID,_) in animeContent.characters){
+            if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.CHARACTER,characterID,ContentStatus.VERIFIED)){
+                throw EmptyResultDataAccessException("Character with id $characterID was not found.",1)
+            }
+
+            if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.PERSON,personID,ContentStatus.VERIFIED)){
+                throw EmptyResultDataAccessException("Voice Actor with id $personID was not found.",1)
+            }
+        }
+
         val content = json.encodeToString(animeContent)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return contentRepository.save(Content(creatorID, NewContentType.ANIME,content, "$ANIME_PREFIX_KEY${animeContent.title}"))
+
+        return contentRepository.save(Content(creatorID, ContentType.ANIME,content, "$ANIME_PREFIX_KEY${animeContent.title}"))
     }
 
     override suspend fun verifyAnime(contentID: Long) : AnimeContent {
@@ -35,7 +66,7 @@ class ContentServiceImpl(
     override suspend fun createStudioEntry(studio: StudioContent): Content {
         val content = json.encodeToString(studio)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return contentRepository.save(Content(creatorID, NewContentType.STUDIO,content,"$STUDIO_PREFIX_KEY${studio.studioName}"))
+        return contentRepository.save(Content(creatorID, ContentType.STUDIO,content,"$STUDIO_PREFIX_KEY${studio.studioName}"))
     }
 
     override suspend fun verifyStudio(contentID: Long): StudioContent {
@@ -48,7 +79,7 @@ class ContentServiceImpl(
         val content = json.encodeToString(novel)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
 
-        return contentRepository.save(Content(creatorID, NewContentType.NOVEL,content, "${NOVEL_PREFIX_KEY}_${novel.title}"))
+        return contentRepository.save(Content(creatorID, ContentType.NOVEL,content, "${NOVEL_PREFIX_KEY}_${novel.title}"))
     }
 
     override suspend fun verifyNovel(novelID: Long): NovelContent {
@@ -60,7 +91,7 @@ class ContentServiceImpl(
     override suspend fun createCharacterEntry(character: CharacterContent): Content {
         val content = json.encodeToString(character)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return contentRepository.save(Content(creatorID, NewContentType.CHARACTER,content, "${CHARACTER_PREFIX_KEY}_${character.characterName}"))
+        return contentRepository.save(Content(creatorID, ContentType.CHARACTER,content, "${CHARACTER_PREFIX_KEY}_${character.characterName}"))
     }
 
     override suspend fun verifyCharacter(contentID: Long): CharacterContent {
@@ -72,7 +103,7 @@ class ContentServiceImpl(
     override suspend fun createPersonEntry(personContent: PersonContent): Content {
         val content = json.encodeToString(personContent)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return contentRepository.save(Content(creatorID, NewContentType.PERSON,content, "${PERSON_PREFIX_KEY}_${personContent.firstName}_${personContent.lastName}_${personContent.givenName}_${personContent.familyName}"))
+        return contentRepository.save(Content(creatorID, ContentType.PERSON,content, "${PERSON_PREFIX_KEY}_${personContent.firstName}_${personContent.lastName}_${personContent.givenName}_${personContent.familyName}"))
     }
 
     override suspend fun verifyPerson(id: Long): PersonContent {

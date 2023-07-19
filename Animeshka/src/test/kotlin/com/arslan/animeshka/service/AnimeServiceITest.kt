@@ -2,7 +2,6 @@ package com.arslan.animeshka.service
 
 import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.Content
-import com.arslan.animeshka.entity.Studio
 import com.arslan.animeshka.entity.User
 import com.arslan.animeshka.repository.*
 import io.kotest.assertions.assertSoftly
@@ -25,7 +24,7 @@ class  AnimeServiceITest @Autowired constructor (
 
     private fun Content.assertAnimeContentPendingVerification(expectedCreator: User, animeContent: AnimeContent){
         assertSoftly(this){
-            contentType shouldBe NewContentType.ANIME
+            contentType shouldBe ContentType.ANIME
             contentStatus shouldBe ContentStatus.PENDING_VERIFICATION
             verifier.shouldBeNull()
             rejectionReason.shouldBeNull()
