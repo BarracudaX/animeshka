@@ -96,6 +96,7 @@ abstract class AbstractServiceITest : AbstractTest(){
         elasticsearchTemplate.refreshPolicy = RefreshPolicy.IMMEDIATE
     }
 
+
     protected suspend fun Novel.novelRelations() : Set<WorkRelation> = databaseClient
             .sql("SELECT * FROM NOVEL_NOVEL_RELATIONS WHERE novel_id = :id")
             .bind("id",id)
@@ -199,6 +200,10 @@ abstract class AbstractServiceITest : AbstractTest(){
         private val r2dbcContainer = MySQLR2DBCDatabaseContainer(mysqlContainer)
         private val elasticImage = DockerImageName.parse("elasticsearch:8.7.0").asCompatibleSubstituteFor("docker.elastic.co/elasticsearch/elasticsearch")
         private val elasticSearchContainer = ElasticsearchContainer(elasticImage)
+
+
+        @JvmStatic
+        fun allContentStatusesExceptionUnderVerification() : List<ContentStatus> = ContentStatus.values().filter { it != ContentStatus.UNDER_VERIFICATION }
 
         @JvmStatic
         @DynamicPropertySource

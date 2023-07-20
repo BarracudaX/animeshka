@@ -1,6 +1,7 @@
 package com.arslan.animeshka.service
 
 import com.arslan.animeshka.*
+import com.arslan.animeshka.entity.Content
 import com.arslan.animeshka.repository.ANIME_PREFIX_KEY
 import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.json.shouldEqualJson
@@ -14,14 +15,17 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.serialization.encodeToString
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.dao.EmptyResultDataAccessException
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import java.time.DayOfWeek
 
-class ContentServiceITest  @Autowired constructor(private val contentService: ContentService): AbstractServiceITest() {
+class AnimeContentServiceITest  @Autowired constructor(private val contentService: ContentService): AbstractServiceITest() {
 
     private val animeData = AnimeContent(
             "test","jp",AnimeStatus.AIRING,SeriesRating.PG_12,-1,Demographic.SEINEN,-1,"synopsis", AnimeType.ONA,"background","additional",
@@ -150,5 +154,44 @@ class ContentServiceITest  @Autowired constructor(private val contentService: Co
         }
     }
 
+    @Test
+    fun `should throw EmptyResultDataAccessException when trying to verify anime content that does not exist`() = runTransactionalTest{
+        shouldThrow<EmptyResultDataAccessException> {
+            mono { contentService.verifyAnime(-1) }.contextWrite(ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(createPlainUser().id,""))).awaitSingle()
+        }
+    }
 
+    @MethodSource("allContentStatusesExceptionUnderVerification")
+    @ParameterizedTest
+    fun `should throw IllegalStateException when trying to verify anime that is not under verification`(notUnderVerificationStatus: ContentStatus) = runTransactionalTest{
+        val creatorID = createPlainUser().id!!
+        val content = contentRepository.save(Content(creatorID,ContentType.ANIME,"{}","",notUnderVerificationStatus))
+
+        shouldThrow<IllegalStateException> {
+            mono { contentService.verifyAnime(content.id!!) }.contextWrite(ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(creatorID,""))).awaitSingle()
+        }
+    }
+
+    @Test
+    fun `should throw AccessDeniedException when trying to verify anime and caller is not the same user as the person who is in charge of anime verification`() = runTransactionalTest{
+        val creatorID = createPlainUser().id!!
+        val verifierID = createPlainUser().id!!
+        val callerID = createPlainUser().id!!
+        val content = contentRepository.save(Content(creatorID,ContentType.ANIME,"{}","",ContentStatus.UNDER_VERIFICATION, verifier = verifierID))
+
+        shouldThrow<AccessDeniedException> {
+            mono { contentService.verifyAnime(content.id!!) }.contextWrite(ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(callerID,""))).awaitSingle()
+        }
+    }
+
+    @Test
+    fun `should verify anime successfully`() = runTransactionalTest{
+        val creatorID = createPlainUser().id!!
+        val verifierID = createPlainUser().id!!
+        val content = contentRepository.save(Content(creatorID,ContentType.ANIME,json.encodeToString(animeData),"",ContentStatus.UNDER_VERIFICATION, verifier = verifierID))
+
+        mono { contentService.verifyAnime(content.id!!) }.contextWrite(ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(verifierID,""))).awaitSingle()
+
+        contentRepository.findById(content.id!!)!!.contentStatus shouldBe ContentStatus.VERIFIED
+    }
 }
