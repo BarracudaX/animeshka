@@ -125,7 +125,6 @@ class ContentServiceImpl(
         val verifier = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
 
         val content = contentRepository.findById(contentID) ?: throw EmptyResultDataAccessException("Content with id $contentID not found.",1)
-        if(content.contentStatus != ContentStatus.UNDER_VERIFICATION) throw IllegalStateException("Unverified content is currently not under verification. Current status: ${content.contentStatus}")
 
         if(content.verifier != verifier) throw AccessDeniedException("User with id ${content.verifier} is trying to verify content with id $contentID that is under verification by different user with id ${content.verifier}.")
 

@@ -203,9 +203,6 @@ abstract class AbstractServiceITest : AbstractTest(){
 
 
         @JvmStatic
-        fun allContentStatusesExceptionUnderVerification() : List<ContentStatus> = ContentStatus.values().filter { it != ContentStatus.UNDER_VERIFICATION }
-
-        @JvmStatic
         @DynamicPropertySource
         fun registerPropertySource(registry: DynamicPropertyRegistry){
             r2dbcContainer.start()

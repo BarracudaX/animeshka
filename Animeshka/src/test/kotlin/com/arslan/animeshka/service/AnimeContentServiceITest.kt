@@ -161,14 +161,14 @@ class AnimeContentServiceITest  @Autowired constructor(private val contentServic
         }
     }
 
-    @MethodSource("allContentStatusesExceptionUnderVerification")
-    @ParameterizedTest
-    fun `should throw IllegalStateException when trying to verify anime that is not under verification`(notUnderVerificationStatus: ContentStatus) = runTransactionalTest{
+    @Test
+    fun `should throw AccessDeniedException when trying to verify anime that is not under verification`() = runTransactionalTest{
         val creatorID = createPlainUser().id!!
-        val content = contentRepository.save(Content(creatorID,ContentType.ANIME,"{}","",notUnderVerificationStatus))
+        val callerID = createPlainUser().id!!
+        val content = contentRepository.save(Content(creatorID,ContentType.ANIME,"{}","",ContentStatus.UNDER_VERIFICATION))
 
-        shouldThrow<IllegalStateException> {
-            mono { contentService.verifyAnime(content.id!!) }.contextWrite(ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(creatorID,""))).awaitSingle()
+        shouldThrow<AccessDeniedException> {
+            mono { contentService.verifyAnime(content.id!!) }.contextWrite(ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(callerID,""))).awaitSingle()
         }
     }
 
