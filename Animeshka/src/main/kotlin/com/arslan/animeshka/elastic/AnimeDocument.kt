@@ -10,7 +10,8 @@ data class AnimeDocument(
         @Field(type = FieldType.Text)
         val title: String,
 
-        @Field(type = FieldType.Text)
+
+        @Field(type = FieldType.Text, name = "japanese_title")
         val japaneseTitle: String,
 
         @Field(type = FieldType.Text)

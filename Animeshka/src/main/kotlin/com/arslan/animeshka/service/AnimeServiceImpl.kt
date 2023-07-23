@@ -31,7 +31,8 @@ class AnimeServiceImpl(
     override suspend fun insertAnime(animeContent: AnimeContent): Anime {
         val season = getAnimeSeason(animeContent)
         val anime = with(animeContent) {
-            val anime = Anime(title, status, rating, studio, demographic, licensor, japaneseTitle, synopsis, animeType, season?.id, explicitGenre, airingTime?.toJavaLocalTime(), airingDay, duration, 0, airedAt?.toJavaLocalDate(), finishedAt?.toJavaLocalDate(), background, additionalInfo, id = id!!).apply { isNewEntity = true }
+            val anime = Anime(title, status, rating, studio, demographic, licensor, japaneseTitle, synopsis, animeType, season?.id, explicitGenre, airingTime?.toJavaLocalTime(), airingDay, duration,
+                airedAt?.toJavaLocalDate(), finishedAt?.toJavaLocalDate(), background, additionalInfo, id = id!!).apply { isNewEntity = true }
             animeRepository.save(anime)
         }
 

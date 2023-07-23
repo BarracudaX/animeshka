@@ -3,10 +3,7 @@ package com.arslan.animeshka.service
 import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
-import com.arslan.animeshka.repository.elastic.CharacterDocumentRepository
-import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
-import com.arslan.animeshka.repository.elastic.PeopleDocumentRepository
-import com.arslan.animeshka.repository.elastic.StudioDocumentRepository
+import com.arslan.animeshka.repository.elastic.*
 import kotlinx.coroutines.flow.toSet
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingleOrNull
@@ -96,6 +93,9 @@ abstract class AbstractServiceITest : AbstractTest(){
     @Autowired
     protected lateinit var characterDocumentRepository: CharacterDocumentRepository
 
+    @Autowired
+    protected lateinit var animeDocumentRepository: AnimeDocumentRepository
+
     @BeforeEach
     fun prepare(){
         elasticsearchTemplate.refreshPolicy = RefreshPolicy.IMMEDIATE
@@ -103,6 +103,45 @@ abstract class AbstractServiceITest : AbstractTest(){
 
     protected suspend fun createPlainUserSecContext(): Context = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(createPlainUser().id!!,""))
 
+    protected suspend fun Anime.characters() : Set<AnimeCharacter> =
+        databaseClient
+            .sql("SELECT * FROM ANIME_CHARACTERS WHERE anime_id = :id")
+            .bind("id",id)
+            .map { row,_ -> AnimeCharacter(row.get("character_id",Long::class.java)!!,row.get("voice_actor_id",Long::class.java)!!,CharacterRole.valueOf(row.get("character_role",String::class.java)!!))}
+            .all().asFlow().toSet()
+
+    /**
+     * Be careful since this method does not consider this anime as a possibly related anime(column related_anime_id containing the id of this anime).
+     */
+    protected suspend fun Anime.animeRelations() : Set<WorkRelation> =
+        databaseClient
+            .sql("SELECT * FROM ANIME_ANIME_RELATIONS WHERE anime_id = :id")
+            .bind("id",id)
+            .map { row,_ -> WorkRelation(row.get("related_anime_id",Long::class.java)!!,Relation.valueOf(row.get("relation",String::class.java)!!)) }
+            .all().asFlow().toSet()
+    protected suspend fun Anime.novelRelations() : Set<WorkRelation> =
+        databaseClient
+            .sql("SELECT * FROM NOVEL_ANIME_RELATIONS WHERE anime_id = :id")
+            .bind("id",id)
+            .map { row,_ -> WorkRelation(row.get("novel_id",Long::class.java)!!,Relation.valueOf(row.get("relation",String::class.java)!!)) }
+            .all().asFlow().toSet()
+
+    protected suspend fun Anime.themes() : Set<Theme> =
+        databaseClient.sql("SELECT * FROM ANIME_THEMES WHERE anime_id = :id")
+            .bind("id",id)
+            .map { row,_ -> Theme.valueOf(row.get("theme",String::class.java)!!) }
+            .all().asFlow().toSet()
+
+    protected suspend fun Anime.genres() : Set<Genre> =
+        databaseClient
+            .sql("SELECT * FROM ANIME_GENRES WHERE anime_id = :id")
+            .bind("id",id)
+            .map { row,_ -> Genre.valueOf(row.get("genre",String::class.java)!!) }
+            .all().asFlow().toSet()
+
+    /**
+     * Be careful, since this method does not consider this novel as the related novel.
+     */
     protected suspend fun Novel.novelRelations() : Set<WorkRelation> = databaseClient
             .sql("SELECT * FROM NOVEL_NOVEL_RELATIONS WHERE novel_id = :id")
             .bind("id",id)

@@ -43,9 +43,6 @@ data class Anime(
 
     val duration: Int? = null,
 
-    @Column("episodes_count")
-    val episodesCount: Int? = null,
-
     @Column("published")
     val publishedAt: LocalDate? = null,
 

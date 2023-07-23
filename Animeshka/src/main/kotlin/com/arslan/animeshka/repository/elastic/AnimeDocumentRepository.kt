@@ -21,7 +21,7 @@ interface CustomizedAnimeDocumentRepository{
 @Component
 class CustomizedAnimeDocumentRepositoryImpl(private val reactiveElasticsearchTemplate: ReactiveElasticsearchTemplate) : CustomizedAnimeDocumentRepository{
     override suspend fun findAnime(searchInput: String, pageable: Pageable): SearchPage<AnimeDocument> {
-        val criteria = Criteria.where("title").matches(searchInput).or("japaneseField").matches(searchInput)
+        val criteria = Criteria.where("title").matches(searchInput).or("japanese_title").matches(searchInput)
 
         val query = CriteriaQuery(criteria,pageable)
 
