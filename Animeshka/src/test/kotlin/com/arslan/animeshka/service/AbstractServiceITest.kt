@@ -30,6 +30,7 @@ import org.testcontainers.containers.MySQLR2DBCDatabaseContainer
 import org.testcontainers.elasticsearch.ElasticsearchContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
+import reactor.util.context.Context
 import java.time.LocalDate
 import java.util.*
 
@@ -96,6 +97,7 @@ abstract class AbstractServiceITest : AbstractTest(){
         elasticsearchTemplate.refreshPolicy = RefreshPolicy.IMMEDIATE
     }
 
+    protected suspend fun createPlainUserSecContext(): Context = ReactiveSecurityContextHolder.withAuthentication(UsernamePasswordAuthenticationToken(createPlainUser().id!!,""))
 
     protected suspend fun Novel.novelRelations() : Set<WorkRelation> = databaseClient
             .sql("SELECT * FROM NOVEL_NOVEL_RELATIONS WHERE novel_id = :id")

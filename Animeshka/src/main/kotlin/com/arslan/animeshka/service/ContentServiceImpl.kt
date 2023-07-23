@@ -76,10 +76,28 @@ class ContentServiceImpl(
     }
 
     override suspend fun createNovelEntry(novel: NovelContent): Content {
+        for((animeID,_) in novel.animeRelations){
+            if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.ANIME,animeID,ContentStatus.VERIFIED)){
+                throw EmptyResultDataAccessException("Anime with id $animeID was not found.",1)
+            }
+        }
+
+        for((novelID,_) in novel.novelRelations){
+            if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.NOVEL,novelID,ContentStatus.VERIFIED)){
+                throw EmptyResultDataAccessException("Novel with id $novelID was not found.",1)
+            }
+        }
+
+        for((characterID,_) in novel.characters){
+            if(!contentRepository.existsByContentTypeAndIdAndContentStatus(ContentType.CHARACTER,characterID,ContentStatus.VERIFIED)){
+                throw EmptyResultDataAccessException("Character with id $characterID was not found.",1)
+            }
+        }
+
         val content = json.encodeToString(novel)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
 
-        return contentRepository.save(Content(creatorID, ContentType.NOVEL,content, "${NOVEL_PREFIX_KEY}_${novel.title}"))
+        return contentRepository.save(Content(creatorID, ContentType.NOVEL,content, "${NOVEL_PREFIX_KEY}${novel.title}"))
     }
 
     override suspend fun verifyNovel(novelID: Long): NovelContent {
