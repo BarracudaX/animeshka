@@ -109,7 +109,7 @@ class ContentServiceImpl(
     override suspend fun createCharacterEntry(character: CharacterContent): Content {
         val content = json.encodeToString(character)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return contentRepository.save(Content(creatorID, ContentType.CHARACTER,content, "${CHARACTER_PREFIX_KEY}_${character.characterName}"))
+        return contentRepository.save(Content(creatorID, ContentType.CHARACTER,content, "${CHARACTER_PREFIX_KEY}${character.characterName}"))
     }
 
     override suspend fun verifyCharacter(contentID: Long): CharacterContent {
