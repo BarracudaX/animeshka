@@ -17,14 +17,10 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AnimeEpisodeServiceImpl(
     private val animeEpisodeRepository: AnimeEpisodeRepository,
-    private val contentRepository: ContentRepository,
-    private val json: Json
 ) : AnimeEpisodeService {
 
     override suspend fun createAnimeEpisodeEntry(animeEpisodeEntry: AnimeEpisodeEntry) {
-        val content = json.encodeToString(animeEpisodeEntry)
-        val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        contentRepository.save(Content(creatorID, ContentType.EPISODE,content,"${ANIME_EPISODE_PREFIX}${animeEpisodeEntry.animeId}_${animeEpisodeEntry.episodeName}"))
+        TODO()
     }
 
 }

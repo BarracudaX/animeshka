@@ -3,6 +3,7 @@ package com.arslan.animeshka.service
 import com.arslan.animeshka.*
 import com.arslan.animeshka.entity.*
 import com.arslan.animeshka.repository.*
+import com.arslan.animeshka.repository.elastic.CharacterDocumentRepository
 import com.arslan.animeshka.repository.elastic.NovelDocumentRepository
 import com.arslan.animeshka.repository.elastic.PeopleDocumentRepository
 import com.arslan.animeshka.repository.elastic.StudioDocumentRepository
@@ -91,6 +92,9 @@ abstract class AbstractServiceITest : AbstractTest(){
 
     @Autowired
     protected lateinit var magazineRepository: MagazineRepository
+
+    @Autowired
+    protected lateinit var characterDocumentRepository: CharacterDocumentRepository
 
     @BeforeEach
     fun prepare(){
