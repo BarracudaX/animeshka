@@ -121,7 +121,7 @@ class ContentServiceImpl(
     override suspend fun createPersonEntry(personContent: PersonContent): Content {
         val content = json.encodeToString(personContent)
         val creatorID = ReactiveSecurityContextHolder.getContext().awaitFirst().authentication.name.toLong()
-        return contentRepository.save(Content(creatorID, ContentType.PERSON,content, "${PERSON_PREFIX_KEY}_${personContent.firstName}_${personContent.lastName}_${personContent.givenName}_${personContent.familyName}"))
+        return contentRepository.save(Content(creatorID, ContentType.PERSON,content, personContent.key))
     }
 
     override suspend fun verifyPerson(id: Long): PersonContent {
